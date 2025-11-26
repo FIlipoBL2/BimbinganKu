@@ -10,7 +10,7 @@ description = "Project Bimbingan TA1 TA2 Bagi mahasiswa UNPAR"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(24)
 	}
 }
 
@@ -34,6 +34,11 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation ("org.postgresql:postgresql")
+
+    testImplementation ("org.springframework.boot:spring-boot-starter-test")
 }
 
 tasks.withType<Test> {
