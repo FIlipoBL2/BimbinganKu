@@ -6,63 +6,88 @@
     <link rel="stylesheet" type="text/css" href="/BimbinganKu/src/main/resources/static/css/AdminStyle.css">
 </head>
 <body>
-    <div class="container">
-        <div class="buttons">
-            <button>Data Preview</button>
-            <button>Import & Schedules</button>
+    
+    <div class="card">
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active">Data Preview</button>
+            <button class="tab">Import & Schedules</button>
+            <div class="underline"></div>
         </div>
         
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th><input type="checkbox"></th>
-                        <th>KODE USER</th>
-                        <th>NAME</th>
-                        <th>DAY</th>
-                        <th>TIME</th>
-                    </tr>
-                </thead>
-                
-                <tbody>
-                    <tr>
-                        <td><input type="checkbox"></td>
-                        <td>61823010004</td>
-                        <td>Filipo</td>
-                        <td>Selasa</td>
-                        <td>12:00–15:30</td>
-                    </tr>
-                    
-                    <tr>
-                        <td><input type="checkbox"></td>
-                        <td>61823010002</td>
-                        <td>Womby</td>
-                        <td>Senin</td>
-                        <td>15:00–18:00</td>
-                    </tr>
-                    
-                    <tr>
-                        <td><input type="checkbox"></td>
-                        <td>61823010001</td>
-                        <td>Orang</td>
-                        <td>Senin</td>
-                        <td>13:00–15:00</td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Header Controls -->
+        <div class="controls-row">
+            <div class="title">Preview Table Data</div>
             
-            <div class="table-footer">
-                <p>Showing 1 to 3 of 10 entries</p>
-                
-                <div class="pagination">
-                    <button>Previous</button>
-                    <button class="active">1</button>
-                    <button>2</button>
-                    <button>3</button>
-                    <button>Next</button>
-                </div>
-            </div>
+            <select class="dropdown">
+                <option>Student Table</option>
+                <option>Lecturer Table</option>
+            </select>
             
+            <select class="dropdown">
+                <option>ID ></option>
+                <option>Name ></option>
+                <option>Day ></option>
+            </select>
+            
+            <input type="text" class="filter-box" placeholder="Filter stuff...">
+            
+            <button class="export-btn">EXPORT CURRENT</button>
         </div>
-    </body>
-    </html>
+        
+        <!-- Table -->
+        <table class="preview-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox"></th>
+                    <th>KODE USER</th>
+                    <th>NAME</th>
+                    <th>DAY</th>
+                    <th>TIME</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>61823010004</td>
+                    <td>Filipo</td>
+                    <td>Selasa</td>
+                    <td>12:00–15:30</td>
+                </tr>
+                
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>61823010002</td>
+                    <td>Womby</td>
+                    <td>Senin</td>
+                    <td>15:00–18:00</td>
+                </tr>
+                
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>61823010001</td>
+                    <td>Orang</td>
+                    <td>Senin</td>
+                    <td>13:00–15:00</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>Showing 1 to 3 of 10 entries</p>
+            
+            <div class="pagination">
+                <button>Previous</button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button>Next</button>
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>
