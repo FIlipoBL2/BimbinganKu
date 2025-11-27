@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BimbinganKu - Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/global.css}">
+    <style>
+        /* Admin-specific style override */
+        .status-card { background-color: #e6f7ff; border-left: 5px solid #007bff; }
+        .data-table-container { margin-top: 20px; }
+        .tab-menu button.active { background-color: #007bff; color: white; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">BimbinganKU (Admin)</div>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">Settings</a>
+            <a href="#" id="logout-btn">Logout</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="status-card">
+            <h2>Admin Control Panel</h2>
+            <p>Welcome, Admin. Manage system data, schedules, and compliance.</p>
+        </section>
+
+        <section class="scheduling-section">
+            <div class="schedule-controls" style="align-items: flex-start;">
+                <div class="tab-menu" id="admin-tabs">
+                    <button class="tab-btn active" data-table="student">Student Table</button>
+                    <button class="tab-btn" data-table="lecturer">Lecturer Table</button>
+                    <button class="tab-btn" data-table="schedule">Schedule Table</button>
+                    <button class="tab-btn" data-table="compliance">Compliance Report</button>
+                </div>
+
+                <div class="session-actions" style="display: flex; gap: 10px;">
+                    <button id="import-btn" class="primary-btn" style="background-color: #ffc107; color: #333;">📤 Import/Update</button>
+                    <button id="export-btn" class="primary-btn">⬇️ Export CSV</button>
+                </div>
+            </div>
+
+            <div class="data-filters" style="display: flex; gap: 20px; margin-bottom: 15px;">
+                <input type="text" id="search-input" placeholder="Search by ID, Name, or Day..." style="flex-grow: 1; padding: 8px;">
+                </div>
+
+            <div class="data-table-container">
+                <h3 id="table-title">Student Table</h3>
+                <table id="admin-data-table" class="data-table">
+                    </table>
+            </div>
+
+            <div class="schedule-search-area">
+                <h3>🔍 Search User Schedule by Code</h3>
+                <input type="text" id="user-code-input" placeholder="Enter NPM/LecturerCode" style="padding: 8px;">
+                <button id="search-schedule-btn" class="primary-btn" style="background-color: #17a2b8;">View Schedule</button>
+                <div id="user-schedule-output" style="margin-top: 15px; background-color: #f9f9f9; padding: 10px; border-radius: 4px;">
+                    </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="import-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>Import & Update Tables</h3>
+            <form id="import-form">
+                <label for="import-file">Select CSV File for Import:</label>
+                <input type="file" id="import-file" accept=".csv" required>
+
+                <label for="target-table">Target Table:</label>
+                <select id="target-table" required>
+                    <option value="student">Student Table</option>
+                    <option value="lecturer">Lecturer Table</option>
+                    <option value="schedule">Schedule Table</option>
+                    <option value="npmtopic">NPMTopicCode Table</option>
+                </select>
+
+                <button type="submit" id="execute-import-btn" class="primary-btn">Execute Import/Update</button>
+            </form>
+        </div>
+    </div>
+    <div id="logout-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to log out of BimbinganKU?</p>
+            <div class="modal-actions">
+                <button id="confirm-logout-btn" class="primary-btn">Yes, Logout</button>
+                <button id="cancel-logout-btn" class="delete-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/admin.js}"></script>
+</body>
+</html>

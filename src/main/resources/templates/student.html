@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>BimbinganKu - Student Home</title>
+    <link rel="stylesheet" th:href="@{/global.css}" href="/global.css">
+</head>
+<body>
+    <header>
+        <div class="logo">BimbinganKU</div>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">Profile</a>
+
+            <div class="notification-area" id="notification-area">
+                <span id="notification-bell" role="button" aria-haspopup="true" aria-expanded="false">🔔</span>
+                <span id="unread-count" class="badge hidden" aria-live="polite">0</span>
+
+                <div id="notification-dropdown" class="dropdown-content hidden" aria-label="Notifications">
+                    <p class="empty-message">No unread messages.</p>
+                </div>
+            </div>
+
+            <a href="#" id="logout-btn">Logout</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="status-card">
+            <h2 id="welcome-heading">Welcome Back, <span id="student-name">[Student Name]</span></h2>
+            <p>Your current Guidance Session Count:</p>
+
+            <div class="eligibility-bar-container" aria-hidden="true">
+                <div id="eligibility-bar" class="eligibility-bar blue" style="width: 50%;"></div>
+            </div>
+
+            <p id="eligibility-text">You are <strong>eligible for UTS</strong> (Count 2-4).</p>
+        </section>
+
+        <section class="scheduling-section schedule-page-layout" id="schedule-section">
+            <!-- LEFT: mini calendar and controls -->
+            <div class="mini-calendar-container">
+                <div class="session-actions" style="margin-bottom: 20px;">
+                    <button id="add-session-btn" class="primary-btn" type="button">➕ New Session</button>
+                </div>
+
+                <div id="mini-calendar" class="calendar-card" aria-label="Mini calendar">
+                    <div class="calendar-header">
+                        <button id="prev-month" class="arrow" aria-label="Previous month">&lt;</button>
+                        <span class="month-year" id="current-month-year">October 2025</span>
+                        <button id="next-month" class="arrow" aria-label="Next month">&gt;</button>
+                    </div>
+
+                    <div class="calendar-weekdays" aria-hidden="true">
+                        <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                    </div>
+
+                    <div class="calendar-days" id="calendar-days" role="grid" aria-label="Month days">
+                        <!-- days are rendered by student.js -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: schedule table (weekly) -->
+            <div class="schedule-view schedule-table-wrapper" id="schedule-view-wrapper">
+                <h3 id="weekly-title">🗓️ Weekly Schedule (This Week)</h3>
+
+                <table id="weekly-schedule-table" aria-label="Weekly schedule">
+                    <thead id="schedule-header-days">
+                        <!-- JS will build header cells for Mon..Sun -->
+                        <tr>
+                            <th>Time</th>
+                            <th data-day="Mon">Monday</th>
+                            <th data-day="Tue">Tuesday</th>
+                            <th data-day="Wed">Wednesday</th>
+                            <th data-day="Thu">Thursday</th>
+                            <th data-day="Fri">Friday</th>
+                            <th data-day="Sat">Saturday</th>
+                            <th data-day="Sun">Sunday</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="schedule-body">
+                        <!-- rows will be rendered by JS to support flexible hours -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SESSION HISTORY SECTION (Ts took way too long to fix </3) -->
+        <section id="history-section" class="scheduling-section">
+    <h3>📚 Session History</h3>
+
+    <div id="history-list">
+        <!-- populated by JS -->
+    </div>
+
+    <div style="margin-top:12px; color:#666; font-size:0.9em;">
+        Showing mock finished sessions up to <strong>2025-11-26</strong>.
+    </div>
+</section>
+
+
+    </main>
+
+    <!-- SESSION MODAL -->
+    <div id="session-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="session-modal-title">
+        <div class="modal-content">
+            <button class="close-btn" aria-label="Close session dialog">&times;</button>
+            <h3 id="session-modal-title">Manage Session</h3>
+
+            <form id="session-form">
+                <label for="session-lecturer">Lecturer:</label>
+                <select id="session-lecturer" required>
+                    <option value="">Select Lecturer</option>
+                    <!-- populated by JS -->
+                </select>
+
+                <label for="session-date">Date:</label>
+                <input type="date" id="session-date" required>
+
+                <label for="session-time">Time:</label>
+                <input type="time" id="session-time" required>
+
+                <button type="submit" id="save-session-btn" class="primary-btn">Save Session</button>
+                <button type="button" id="delete-session-btn" class="delete-btn hidden">Delete</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- LOGOUT MODAL -->
+    <div id="logout-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="logout-modal-title">
+        <div class="modal-content">
+            <h3 id="logout-modal-title">Confirm Logout</h3>
+            <p>Are you sure you want to log out of BimbinganKU?</p>
+            <div class="modal-actions">
+                <button id="confirm-logout-btn" class="primary-btn">Yes, Logout</button>
+                <button id="cancel-logout-btn" class="delete-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/student.js}" src="/student.js"></script>
+</body>
+</html>
