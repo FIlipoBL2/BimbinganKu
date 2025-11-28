@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const MOCK_UNREAD_MESSAGES = [
         { id: 101, sender: "Dr. Smith", message: "Reminder: Session moved to 10:00.", read: false },
         { id: 102, sender: "Admin", message: "Schedule updated for next week.", read: false },
-        { id: 103, sender: "Dr. Jones", message: "Session notes are ready.", read: true },
+        { id: 103, sender: "Dr. Jones", message: "Session notes are ready.", read: false },
     ];
 
     // Sessions - NOTE: dates are YYYY-MM-DD and chosen BEFORE 2025-11-27
@@ -16,8 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 3, lecturerId: 'ls', lecturer: 'Dr. Smith', date: '2025-11-26', time: '10:00', notes: 'Proposal feedback', status: 'finished' },
         { id: 4, lecturerId: 'lx', lecturer: 'Dr. X', date: '2025-11-20', time: '14:00', notes: 'Write-up review', status: 'finished' },
         { id: 5, lecturerId: 'ly', lecturer: 'Dr. Y', date: '2025-11-10', time: '11:00', notes: 'Methodology check', status: 'finished' },
-        // future or pending examples (optional)
-        { id: 6, lecturerId: 'ls', lecturer: 'Dr. Smith', date: '2025-12-02', time: '09:00', notes: 'Next steps', status: 'pending' }
     ];
 
     const MOCK_LECTURERS = [
@@ -84,9 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const WEEKDAYS_LABELS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 
-    // requested times: 07:00 -> 17:00
+    // schedule time 
     const SCHEDULE_START_HOUR = 7;
-    const SCHEDULE_END_HOUR = 17; // inclusive
+    const SCHEDULE_END_HOUR = 17;
 
     // selected date global (YYYY-MM-DD)
     let selectedDateString = formatDate(new Date()); // default today
@@ -391,7 +389,6 @@ document.addEventListener('DOMContentLoaded', () => {
                               <div style="margin-top:6px;">
                                 <div><strong>Lecturer:</strong> ${s.lecturer}</div>
                                 <div><strong>Notes:</strong> ${s.notes || '-'}</div>
-                                <div style="margin-top:6px;color:#28a745;"><strong>Status:</strong> Finished</div>
                               </div>`;
             historyList.appendChild(card);
         });

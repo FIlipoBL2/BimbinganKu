@@ -5,16 +5,26 @@ body {
     padding: 0;
     background-color: #f4f4f9;
     color: #333;
+    padding-top: 80px; /* Add padding to body so content doesn't hide under header */
+
 }
 
 header {
-    background-color: #007bff; /* Primary Blue header */
+    background-color: #007bff;
     color: white;
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    position: fixed; /*Fixes position of header on the screen*/
+    top: 0;
+    left: 0;
+    width: 100%;   /* Prevent shrinking */
+    z-index: 1000; /* Stay above content */
+    box-sizing: border-box;  /* ensures padding doesn’t make it overflow */
+
 }
 
 header .logo {
@@ -442,3 +452,7 @@ header nav a:hover {
 #schedule-table td.selected-column {
     background-color: #fff9e6; /* Lighter background for the column body */
 }
+
+
+
+
