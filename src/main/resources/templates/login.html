@@ -1,26 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8">
-        <title></title>
-        <link rel="stylesheet" type="text/css" href="../static/css/loginStyles.css">
+        <title>Login - BimbinganKu</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/loginStyles.css">
     </head>
     <body>
         <div class="container">
             <div class="login-box">
+                <!-- Error Notification -->
+                <div th:if="${errorMessage != null}" class="error-message" style="display: block;">
+                    <strong>Error:</strong> <span th:text="${errorMessage}"></span>
+                </div>
+
                 <img src="">
                 <h2>BimbinganKu</h2>
                 <p>Please enter your credentials to log in</p>
 
-                <form>
+                <form method="post" action="/login">
                     <div class="input-group">
                         <label>Username</label>
-                        <input type="text" required>
+                        <input type="text" name="email" required>
                     </div>
 
                     <div class="input-group">
                         <label>Password</label>
-                        <input type="password" required>
+                        <input type="password" name="password" required>
                     </div>
         
                     <button class="login-btn">Login</button>

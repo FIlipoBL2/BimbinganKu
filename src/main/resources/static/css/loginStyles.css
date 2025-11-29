@@ -24,6 +24,25 @@
     text-align: center;
 }
 
+/* Error Message */
+.error-message {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    margin-top: -32px;
+    margin-left: -32px;
+    margin-right: -32px;
+    font-size: 14px;
+    border-radius: 12px 12px 0 0;
+}
+
+.error-message strong {
+    font-weight: 600;
+}
+
 /* Title */
 .login-box h2 {
     margin-bottom: 0px;
