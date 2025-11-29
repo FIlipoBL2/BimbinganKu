@@ -26,12 +26,12 @@ public class StudentRepository {
         
         int user_id = userRepo.getUserId(newUser);
 
-        String sql = "INSERT INTO student (npm, user_id) VALUES (?, ?)";
+        String sql = "INSERT INTO Students (npm, user_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, user.getNpm(), user_id);
     }
 
     Optional<Student> findByNPM(String npm) {
-        String sql = "SELECT * FROM users WHERE name = ?";
+        String sql = "SELECT * FROM Students WHERE npm = ?";
         List<Student> results = jdbcTemplate.query(sql, this::mapRowToStudent, npm);
         return results.size() == 0 ? Optional.empty() : Optional.of(results.get(0));
     }

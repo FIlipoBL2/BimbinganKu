@@ -17,24 +17,24 @@ public class UserRepository {
     private JdbcTemplate jdbcTemplate;
     
     void save(User user) throws Exception {
-        String sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Users (name, email, password) VALUES (?, ?, ?)";
         jdbcTemplate.update(sql, user.getName(), user.getEmail(), user.getPassword());
     }
     
     Optional<User> findByName(String name) {
-        String sql = "SELECT * FROM users WHERE name = ?";
+        String sql = "SELECT * FROM Users WHERE name = ?";
         List<User> results = jdbcTemplate.query(sql, this::mapRowToUser, name);
         return results.size() == 0 ? Optional.empty() : Optional.of(results.get(0));
     }
     
     Optional<User> findByEmail(String email) {
-        String sql = "SELECT * FROM users WHERE email = ?";
+        String sql = "SELECT * FROM Users WHERE email = ?";
         List<User> results = jdbcTemplate.query(sql, this::mapRowToUser, email);
         return results.size() == 0 ? Optional.empty() : Optional.of(results.get(0));
     }
     
     int getUserId(User user) {
-        String sql = "SELECT id WHERE email = ?";
+        String sql = "SELECT id FROM Users WHERE email = ?";
         return jdbcTemplate.queryForObject(sql, Integer.class, user.getEmail());
     }
     
