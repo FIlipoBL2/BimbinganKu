@@ -42,13 +42,13 @@ public class UserRepository {
         int user_id = getUserId(user);
         
         boolean isStudent = jdbcTemplate.queryForObject(
-            "SELECT EXISTS(SELECT 1 FROM students WHERE user_id = ?)",
+            "SELECT EXISTS(SELECT 1 FROM Students WHERE user_id = ?)",
             Boolean.class,
             user_id
         );
         
         boolean isLecturer = jdbcTemplate.queryForObject(
-            "SELECT EXISTS(SELECT 1 FROM lecturers WHERE user_id = ?)",
+            "SELECT EXISTS(SELECT 1 FROM Lecturers WHERE user_id = ?)",
             Boolean.class,
             user_id
         );
