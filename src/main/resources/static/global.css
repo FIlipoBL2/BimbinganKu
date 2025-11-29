@@ -5,16 +5,26 @@ body {
     padding: 0;
     background-color: #f4f4f9;
     color: #333;
+    padding-top: 80px; /* Add padding to body so content doesn't hide under header */
+
 }
 
 header {
-    background-color: #007bff; /* Primary Blue header */
+    background-color: #007bff;
     color: white;
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    position: fixed; /*Fixes position of header on the screen*/
+    top: 0;
+    left: 0;
+    width: 100%;   /* Prevent shrinking */
+    z-index: 1000; /* Stay above content */
+    box-sizing: border-box;  /* ensures padding doesn’t make it overflow */
+
 }
 
 header .logo {
@@ -120,13 +130,34 @@ header nav a:hover {
     display: none;
 }
 
-/* --- Scheduling Section & Controls --- */
+/* --- Scheduling Section Layout --- */
+/* The .scheduling-section itself has white background, let's keep it clean */
 .scheduling-section {
     margin-top: 30px;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: white; /* Retained background color */
+    padding: 20px; /* Retained padding */
+    border-radius: 8px; /* Retained border radius */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Retained shadow */
+}
+
+.schedule-page-layout {
+    display: flex; /* FIX: Enable flex layout for side-by-side elements */
+    gap: 25px;
+    /* Removed margin-top: 20px here, as it's already on .scheduling-section */
+    align-items: flex-start; /* FIX: Ensures both columns start at the top */
+}
+
+/* Apply specific dimensions only within the new layout */
+.schedule-page-layout .mini-calendar-container {
+    flex: 0 0 300px; /* Do not grow, do not shrink, fixed width */
+    /* Add position: sticky to keep it visible while scrolling the schedule (Optional but highly recommended) */
+    position: sticky;
+    top: 100px; /* Adjust based on your header height (80px + margin) */
+}
+
+.schedule-page-layout .schedule-table-wrapper {
+    flex-grow: 1; /* Allow the schedule to take up the remaining width */
+    width: auto; /* Remove fixed width calculation */
 }
 
 .schedule-controls {
@@ -176,12 +207,15 @@ header nav a:hover {
     border-bottom: 2px solid #eee;
     padding-bottom: 10px;
     margin-top: 0;
+    /* FIX: Ensure there's no massive margin after the schedule-view h3 */
+    margin-bottom: 10px; 
 }
 
 #weekly-schedule-table, .data-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
+    /* FIX: Set a small margin-top to eliminate the large gap */
+    margin-top: 5px; 
     table-layout: fixed; /* For uniform column width */
 }
 
@@ -441,4 +475,86 @@ header nav a:hover {
 /* Highlights the cells (TDs) of the selected day's column */
 #schedule-table td.selected-column {
     background-color: #fff9e6; /* Lighter background for the column body */
+}
+
+/* --- Style for the Selected Day on Mini Calendar --- */
+.calendar-days .selected-day {
+    background-color: #ffc107; /* Bright highlight color (Yellow/Orange) */
+    color: #333;
+    font-weight: bold;
+    border: 2px solid #333; /* Make it pop */
+    padding: 6px 0; 
+}
+
+/* Ensure the selected day highlight works on 'today's' date too */
+.calendar-days .current-day.selected-day {
+    background-color: #ffc107 !important; 
+    color: #333 !important;
+}
+
+/* --- Style for the Selected Column in the Schedule Table --- */
+/* Highlights the header of the selected day */
+/* CORRECTED SELECTOR: Targets #weekly-schedule-table */
+#weekly-schedule-table th.selected-column { 
+    background-color: #ffc107; /* Matches the mini-calendar highlight */
+    color: #333;
+    font-weight: bold;
+}
+
+/* Highlights the cells (TDs) of the selected day's column */
+/* CORRECTED SELECTOR: Targets #weekly-schedule-table */
+#weekly-schedule-table td.selected-column { 
+    background-color: #fff9e6; /* Lighter background for the column body */
+}
+
+/* --- New/Updated Schedule Cell Styles (Add to global.css) --- */
+
+/* Ensures all schedule types are styled similarly in size/font */
+#weekly-schedule-table td.session,
+#weekly-schedule-table td.teaching-schedule,
+#weekly-schedule-table td.study-schedule {
+    font-size: 0.8em;
+    padding: 2px;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out; 
+    /* FIX: Use flexbox to center content vertically/horizontally */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Important: makes the content fill the cell height */
+    box-sizing: border-box; /* Include padding in the height */
+}
+
+/* Style for Guidance Sessions (Existing) */
+#weekly-schedule-table td.session {
+    background-color: #ffc107; /* Orange/Yellow */
+    color: #333;
+    font-weight: bold;
+}
+
+/* New Style for Lecturer Teaching Schedule (Busy time) */
+#weekly-schedule-table td.teaching-schedule {
+    background-color: #28a745; /* Green */
+    color: white;
+}
+
+/* New Style for Student Study Schedule (Busy time) */
+#weekly-schedule-table td.study-schedule {
+    background-color: #17a2b8; /* Cyan/Light Blue */
+    color: white;
+}
+
+/* Utility class to hide schedule cells when toggled off */
+#weekly-schedule-table td.hidden-schedule {
+    /* Ensure it completely hides the content and takes no space, but is clickable when visible */
+    visibility: hidden;
+    opacity: 0;
+    padding: 0;
+    pointer-events: none; /* Disable interaction when hidden */
+}
+
+/* Ensure empty cells look normal */
+#weekly-schedule-table td:empty {
+    background-color: transparent !important;
 }

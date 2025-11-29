@@ -11,8 +11,6 @@
     <header>
         <div class="logo">BimbinganKU (Lecturer)</div>
         <nav>
-            <a href="#">Home</a>
-            <a href="#">Profile</a>
             <div class="notification-area">
                 <span id="notification-bell">🔔</span>
                 <span id="unread-count" class="badge hidden">0</span>
@@ -33,10 +31,6 @@
 
         <section class="scheduling-section schedule-page-layout">
             <div class="mini-calendar-container">
-                <div class="session-actions" style="margin-bottom: 20px;">
-                    <button id="add-session-btn" class="primary-btn">➕ New Session</button>
-                </div>
-
                 <div id="mini-calendar" class="calendar-card">
                     <div class="calendar-header">
                         <span class="arrow left-arrow" id="prev-month">&lt;</span>
@@ -52,44 +46,72 @@
                 
             </div>
 
-            <div class="schedule-view">
-                <h3>🗓️ Weekly Schedule (This Week)</h3>
+            <div class="schedule-table-wrapper"> <h3>🗓️ Weekly Schedule (This Week)</h3>
+                
+                <div class="schedule-controls-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                    
+                    <div id="student-schedule-filter-container">
+                        <label for="student-schedule-filter">Show Student Study Schedule For:</label>
+                        <select id="student-schedule-filter">
+                            <option value="all">All Students</option>
+                            </select>
+                    </div>
+                    
+                    <div id="new-session-action" class="session-actions">
+                        <button id="add-session-btn" class="primary-btn">➕ New Session</button>
+                    </div>
+                    
+                </div>
                 <table id="weekly-schedule-table">
                     <thead>
-                        <tr>
+                        <tr id="schedule-header-days"> 
                             <th>Time</th>
+                            <th data-day="Sun">Sunday</th>
                             <th data-day="Mon">Monday</th>
                             <th data-day="Tue">Tuesday</th>
                             <th data-day="Wed">Wednesday</th>
-                            <th data-day="Thu" class="highlighted">Thursday</th>
+                            <th data-day="Thu">Thursday</th>
                             <th data-day="Fri">Friday</th>
                             <th data-day="Sat">Saturday</th>
-                            <th data-day="Sun">Sunday</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="schedule-body">
+                        <tr><td>07:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                         <tr>
                             <td>08:00</td>
-                            <td></td>
-                            <td class="session">Session A<br> (Lecturer X)</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                            <td class="study-schedule" data-student-id="s1">Study Session<br>(Student A)</td> <td></td> <td class="session">Session A<br> (Student X)</td> <td></td> <td></td> <td></td> <td></td> </tr>
                         <tr>
                             <td>09:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td class="session">Session B<br> (Lecturer Y)</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+                        <tr><td>10:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr>
+                            <td>11:00</td>
+                            <td></td><td></td><td></td><td></td><td></td>
+                            <td class="study-schedule" data-student-id="s2">Group Work<br>(Student Y)</td> <td></td>
                         </tr>
-                        </tbody>
+                        <tr><td>12:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>13:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>14:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>15:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>16:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>17:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>18:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>19:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    </tbody>
                 </table>
+            </div>
+        </section>
+        
+        <section id="history-section" class="scheduling-section">
+            <h3>📚 Session History</h3>
+            <div style="margin-bottom: 15px;">
+                <label for="history-student-filter">Filter by Student:</label>
+                <select id="history-student-filter">
+                    <option value="all">All Students</option>
+                    </select>
+            </div>
+            <div id="history-list">
+                <p>Loading session history...</p>
             </div>
         </section>
     </main>
@@ -109,11 +131,15 @@
 
                 <label for="session-time">Time:</label>
                 <input type="time" id="session-time" required>
-
+                
+                <label for="session-location">Location:</label>
+                <select id="session-location" required>
+                    </select>
+                <input type="text" id="session-custom-location" placeholder="Enter custom location (e.g., Office A-101)" class="hidden" style="margin-top: 5px;">
                 <label for="session-notes">Notes (Lecturer Only):</label>
                 <textarea id="session-notes" placeholder="Write session notes here..." rows="4"></textarea> 
                 
-                <button type="submit" id="save-session-btn">Save Session</button>
+                <button type="submit" id="save-session-btn" class="primary-btn">Save Session</button>
                 <button type="button" id="delete-session-btn" class="delete-btn hidden">Delete</button>
             </form>
         </div>

@@ -1,44 +1,42 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>BimbinganKu - Student Home</title>
-    <link rel="stylesheet" th:href="@{/global.css}"> 
-    </head>
+    <link rel="stylesheet" th:href="@{/global.css}" href="/global.css">
+</head>
 <body>
     <header>
         <div class="logo">BimbinganKU</div>
         <nav>
-            <a href="#">Home</a>
-            <a href="#">Profile</a>
-            <div class="notification-area">
-                <span id="notification-bell">🔔</span>
-                <span id="unread-count" class="badge hidden">0</span>
-                <div id="notification-dropdown" class="dropdown-content hidden">
+            <div class="notification-area" id="notification-area">
+                <span id="notification-bell" role="button" aria-haspopup="true" aria-expanded="false">🔔</span>
+                <span id="unread-count" class="badge hidden" aria-live="polite">0</span>
+
+                <div id="notification-dropdown" class="dropdown-content hidden" aria-label="Notifications">
                     <p class="empty-message">No unread messages.</p>
                 </div>
             </div>
+
             <a href="#" id="logout-btn">Logout</a>
         </nav>
     </header>
 
     <main class="container">
         <section class="status-card">
-            <h2>Welcome Back, [Student Name]</h2>
+            <h2 id="welcome-heading">Welcome Back, <span id="student-name">[Student Name]</span></h2>
             <p>Your current Guidance Session Count:</p>
-            <div class="eligibility-bar-container">
-                <div id="eligibility-bar" class="eligibility-bar blue" style="width: 50%;"></div>
+
+            <div class="eligibility-bar-container" aria-hidden="true">
+                <div id="eligibility-bar" class="eligibility-bar blue" style="width: 60%;" data-count="3"></div>
             </div>
-            <p id="eligibility-text">You are **eligible for UTS** (Count 2-4).</p>
-        </section>
+            <p><small>You have completed **3 out of 5** mandatory guidance sessions.</small></p>
+
+            </section>
 
         <section class="scheduling-section schedule-page-layout">
             <div class="mini-calendar-container">
-                <div class="session-actions" style="margin-bottom: 20px;">
-                    <button id="add-session-btn" class="primary-btn">➕ New Session</button>
-                </div>
-
                 <div id="mini-calendar" class="calendar-card">
                     <div class="calendar-header">
                         <span class="arrow left-arrow" id="prev-month">&lt;</span>
@@ -49,57 +47,86 @@
                         <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
                     </div>
                     <div class="calendar-days" id="calendar-days">
-                    </div>
+                        </div>
                 </div>
-                
             </div>
 
             <div class="schedule-view">
-                <h3>🗓️ Weekly Schedule (This Week)</h3>
+                <h3>🗓️ Weekly Schedule (Your Sessions)</h3>
+                
+                <div class="schedule-controls-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                    
+                    <div id="lecturer-schedule-filter-container">
+                        <label for="lecturer-schedule-filter">Show Teaching Schedule For:</label>
+                        <select id="lecturer-schedule-filter">
+                            <option value="all">All Guiding Lecturers</option>
+                            </select>
+                    </div>
+                    
+                    <div id="new-session-action" class="session-actions">
+                        <button id="add-session-btn" class="primary-btn">➕ New Session</button>
+                    </div>
+                    
+                </div>
                 <table id="weekly-schedule-table">
                     <thead>
-                        <tr>
+                        <tr id="schedule-header-days">
                             <th>Time</th>
-                            <th data-day="Mon">Monday</th>
-                            <th data-day="Tue">Tuesday</th>
-                            <th data-day="Wed">Wednesday</th>
-                            <th data-day="Thu" class="highlighted">Thursday</th>
-                            <th data-day="Fri">Friday</th>
-                            <th data-day="Sat">Saturday</th>
-                            <th data-day="Sun">Sunday</th>
+                            <th data-day="Sun">Sun</th>
+                            <th data-day="Mon">Mon</th>
+                            <th data-day="Tue">Tue</th>
+                            <th data-day="Wed">Wed</th>
+                            <th data-day="Thu">Thu</th>
+                            <th data-day="Fri">Fri</th>
+                            <th data-day="Sat">Sat</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="schedule-body">
+                        <tr><td>07:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                         <tr>
                             <td>08:00</td>
-                            <td></td>
-                            <td class="session">Session A<br> (Lecturer X)</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td class="teaching-schedule" data-lecturer-id="lx">Dr. X - C101</td> <td></td><td></td><td></td><td></td><td></td><td></td>
                         </tr>
                         <tr>
                             <td>09:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td class="session">Session B<br> (Lecturer Y)</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td></td> <td class="session">Dr. X</td> <td></td><td></td><td></td><td></td><td></td>
                         </tr>
-                        </tbody>
+                        <tr><td>10:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr>
+                            <td>11:00</td>
+                            <td></td> <td class="study-schedule">Group Study</td> <td></td>
+                            <td class="session">Dr. Y</td> <td></td><td></td><td></td>
+                        </tr>
+                        <tr><td>12:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>13:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr>
+                            <td>14:00</td>
+                            <td></td><td></td>
+                            <td class="teaching-schedule" data-lecturer-id="lz">Dr. Z - C201</td> <td></td><td></td><td></td><td></td>
+                        </tr>
+                        <tr><td>15:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>16:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>17:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>18:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>19:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    </tbody>
                 </table>
+            </div>
+        </section>
+
+        <section id="history-section" class="scheduling-section">
+            <h3>📚 Session History</h3>
+            <div id="history-list">
+                <p>Loading session history...</p>
             </div>
         </section>
     </main>
 
-    <div id="session-modal" class="modal hidden">
+    <div id="session-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="session-modal-title">
         <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <h3>Manage Session</h3>
+            <span class="close-btn" id="close-session-modal" role="button" aria-label="Close modal">&times;</span>
+            <h3 id="session-modal-title">Manage Session</h3>
+
             <form id="session-form">
                 <label for="session-lecturer">Lecturer:</label>
                 <select id="session-lecturer" required>
@@ -112,14 +139,19 @@
                 <label for="session-time">Time:</label>
                 <input type="time" id="session-time" required>
 
-                <button type="submit" id="save-session-btn">Save Session</button>
+                <label for="session-location">Location:</label>
+                <select id="session-location" required>
+                    </select>
+                <input type="text" id="session-custom-location" placeholder="Enter custom location (e.g., Library Study Room)" class="hidden" style="margin-top: 5px;">
+                <button type="submit" id="save-session-btn" class="primary-btn">Save Session</button>
                 <button type="button" id="delete-session-btn" class="delete-btn hidden">Delete</button>
             </form>
         </div>
     </div>
-    <div id="logout-modal" class="modal hidden">
+
+    <div id="logout-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="logout-modal-title">
         <div class="modal-content">
-            <h3>Confirm Logout</h3>
+            <h3 id="logout-modal-title">Confirm Logout</h3>
             <p>Are you sure you want to log out of BimbinganKU?</p>
             <div class="modal-actions">
                 <button id="confirm-logout-btn" class="primary-btn">Yes, Logout</button>
@@ -127,6 +159,7 @@
             </div>
         </div>
     </div>
-    <script th:src="@{/student.js}"></script>
+
+    <script th:src="@{/student.js}" src="/student.js"></script>
 </body>
 </html>
