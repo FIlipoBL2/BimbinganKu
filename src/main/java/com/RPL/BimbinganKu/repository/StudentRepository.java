@@ -17,10 +17,17 @@ public class StudentRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    void save(Student user) throws SQLException {
-        User newUser = new User();
+    @Autowired
+    private UserRepository userRepo;
 
-        String sql_student = "";
+    void save(Student user) throws Exception {
+        User newUser = new User(user.getEmail(), user.getPassword(), user.getName());
+        userRepo.save(newUser);
+        
+        int user_id = userRepo.getUserId(newUser);
+
+        String sql = "INSERT INTO student (npm, user_id) VALUES (?, ?)";
+        jdbcTemplate.update(sql, user.getNpm(), user_id);
     }
 
     Optional<Student> findByNPM(String npm) {

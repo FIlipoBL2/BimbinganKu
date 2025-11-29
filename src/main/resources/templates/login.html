@@ -11,16 +11,17 @@
             <img src="">
             <h2>Welcome Back!</h2>
             <p>Please enter your credentials to log in</p>
+            <p th:if="${status}==failed">Please check username or password</p>
 
-            <form>
+            <form action = "login" method="post">
                 <div class="input-group">
-                    <label>Username</label>
-                    <input type="text" required>
+                    <label>Email</label>
+                    <input type="text" name="email" required>
                 </div>
 
                 <div class="input-group">
                     <label>Password</label>
-                    <input type="password" required>
+                    <input type="password" name="password" required>
                 </div>
 
                 <button class="login-btn">Login</button>
