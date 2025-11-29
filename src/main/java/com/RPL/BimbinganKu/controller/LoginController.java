@@ -16,30 +16,43 @@ import jakarta.servlet.http.HttpSession;
 public class LoginController {
     @Autowired
     private UserService userService;
-
+    
     @PostMapping("/login")
     public String loginProcess(@RequestParam String email, @RequestParam String password, HttpSession session, Model model) {
         User user = userService.login(email, password);
-
+        
         if (user == null) {
             model.addAttribute("status", "failed");
             return "login";
         }
-
+        
         model.addAttribute("status", null);
         session.setAttribute("loggedUser", user);
         String role = userService.getUserType(user);
-
-        if (role.equals("student")) return "redirect:/student/home";
+        
+        if (role.equals("student")) {
+            return "redirect:/student/home";
+        }
         else return "redirect:/lecturer/home";
     }
-
+    
     @GetMapping("/login")
     public String loginPage(HttpSession session) {
-        if (session.getAttribute("loggedUser") != null) {
-            return "redirect:/dashboard";
+        
+        User logged = (User) session.getAttribute("loggedUser");
+        
+        if (logged != null) {
+            // User already logged in → redirect based on role
+            String role = userService.getUserType(logged);
+            
+            if (role.equals("student")) {
+                return "redirect:/student/home";
+            } else {
+                return "redirect:/lecturer/home";
+            }
         }
-
+        
         return "login";
     }
+    
 }
