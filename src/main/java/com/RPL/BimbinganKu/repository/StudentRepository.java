@@ -1,0 +1,42 @@
+package com.RPL.BimbinganKu.repository;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import com.RPL.BimbinganKu.data.Student;
+import com.RPL.BimbinganKu.data.User;
+
+@Repository
+public class StudentRepository {
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    void save(Student user) throws SQLException {
+        User newUser = new User();
+
+        String sql_student = "";
+    }
+
+    Optional<Student> findByNPM(String npm) {
+        String sql = "SELECT * FROM users WHERE name = ?";
+        List<Student> results = jdbcTemplate.query(sql, this::mapRowToStudent, npm);
+        return results.size() == 0 ? Optional.empty() : Optional.of(results.get(0));
+    }
+
+    private Student mapRowToStudent(ResultSet resultSet, int rowNum) throws SQLException {
+        return new Student(
+            resultSet.getString("email"),
+            resultSet.getString("password"),
+            resultSet.getString("name"),
+            resultSet.getString("npm"),
+            resultSet.getInt("total_guidance_uas"),
+            resultSet.getInt("total_guidance_uts")
+        );
+    }
+}
