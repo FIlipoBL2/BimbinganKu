@@ -23,6 +23,7 @@ public class LoginController {
 
         if (user == null) {
             model.addAttribute("status", "failed");
+            return "login";
         }
 
         model.addAttribute("status", null);
