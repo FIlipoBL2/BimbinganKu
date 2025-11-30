@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.RPL.BimbinganKu.data.Student;
 import com.RPL.BimbinganKu.data.User;
 
 @Service
@@ -12,13 +13,22 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public boolean register(User user) {
+    private <T extends User> T encodePassword(T user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
+        return user;
+    }
+
+    public boolean saveStudent(Student student) {
+        student = encodePassword(student);
+
         try {
-            userRepository.save(user);
+            studentRepository.save(user);
         } catch (Exception e) {
             return false;
         }

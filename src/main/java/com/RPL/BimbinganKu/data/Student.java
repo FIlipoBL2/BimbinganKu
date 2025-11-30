@@ -21,4 +21,11 @@ public class Student extends User {
         this.totalGuidanceUAS = uasGuidance;
         this.totalGuidanceUTS = utsGuidance;
     }
+
+    public Student(User user, String npm, int uasGuidance, int utsGuidance) {
+        super(user);
+        this.npm = npm;
+        this.totalGuidanceUAS = uasGuidance;
+        this.totalGuidanceUTS = utsGuidance;
+    }
 }

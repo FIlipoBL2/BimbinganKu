@@ -24,13 +24,13 @@ public class UserRepository {
     Optional<User> findByName(String name) {
         String sql = "SELECT * FROM Users WHERE name = ?";
         List<User> results = jdbcTemplate.query(sql, this::mapRowToUser, name);
-        return results.size() == 0 ? Optional.empty() : Optional.of(results.get(0));
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
     
     Optional<User> findByEmail(String email) {
         String sql = "SELECT * FROM Users WHERE email = ?";
         List<User> results = jdbcTemplate.query(sql, this::mapRowToUser, email);
-        return results.size() == 0 ? Optional.empty() : Optional.of(results.get(0));
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
     
     int getUserId(User user) {
