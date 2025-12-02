@@ -15,7 +15,7 @@ public class DataSourceConfig {
         dataSource.setDriverClassName("org.postgresql.Driver");
         dataSource.setJdbcUrl("jdbc:postgresql://localhost:5432/bimbingan_db");
         dataSource.setUsername("postgres");
-        dataSource.setPassword("postgres");
+        dataSource.setPassword("vin24nubi");
         return dataSource;
     }
 }

@@ -24,6 +24,10 @@ public class UserService {
         return user;
     }
 
+    public String encodePassword(String password) {
+        return passwordEncoder.encode(password.trim());
+    }
+
     public boolean saveStudent(Student student) {
         student = encodePassword(student);
 
