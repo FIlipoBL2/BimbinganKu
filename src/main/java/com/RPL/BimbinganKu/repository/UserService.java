@@ -36,13 +36,15 @@ public class UserService {
     }
 
     public User login(String email, String password) {
-        User user = userRepository.findByEmail(email.trim()).get();
+        User user = userRepository.findByEmail(email.trim()).orElse(null);
 
-        if (user == null) return null;
+        if (user == null)
+            return null;
 
         if (passwordEncoder.matches(password.trim(), user.getPassword())) {
             return user;
-        } else return null;
+        } else
+            return null;
     }
 
     public String getUserType(User user) {
