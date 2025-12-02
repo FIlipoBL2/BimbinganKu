@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>BimbinganKu - Inbox</title>
+    <link rel="stylesheet" th:href="@{/global.css}"> 
+    <!-- Note: Header and footer are intentionally omitted for simplicity, 
+         as navigation back to home is managed by the browser (back button) 
+         or a dedicated link if needed. -->
+</head>
+<body>
+    <header>
+        <div class="logo">BimbinganKU - Inbox</div>
+        <nav>
+            <!-- Link back to the main user dashboard -->
+            <a th:href="@{/student.html}" href="/student.html" id="back-to-home-link">Go to Dashboard</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="status-card">
+            <h2>Message History</h2>
+            <p>View, search, and manage all notifications and system messages.</p>
+        </section>
+
+        <!-- Filter and Actions Bar -->
+        <div class="inbox-filter-bar">
+            <div class="filter-group">
+                <label for="filter-status">Filter:</label>
+                <select id="filter-status">
+                    <option value="all">All Messages</option>
+                    <option value="unread">Unread Only</option>
+                    <option value="read">Read Only</option>
+                </select>
+                <input type="text" id="search-inbox" placeholder="Search messages..." />
+            </div>
+            
+            <button id="mark-all-read-btn">Mark All As Read</button>
+        </div>
+
+        <!-- Inbox List -->
+        <div class="status-card" style="padding: 0;">
+            <ul id="inbox-list" class="inbox-list">
+                <!-- Messages will be rendered here by inbox.js -->
+            </ul>
+            <p id="empty-inbox-message" class="empty-message hidden" style="padding: 20px;">Your inbox is empty!</p>
+        </div>
+    </main>
+
+    <script src="/inbox.js"></script>
+</body>
+</html>

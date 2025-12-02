@@ -36,19 +36,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     
-    // --- DOM Elements ---
-    const adminTabs = document.getElementById('admin-tabs');
+    // --- DOM Elements (Updated/New) ---
+    const adminTabs = document.getElementById('admin-tabs'); // Kept for inner tabs
     const tableTitle = document.getElementById('table-title');
     const dataTable = document.getElementById('admin-data-table');
     const searchInput = document.getElementById('search-input');
     const exportBtn = document.getElementById('export-btn');
-    const importBtn = document.getElementById('import-btn');
+    
+    // NEW Elements for top-level tabs and new import triggers
+    const topAdminTabs = document.querySelectorAll('.tab-btn-admin');
+    const tabContents = document.querySelectorAll('.tab-content-admin');
+    const importTriggerBtns = document.querySelectorAll('.import-trigger, .update-trigger');
+
+    // Updated/New Elements for Import Modal and Schedule Search
     const importModal = document.getElementById('import-modal');
     const modalCloseBtn = importModal.querySelector('.close-btn');
     const importForm = document.getElementById('import-form');
-    const scheduleSearchBtn = document.getElementById('search-schedule-btn');
-    const userCodeInput = document.getElementById('user-code-input');
-    const userScheduleOutput = document.getElementById('user-schedule-output');
+    // const importBtn = document.getElementById('import-btn'); // No longer needed as primary trigger
+    
+    // UPDATE THESE SELECTORS for the new schedule search area
+    const scheduleSearchBtn = document.getElementById('search-schedule-btn-new'); 
+    const userCodeInput = document.getElementById('user-code-input-new'); 
+    const userScheduleOutput = document.getElementById('user-schedule-output-new');
 
 
     // --- Functions ---
@@ -113,35 +122,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Event Listeners ---
 
-    // 1. Tab Switching
-    adminTabs.addEventListener('click', (event) => {
-        if (event.target.classList.contains('tab-btn')) {
-            const selectedTable = event.target.getAttribute('data-table');
+    // NEW: 1. Top-Level Tab Switching (Data Preview vs. Import & Schedules)
+    topAdminTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetTab = tab.getAttribute('data-tab-content');
             
-            // Update active state
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            // Deactivate all tabs and hide all content
+            topAdminTabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(content => content.classList.add('hidden'));
 
-            // Render new table
-            renderTable(selectedTable);
-            searchInput.value = ''; // Clear search when switching tabs
-        }
+            // Activate the clicked tab and show content
+            tab.classList.add('active');
+            document.getElementById(targetTab).classList.remove('hidden');
+
+            // If switching to Data Preview, re-render the default table
+            if (targetTab === 'data-preview-section') {
+                renderTable('student');
+            }
+        });
     });
 
-    // 2. Search/Filter
-    searchInput.addEventListener('keyup', filterTable);
 
-    // 3. Export CSV
-    exportBtn.addEventListener('click', () => {
-        const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-table');
-        console.log(`Simulating export of ${activeTab} table to CSV...`);
-        alert(`Successfully generated and downloaded ${activeTab}.csv. (Simulation)`);
-        // In Spring Boot, this would trigger an API endpoint that streams the CSV data.
-    });
+    // 2. Inner Tab Switching (Student/Lecturer/Schedule/Compliance)
+    // CRITICAL FIX: Check if adminTabs element exists before adding listener
+    if (adminTabs) { 
+        adminTabs.addEventListener('click', (event) => {
+            if (event.target.classList.contains('tab-btn')) {
+                const selectedTable = event.target.getAttribute('data-table');
+                
+                // Update active state
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
 
-    // 4. Import/Update Modal
-    importBtn.addEventListener('click', () => {
-        importModal.classList.remove('hidden');
+                // Render new table
+                renderTable(selectedTable);
+                searchInput.value = ''; // Clear search when switching tabs
+            }
+        });
+    }
+
+    // 3. Search/Filter (Remains the same, uses the inner tab)
+    if (searchInput) {
+        searchInput.addEventListener('keyup', filterTable);
+    }
+
+    // 4. Import/Update Modal (Uses new triggers)
+    importTriggerBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            importModal.classList.remove('hidden');
+            // Optional: Auto-select the table based on the card h3
+            const targetTable = btn.closest('.card').querySelector('h3').textContent.split(' ')[0].toLowerCase();
+            document.getElementById('target-table').value = targetTable;
+        });
     });
 
     modalCloseBtn.addEventListener('click', () => {
@@ -165,27 +197,39 @@ document.addEventListener('DOMContentLoaded', () => {
         // In Spring Boot, this would be a file upload API endpoint.
     });
 
-    // 5. Search User Schedule
-    scheduleSearchBtn.addEventListener('click', () => {
-        const userCode = userCodeInput.value.trim();
-        if (userCode) {
-            console.log(`Searching schedule for user: ${userCode}`);
-            // SIMULATION: Fetch relevant schedule data
-            userScheduleOutput.innerHTML = `
-                <h4>Schedule for ${userCode}</h4>
-                <p><strong>Total Sessions Found:</strong> 2</p>
-                <p><strong>Next Session:</strong> 2025-12-05 10:00 with Lecturer X</p>
-                <p style="font-style: italic;">(In a real app, a mini-schedule table would be displayed here.)</p>
-            `;
-        } else {
-            userScheduleOutput.innerHTML = `<p style="color: red;">Please enter a valid NPM or LecturerCode.</p>`;
-        }
-    });
+    // 5. Search User Schedule (Uses new triggers)
+    // CRITICAL FIX: Check if scheduleSearchBtn element exists before adding listener
+    if (scheduleSearchBtn) {
+        scheduleSearchBtn.addEventListener('click', () => {
+            const userCode = userCodeInput.value.trim();
+            if (userCode) {
+                console.log(`Searching schedule for user: ${userCode}`);
+                // SIMULATION: Fetch relevant schedule data
+                userScheduleOutput.innerHTML = `
+                    <h4>Schedule for ${userCode}</h4>
+                    <p><strong>Total Sessions Found:</strong> 2</p>
+                    <p><strong>Next Session:</strong> 2025-12-05 10:00 with Lecturer X</p>
+                    <p style="font-style: italic;">(In a real app, a mini-schedule table would be displayed here.)</p>
+                `;
+            } else {
+                userScheduleOutput.innerHTML = `<p style="color: red;">Please enter a valid NPM or LecturerCode.</p>`;
+            }
+        });
+    }
 
+    // --- Logout Modal Logic ---
     const logoutModal = document.getElementById('logout-modal');
     const logoutBtn = document.getElementById('logout-btn');
     const confirmLogoutBtn = document.getElementById('confirm-logout-btn');
     const cancelLogoutBtn = document.getElementById('cancel-logout-btn');
+
+    if (logoutBtn) {
+        // 1. Open the modal when the 'Logout' link is clicked
+        logoutBtn.addEventListener('click', (event) => {
+            event.preventDefault(); 
+            logoutModal.classList.remove('hidden');
+        });
+    }
 
     // 1. Open the modal when the 'Logout' link is clicked
     logoutBtn.addEventListener('click', (event) => {
@@ -200,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Confirm logout and redirect
     confirmLogoutBtn.addEventListener('click', () => {
-        // This URL maps to the /logout @GetMapping in your HomeController.java
+        // This URL typically directs to a server endpoint to clear the session
         window.location.href = '/logout'; 
     });
 
@@ -208,8 +252,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('click', (event) => { 
         if (event.target === logoutModal) {
             logoutModal.classList.add('hidden');
-        } 
+        }
     });
+
     // --- Initialization ---
     renderTable('student'); // Load student table by default
 });

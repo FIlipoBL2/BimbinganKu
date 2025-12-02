@@ -16,8 +16,6 @@
     <header>
         <div class="logo">BimbinganKU (Admin)</div>
         <nav>
-            <a href="#">Home</a>
-            <a href="#">Settings</a>
             <a href="#" id="logout-btn">Logout</a>
         </nav>
     </header>
@@ -29,23 +27,78 @@
         </section>
 
         <section class="scheduling-section">
-            <div class="schedule-controls" style="align-items: flex-start;">
-                <div class="tab-menu" id="admin-tabs">
-                    <button class="tab-btn active" data-table="student">Student Table</button>
-                    <button class="tab-btn" data-table="lecturer">Lecturer Table</button>
-                    <button class="tab-btn" data-table="schedule">Schedule Table</button>
-                    <button class="tab-btn" data-table="compliance">Compliance Report</button>
-                </div>
+            <div class="tab-menu-admin">
+                <button class="tab-btn-admin active" data-tab-content="data-preview-section">Data Preview</button>
+                <button class="tab-btn-admin" data-tab-content="import-schedules-section" id="admin-import-tab-btn">Import & Schedules</button>
+            </div>
+            <hr> <div id="admin-tab-content">
+                
+                <div id="data-preview-section" class="tab-content-admin active">
+                    <div class="schedule-controls" style="align-items: flex-start;">
+                        <div class="tab-menu" id="admin-tabs">
+                            <button class="tab-btn active" data-table="student">Student Table</button>
+                            <button class="tab-btn" data-table="lecturer">Lecturer Table</button>
+                            <button class="tab-btn" data-table="schedule">Schedule Table</button>
+                            <button class="tab-btn" data-table="compliance">Compliance Report</button>
+                        </div>
+                    </div>
 
-                <div class="session-actions" style="display: flex; gap: 10px;">
-                    <button id="import-btn" class="primary-btn" style="background-color: #ffc107; color: #333;">📤 Import/Update</button>
-                    <button id="export-btn" class="primary-btn">⬇️ Export CSV</button>
+                    <div class="data-filters" style="display: flex; gap: 20px; margin-bottom: 15px;">
+                        <input type="text" id="search-input" placeholder="Search by ID, Name, or Day..." style="flex-grow: 1; padding: 8px;">
+                    </div>
+                    
+                    <div class="data-table-container">
+                        <h3 id="table-title">Student Table</h3>
+                        <table id="admin-data-table" class="data-table"></table>
+                    </div>
+                </div>
+                
+                <div id="import-schedules-section" class="tab-content-admin hidden">
+                    <div class="section">
+                        <h2>Database Management</h2>
+                        <div class="grid-4">
+                            <div class="card">
+                                <h3>Student Table</h3>
+                                <div class="button-row">
+                                    <button class="btn blue import-trigger">Import</button>
+                                    <button class="btn green update-trigger">Update</button>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <h3>Lecturer Table</h3>
+                                <div class="button-row">
+                                    <button class="btn blue import-trigger">Import</button>
+                                    <button class="btn green update-trigger">Update</button>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <h3>Schedule Table</h3>
+                                <div class="button-row">
+                                    <button class="btn blue import-trigger">Import</button>
+                                    <button class="btn green update-trigger">Update</button>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <h3>NPMTopicCode Table</h3>
+                                <div class="button-row">
+                                    <button class="btn blue import-trigger">Import</button>
+                                    <button class="btn green update-trigger">Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h2>User Schedule Preview</h2>
+                        <input type="text" id="user-code-input-new" class="search-input" placeholder="Search by Kode User...">
+                        <button id="search-schedule-btn-new" class="primary-btn" style="background-color: #17a2b8; margin-top: 15px;">View Schedule</button>
+                        <div id="user-schedule-output-new" style="margin-top: 15px; background-color: #f9f9f9; padding: 10px; border-radius: 4px;"></div>
+                    </div>
                 </div>
             </div>
-
-            <div class="data-filters" style="display: flex; gap: 20px; margin-bottom: 15px;">
-                <input type="text" id="search-input" placeholder="Search by ID, Name, or Day..." style="flex-grow: 1; padding: 8px;">
-                </div>
 
             <div class="data-table-container">
                 <h3 id="table-title">Student Table</h3>

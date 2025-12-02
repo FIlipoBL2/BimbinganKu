@@ -11,6 +11,13 @@
     <header>
         <div class="logo">BimbinganKU</div>
         <nav>
+            <!-- NEW: Inbox Button -->
+            <div class="inbox-area">
+                <a th:href="@{/inbox(role='student')}" href="/inbox.html?role=student" id="inbox-link" title="Inbox">✉️ Inbox</a>
+                <!-- NOTE: Unread badge will NOT be here, it is only on notifications -->
+            </div>
+
+            <!-- Notification Dropdown -->
             <div class="notification-area" id="notification-area">
                 <span id="notification-bell" role="button" aria-haspopup="true" aria-expanded="false">🔔</span>
                 <span id="unread-count" class="badge hidden" aria-live="polite">0</span>
@@ -19,7 +26,6 @@
                     <p class="empty-message">No unread messages.</p>
                 </div>
             </div>
-
             <a href="#" id="logout-btn">Logout</a>
         </nav>
     </header>
