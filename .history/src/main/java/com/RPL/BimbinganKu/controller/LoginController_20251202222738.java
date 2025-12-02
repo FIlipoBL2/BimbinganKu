@@ -22,10 +22,6 @@ public class LoginController {
     
     @PostMapping("/login")
     public String loginProcess(@RequestParam String email, @RequestParam String password, HttpSession session, Model model) {
-        if(email.equals(adminEmail) && password.equals(adminPass)) {
-            return "redirect:/admin/dashboard";
-        }
-        
         User user = userService.login(email, password);
         
         if (user == null) {

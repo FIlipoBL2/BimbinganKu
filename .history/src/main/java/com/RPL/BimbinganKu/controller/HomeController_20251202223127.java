@@ -61,6 +61,8 @@ public class HomeController {
      */
     @GetMapping("/logout")
     public String logout(HttpSession session) {
+        // In a real application with Spring Security, session invalidation would happen here.
+        // For now, we simply redirect to the login page.
         session.invalidate();
         return "redirect:/login"; // Redirects to the /login path mapped in showLogin()
     }

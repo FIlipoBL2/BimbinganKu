@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.RPL.BimbinganKu.data.Student;
 import com.RPL.BimbinganKu.repository.StudentRepository;
 
-import jakarta.servlet.http.HttpSession;
-
 @Controller
 public class HomeController {
 
@@ -60,8 +58,9 @@ public class HomeController {
      * Handles the logout request and redirects to the login page.
      */
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
+    public String logout() {
+        // In a real application with Spring Security, session invalidation would happen here.
+        // For now, we simply redirect to the login page.
         return "redirect:/login"; // Redirects to the /login path mapped in showLogin()
     }
 }

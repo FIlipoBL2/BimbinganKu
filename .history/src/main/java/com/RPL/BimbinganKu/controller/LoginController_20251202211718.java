@@ -16,16 +16,9 @@ import jakarta.servlet.http.HttpSession;
 public class LoginController {
     @Autowired
     private UserService userService;
-
-    private final String adminEmail = "admin";
-    private final String adminPass = "admin123";
     
     @PostMapping("/login")
     public String loginProcess(@RequestParam String email, @RequestParam String password, HttpSession session, Model model) {
-        if(email.equals(adminEmail) && password.equals(adminPass)) {
-            return "redirect:/admin/dashboard";
-        }
-        
         User user = userService.login(email, password);
         
         if (user == null) {
