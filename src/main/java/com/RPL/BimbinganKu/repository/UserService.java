@@ -42,17 +42,15 @@ public class UserService {
     }
     
     public User login(String email, String password) {
-        Optional<User> optional = userRepository.findByEmail(email);
-        
-        if (optional.isEmpty()) {
+        User user = userRepository.findByEmail(email.trim()).orElse(null);
+
+        if (user == null)
             return null;
-        }
-        
-        User user = optional.get();
-        
+
         if (passwordEncoder.matches(password.trim(), user.getPassword())) {
             return user;
-        } else return null;
+        } else
+            return null;
     }
     
     public String getUserType(User user) {
