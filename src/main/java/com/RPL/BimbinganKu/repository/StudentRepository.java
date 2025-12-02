@@ -24,8 +24,8 @@ public class StudentRepository {
     void save(Student user) throws Exception {
         User newUser = new User(user.getEmail(), user.getPassword(), user.getName());
         userRepo.save(newUser);
-        
-        int user_id = userRepo.getUserId(newUser);
+
+        String user_id = userRepo.getUserId(newUser);
 
         String sql = "INSERT INTO Students (npm, user_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, user.getNpm(), user_id);
@@ -47,12 +47,11 @@ public class StudentRepository {
 
     private Student mapRowToStudent(ResultSet resultSet, int rowNum) throws SQLException {
         return new Student(
-            resultSet.getString("email"),
-            resultSet.getString("password"),
-            resultSet.getString("name"),
-            resultSet.getString("npm"),
-            resultSet.getInt("total_guidance_uas"),
-            resultSet.getInt("total_guidance_uts")
-        );
+                resultSet.getString("email"),
+                resultSet.getString("password"),
+                resultSet.getString("name"),
+                resultSet.getString("npm"),
+                resultSet.getInt("totalGuidanceUAS"),
+                resultSet.getInt("totalGuidanceUTS"));
     }
 }

@@ -17,13 +17,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()
-            )
-            .formLogin(form -> form
-                .loginPage("/login")  // use your login page
-                .permitAll()
-            );
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll())
+                .formLogin(form -> form
+                        .loginPage("/login") // use your login page
+                        .permitAll());
 
         return http.build();
     }
