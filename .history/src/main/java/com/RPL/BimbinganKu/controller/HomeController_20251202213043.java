@@ -1,6 +1,7 @@
 package com.RPL.BimbinganKu.controller;
 
 import com.RPL.BimbinganKu.data.Student;
+import com.RPL.BimbinganKu.repository.StudentRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -8,6 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
+
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 
 import com.RPL.BimbinganKu.repository.StudentRepository;
 
@@ -22,7 +25,7 @@ public class HomeController {
      */
     @GetMapping({"/", "/login"})
     public String showLogin() {
-        return "login";
+        return "login"; 
     }
 
     /**
@@ -42,7 +45,7 @@ public class HomeController {
             model.addAttribute("sessionCount", 0);
         }
         
-        return "student";
+        return "student"; 
     }
 
     /**
@@ -61,7 +64,7 @@ public class HomeController {
     @GetMapping("/admin/dashboard")
     public String showAdminDashboard(Model model) {
         // Here, you would fetch data necessary for admin tables/reports
-        return "admin";
+        return "admin"; 
     }
 
     /**

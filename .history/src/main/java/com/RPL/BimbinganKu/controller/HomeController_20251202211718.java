@@ -1,7 +1,7 @@
 package com.RPL.BimbinganKu.controller;
 
-import com.RPL.BimbinganKu.data.Student;
-
+import com.RPL.BimbinganKu.model.Student;
+import com.RPL.BimbinganKu.repository.StudentDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,20 +9,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
-import com.RPL.BimbinganKu.repository.StudentRepository;
-
 @Controller
 public class HomeController {
 
+    private final StudentDAO studentDAO;
+
     @Autowired
-    private StudentRepository studentRepo;
+    public HomeController(StudentDAO studentDAO) {
+        this.studentDAO = studentDAO;
+    }
 
     /**
      * Maps the base URL (http://localhost:8080/) and /login to the login template.
      */
     @GetMapping({"/", "/login"})
     public String showLogin() {
-        return "login";
+        return "login"; 
     }
 
     /**
@@ -31,18 +33,18 @@ public class HomeController {
     @GetMapping("/student/home")
     public String showStudentDashboard(Model model) {
         // --- THIS LINE IS WHERE THE ERROR IS OCCURRING ---
-        List<Student> students = studentRepo.findAll();
+        List<Student> students = studentDAO.findAll();
         
         if (!students.isEmpty()) {
             Student currentStudent = students.get(0);
             model.addAttribute("studentName", currentStudent.getName()); 
-            model.addAttribute("sessionCount", currentStudent.getTotalGuidanceUTS());
+            model.addAttribute("sessionCount", currentStudent.getGuidanceCount());
         } else {
             model.addAttribute("studentName", "[No Student Data]");
             model.addAttribute("sessionCount", 0);
         }
         
-        return "student";
+        return "student"; 
     }
 
     /**
@@ -61,7 +63,7 @@ public class HomeController {
     @GetMapping("/admin/dashboard")
     public String showAdminDashboard(Model model) {
         // Here, you would fetch data necessary for admin tables/reports
-        return "admin";
+        return "admin"; 
     }
 
     /**
