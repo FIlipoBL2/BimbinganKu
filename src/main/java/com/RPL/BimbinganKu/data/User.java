@@ -23,4 +23,10 @@ public class User {
     @NotBlank
     @Size(max = 255)
     private String name;
+
+    public User(User user) {
+        this.email = user.email;
+        this.name = user.name;
+        this.password = user.password;
+    }
 }
