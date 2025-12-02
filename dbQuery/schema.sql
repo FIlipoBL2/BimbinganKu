@@ -1,19 +1,19 @@
 CREATE TABLE Users (
-	id BIGSERIAL PRIMARY KEY,
+	id VARCHAR(10) PRIMARY KEY,
 	name VARCHAR(255) NOT NULL,
 	email VARCHAR(255) NOT NULL,
 	password VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE Students (
-	NPM BIGSERIAL PRIMARY KEY,
+	NPM VARCHAR(10) PRIMARY KEY,
 	totalGuidanceUTS INT NOT NULL DEFAULT 0,
 	totalGuidanceUAS INT NOT NULL DEFAULT 0,
 	FOREIGN KEY (NPM) REFERENCES Users(id)
 );
 
 CREATE TABLE Lecturers (
-	lecturerCode BIGSERIAL PRIMARY KEY,
+	lecturerCode VARCHAR(10) PRIMARY KEY,
 	FOREIGN KEY (lecturerCode) REFERENCES Users(id)
 );
 
@@ -32,7 +32,7 @@ CREATE TABLE Akademik(
 );
 
 CREATE TABLE StudentSchedule(
-	NPM SERIAL,
+	NPM VARCHAR,
 	akademik_ID SERIAL NOT NULL,
 	day VARCHAR(10) NOT NULL,
 	hourStart TIME NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE StudentSchedule(
 );
 
 CREATE TABLE LecturerSchedule(
-	lecturerCode SERIAL,
+	lecturerCode VARCHAR(10),
 	akademik_ID SERIAL NOT NULL,
 	day VARCHAR(10) NOT NULL,
 	hourStart TIME NOT NULL,
@@ -53,8 +53,8 @@ CREATE TABLE LecturerSchedule(
 
 CREATE TABLE Topic(
 	topicCode VARCHAR(10) PRIMARY KEY,
-	NPM SERIAL,
-	lecturerCode SERIAL,
+	NPM VARCHAR,
+	lecturerCode VARCHAR(10),
 	topicName VARCHAR(255) NOT NULL,
 	FOREIGN KEY (NPM) REFERENCES Students(NPM),
 	FOREIGN KEY (lecturerCode) REFERENCES Lecturers(lecturerCode)
