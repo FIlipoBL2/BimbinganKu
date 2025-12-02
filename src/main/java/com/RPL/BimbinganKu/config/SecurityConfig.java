@@ -13,16 +13,15 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll())
-                .formLogin(form -> form
-                        .loginPage("/login") // use your login page
-                        .permitAll());
-
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+        .formLogin(login -> login.disable())  // <--- let YOUR controller handle login
+        .logout(logout -> logout.disable());   // optional
+        
         return http.build();
     }
 }

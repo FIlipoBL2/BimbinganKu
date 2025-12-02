@@ -16,31 +16,44 @@ import jakarta.servlet.http.HttpSession;
 public class LoginController {
     @Autowired
     private UserService userService;
-
-    private final String adminEmail = "admin";
-    private final String adminPass = "admin123";
+    
+    User admin = new User("admin", "admin123", "admin");
+    
+    //admin123 but encrypted
+    // private final String adminPass = "$2b$12$NCddI0iCpbJQR8pdTYPseOE5WYdb0H4GZqF9gX1ajRw87qZPE8GYu";
     
     @PostMapping("/login")
     public String loginProcess(@RequestParam String email, @RequestParam String password, HttpSession session, Model model) {
-        if(email.equals(adminEmail) && password.equals(adminPass)) {
-            return "redirect:/admin/dashboard";
-        }
+        // if(email.equals(adminEmail) && adminPass.equals(userService.encodePassword(password))) {
+        //     return "redirect:/admin/dashboard";
+        // }
         
         User user = userService.login(email, password);
+        String role = "";
         
         if (user == null) {
-            model.addAttribute("status", "failed");
-            return "login";
+            if (email.equals(admin.getEmail()) && password.equals(admin.getPassword())) {
+                user = admin;
+                role = "admin";
+            } else {
+                model.addAttribute("status", "failed");
+                return "login";
+            }
         }
+        
         
         model.addAttribute("status", null);
         session.setAttribute("loggedUser", user);
-        String role = userService.getUserType(user);
+        if (role.equals("")) role = userService.getUserType(user);
         
-        if (role.equals("student")) {
+        switch (role) {
+            case "student":
             return "redirect:/student/home";
+            case "lecturer":
+            return "redirect:/lecturer/home";
+            default:
+            return "redirect:/admin/dashboard";
         }
-        else return "redirect:/lecturer/home";
     }
     
     @GetMapping("/login")
