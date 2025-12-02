@@ -28,7 +28,7 @@ public class UserService {
         student = encodePassword(student);
 
         try {
-            studentRepository.save(student);
+            studentRepository.save(user);
         } catch (Exception e) {
             return false;
         }
