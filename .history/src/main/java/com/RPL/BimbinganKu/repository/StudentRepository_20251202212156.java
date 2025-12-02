@@ -32,17 +32,9 @@ public class StudentRepository {
     }
 
     Optional<Student> findByNPM(String npm) {
-        String sql = "SELECT * FROM Students JOIN Users ON Users.id = Students.NPM WHERE NPM = ?";
+        String sql = "SELECT * FROM Students WHERE npm = ?";
         List<Student> results = jdbcTemplate.query(sql, this::mapRowToStudent, npm);
         return results.isEmpty() ? empty() : Optional.of(results.get(0));
-    }
-
-    public List<Student> findAll() {
-        // *** FIX: Added JOIN to 'users' table to fetch the student's name ***
-        // Alias 's' for student and 'u' for users
-        String sql = "SELECT * FROM Student s JOIN Users u ON s.NPM = u.id";
-
-        return jdbcTemplate.query(sql, this::mapRowToStudent);
     }
 
     private Student mapRowToStudent(ResultSet resultSet, int rowNum) throws SQLException {
@@ -53,6 +45,21 @@ public class StudentRepository {
             resultSet.getString("npm"),
             resultSet.getInt("total_guidance_uas"),
             resultSet.getInt("total_guidance_uts")
+        );
+    }
+
+    public List<Student> findAll() {
+        // *** FIX: Added JOIN to 'users' table to fetch the student's name ***
+        // Alias 's' for student and 'u' for users
+        String sql = "SELECT s.npm, u.name, s.total_guidance_uts AS guidance_count " + "FROM student s JOIN users u ON s.user_id = u.id";
+        
+        return jdbcTemplate.query(sql, (rs, rowNum) ->
+            new Student(
+                rs.getString("npm"),
+                rs.getString("name"),
+                // Major field is omitted as it is not in the schema snippet
+                rs.getInt("guidance_count")
+            )
         );
     }
 }
