@@ -17,7 +17,7 @@ public class LoginController {
     @Autowired
     private UserService userService;
     
-    User admin = new User("admin@gmail.com", "admin123", "admin");
+    User admin = new User("admin", "admin123", "admin");
     
     //admin123 but encrypted
     // private final String adminPass = "$2b$12$NCddI0iCpbJQR8pdTYPseOE5WYdb0H4GZqF9gX1ajRw87qZPE8GYu";
