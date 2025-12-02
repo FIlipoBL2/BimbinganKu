@@ -18,10 +18,7 @@ public class LoginController {
     private UserService userService;
     
     User admin = new User("admin", "admin123", "admin");
-    
-    //admin123 but encrypted
-    // private final String adminPass = "$2b$12$NCddI0iCpbJQR8pdTYPseOE5WYdb0H4GZqF9gX1ajRw87qZPE8GYu";
-    
+
     @PostMapping("/login")
     public String loginProcess(@RequestParam String email, @RequestParam String password, HttpSession session, Model model) {
         // if(email.equals(adminEmail) && adminPass.equals(userService.encodePassword(password))) {
