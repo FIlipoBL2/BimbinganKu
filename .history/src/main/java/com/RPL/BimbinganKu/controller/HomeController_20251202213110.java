@@ -1,13 +1,14 @@
 package com.RPL.BimbinganKu.controller;
 
-import java.util.List;
+import com.RPL.BimbinganKu.data.Student;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.RPL.BimbinganKu.data.Student;
+import java.util.List;
+
 import com.RPL.BimbinganKu.repository.StudentRepository;
 
 @Controller
@@ -17,10 +18,19 @@ public class HomeController {
     private StudentRepository studentRepo;
 
     /**
+     * Maps the base URL (http://localhost:8080/) and /login to the login template.
+     */
+    @GetMapping({"/", "/login"})
+    public String showLogin() {
+        return "login";
+    }
+
+    /**
      * Maps to the student dashboard and fetches dynamic data from the database.
      */
     @GetMapping("/student/home")
     public String showStudentDashboard(Model model) {
+        // --- THIS LINE IS WHERE THE ERROR IS OCCURRING ---
         List<Student> students = studentRepo.findAll();
         
         if (!students.isEmpty()) {

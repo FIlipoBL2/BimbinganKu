@@ -21,6 +21,7 @@ public class HomeController {
      */
     @GetMapping("/student/home")
     public String showStudentDashboard(Model model) {
+        // --- THIS LINE IS WHERE THE ERROR IS OCCURRING ---
         List<Student> students = studentRepo.findAll();
         
         if (!students.isEmpty()) {

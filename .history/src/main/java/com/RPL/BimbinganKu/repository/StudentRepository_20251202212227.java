@@ -32,17 +32,9 @@ public class StudentRepository {
     }
 
     Optional<Student> findByNPM(String npm) {
-        String sql = "SELECT * FROM Students JOIN Users ON Users.id = Students.NPM WHERE NPM = ?";
+        String sql = "SELECT * FROM Students WHERE npm = ?";
         List<Student> results = jdbcTemplate.query(sql, this::mapRowToStudent, npm);
         return results.isEmpty() ? empty() : Optional.of(results.get(0));
-    }
-
-    public List<Student> findAll() {
-        // *** FIX: Added JOIN to 'users' table to fetch the student's name ***
-        // Alias 's' for student and 'u' for users
-        String sql = "SELECT * FROM Students JOIN Users ON Students.NPM = Users.id";
-
-        return jdbcTemplate.query(sql, this::mapRowToStudent);
     }
 
     private Student mapRowToStudent(ResultSet resultSet, int rowNum) throws SQLException {

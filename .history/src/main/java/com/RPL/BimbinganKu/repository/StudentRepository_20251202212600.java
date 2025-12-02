@@ -40,7 +40,7 @@ public class StudentRepository {
     public List<Student> findAll() {
         // *** FIX: Added JOIN to 'users' table to fetch the student's name ***
         // Alias 's' for student and 'u' for users
-        String sql = "SELECT * FROM Students JOIN Users ON Students.NPM = Users.id";
+        String sql = "SELECT s.npm, u.name, s.total_guidance_uts AS guidance_count " + "FROM student s JOIN users u ON s.user_id = u.id";
 
         return jdbcTemplate.query(sql, this::mapRowToStudent);
     }
