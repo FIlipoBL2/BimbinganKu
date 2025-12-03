@@ -3,10 +3,12 @@ package com.RPL.BimbinganKu.data;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Student extends User {
     @NotBlank
     @Size(min = 10, max = 10)
