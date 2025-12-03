@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.RPL.BimbinganKu.data.Lecturer;
 import com.RPL.BimbinganKu.data.Student;
 import com.RPL.BimbinganKu.data.User;
 import com.RPL.BimbinganKu.repository.LecturerRepository;
@@ -42,7 +43,7 @@ public class AdminRestController {
     }
 
     @GetMapping("/lecturers")
-    public List<User> getAllLecturers() {
+    public List<Lecturer> getAllLecturers() {
         return lecturerRepo.findAll();
     }
 

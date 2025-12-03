@@ -17,7 +17,7 @@ public class LoginController {
     @Autowired
     private UserService userService;
     
-    User admin = new User("admin", "admin123", "admin");
+    User admin = new User("admin", "admin", "admin123", "admin");
 
     @PostMapping("/login")
     public String loginProcess(@RequestParam String email, @RequestParam String password, HttpSession session, Model model) {

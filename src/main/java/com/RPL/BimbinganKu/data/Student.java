@@ -16,7 +16,7 @@ public class Student extends User {
     private int totalGuidanceUAS;
 
     public Student(String email, String password, String name, String npm, int uasGuidance, int utsGuidance) {
-        super(email, password, name);
+        super(npm, email, password, name);
         this.npm = npm;
         this.totalGuidanceUAS = uasGuidance;
         this.totalGuidanceUTS = utsGuidance;

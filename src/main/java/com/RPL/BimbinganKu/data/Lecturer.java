@@ -2,7 +2,6 @@ package com.RPL.BimbinganKu.data;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +13,12 @@ public class Lecturer extends User {
     private String lecturerCode;
 
     public Lecturer(String email, String password, String name, String code) {
-        super(email, password, name);
+        super(code, email, password, name);
+        this.lecturerCode = code;
+    }
+
+    public Lecturer(User user, String code) {
+        super(user);
         this.lecturerCode = code;
     }
 }

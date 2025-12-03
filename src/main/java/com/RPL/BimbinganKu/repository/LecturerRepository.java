@@ -24,7 +24,7 @@ public class LecturerRepository {
     private UserRepository userRepo;
 
     void save(Lecturer user) throws Exception {
-        User newUser = new User(user.getEmail(), user.getPassword(), user.getName());
+        User newUser = new User(user.getId, user.getEmail(), user.getPassword(), user.getName());
         userRepo.save(newUser);
 
         String user_id = userRepo.getUserId(newUser);

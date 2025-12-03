@@ -61,6 +61,7 @@ public class UserRepository {
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return new User(
+                resultSet.getString("id"),
                 resultSet.getString("email"),
                 resultSet.getString("password"),
                 resultSet.getString("name"));

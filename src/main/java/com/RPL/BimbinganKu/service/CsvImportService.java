@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.RPL.BimbinganKu.data.Lecturer;
 import com.RPL.BimbinganKu.data.Student;
 import com.RPL.BimbinganKu.data.User;
 import com.RPL.BimbinganKu.repository.UserService;
@@ -59,7 +60,7 @@ public class CsvImportService {
                     String email = values[2].trim();
                     String password = values[3].trim();
 
-                    User lecturer = new User(email, password, code, name);
+                    Lecturer lecturer = new Lecturer(email, password, name, code);
                     userService.saveLecturer(lecturer);
                 }
             }
