@@ -5,8 +5,11 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import lombok.EqualsAndHashCode;
+
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Lecturer extends User {
     @NotBlank
     @Size(max = 50)
