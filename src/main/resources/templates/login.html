@@ -11,7 +11,7 @@
             <img src="">
             <h2>Welcome Back!</h2>
             <p th:unless="${status}==failed">Please enter your credentials to log in</p>
-            <p style="color: #D32F2F;" th:if="${status}==failed">Please check username or password</p>
+            <p style="color: #D32F2F;" th:if="${status}==failed">Please check email or password</p>
 
             <form action = "login" method="post">
                 <div class="input-group">
