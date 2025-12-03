@@ -27,7 +27,7 @@ public class StudentRepository {
 
         String user_id = userRepo.getUserId(newUser);
 
-        String sql = "INSERT INTO Students (npm, user_id) VALUES (?, ?)";
+        String sql = "INSERT INTO Students (npm) VALUES (?)";
         jdbcTemplate.update(sql, user.getNpm(), user_id);
     }
 
@@ -38,8 +38,6 @@ public class StudentRepository {
     }
 
     public List<Student> findAll() {
-        // *** FIX: Added JOIN to 'users' table to fetch the student's name ***
-        // Alias 's' for student and 'u' for users
         String sql = "SELECT * FROM Students JOIN Users ON Students.NPM = Users.id";
 
         return jdbcTemplate.query(sql, this::mapRowToStudent);
