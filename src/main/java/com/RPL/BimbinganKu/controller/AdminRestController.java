@@ -42,7 +42,7 @@ public class AdminRestController {
     }
 
     @GetMapping("/lecturers")
-    public List<User> getAllLecturers() {
+    public List<com.RPL.BimbinganKu.data.Lecturer> getAllLecturers() {
         return lecturerRepo.findAll();
     }
 

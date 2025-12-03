@@ -59,7 +59,7 @@ public class CsvImportService {
                     String email = values[2].trim();
                     String password = values[3].trim();
 
-                    User lecturer = new User(email, password, code, name);
+                    com.RPL.BimbinganKu.data.Lecturer lecturer = new com.RPL.BimbinganKu.data.Lecturer(email, password, name, code);
                     userService.saveLecturer(lecturer);
                 }
             }
