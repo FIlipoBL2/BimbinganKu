@@ -21,12 +21,24 @@ public class User {
     private String password;
 
     @NotBlank
+    @Size(max = 10)
+    private String id;
+
+    @NotBlank
     @Size(max = 255)
     private String name;
 
     public User(User user) {
+        this.id = user.id;
         this.email = user.email;
         this.name = user.name;
         this.password = user.password;
     }
+
+    public User(String email, String password, String name) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+    }
+
 }
