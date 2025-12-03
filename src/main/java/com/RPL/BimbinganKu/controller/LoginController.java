@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.RPL.BimbinganKu.data.User;
-import com.RPL.BimbinganKu.repository.UserService;
+import com.RPL.BimbinganKu.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
 
