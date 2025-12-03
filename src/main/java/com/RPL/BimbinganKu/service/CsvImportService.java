@@ -9,8 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.RPL.BimbinganKu.data.Lecturer;
 import com.RPL.BimbinganKu.data.Student;
-import com.RPL.BimbinganKu.data.User;
-import com.RPL.BimbinganKu.repository.UserService;
 
 @Service
 public class CsvImportService {

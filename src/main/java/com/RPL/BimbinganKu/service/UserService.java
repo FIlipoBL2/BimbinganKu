@@ -1,4 +1,4 @@
-package com.RPL.BimbinganKu.repository;
+package com.RPL.BimbinganKu.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import com.RPL.BimbinganKu.data.Lecturer;
 import com.RPL.BimbinganKu.data.Student;
 import com.RPL.BimbinganKu.data.User;
+import com.RPL.BimbinganKu.repository.LecturerRepository;
+import com.RPL.BimbinganKu.repository.StudentRepository;
+import com.RPL.BimbinganKu.repository.UserRepository;
 
 @Service
 public class UserService {

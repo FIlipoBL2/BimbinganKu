@@ -23,7 +23,7 @@ public class LecturerRepository {
     @Autowired
     private UserRepository userRepo;
 
-    void save(Lecturer user) throws Exception {
+    public void save(Lecturer user) throws Exception {
         User newUser = new User(user.getId, user.getEmail(), user.getPassword(), user.getName());
         userRepo.save(newUser);
 
@@ -33,7 +33,7 @@ public class LecturerRepository {
         jdbcTemplate.update(sql, user.getLecturerCode(), user_id);
     }
 
-    Optional<Lecturer> findByLecturerCode(String code) {
+    public Optional<Lecturer> findByLecturerCode(String code) {
         String sql = "SELECT * FROM Lecturers JOIN Users ON Users.id = Lecturers.lecturerCode WHERE NPM = ?";
         List<Lecturer> results = jdbcTemplate.query(sql, this::mapRowToLecturer, code);
         return results.isEmpty() ? empty() : Optional.of(results.get(0));

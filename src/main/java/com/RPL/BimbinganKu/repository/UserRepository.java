@@ -16,29 +16,29 @@ public class UserRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    void save(User user) throws Exception {
+    public void save(User user) throws Exception {
         String sql = "INSERT INTO Users (name, email, password) VALUES (?, ?, ?)";
         jdbcTemplate.update(sql, user.getName(), user.getEmail(), user.getPassword());
     }
 
-    Optional<User> findByName(String name) {
+    public Optional<User> findByName(String name) {
         String sql = "SELECT * FROM Users WHERE name = ?";
         List<User> results = jdbcTemplate.query(sql, this::mapRowToUser, name);
         return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 
-    Optional<User> findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         String sql = "SELECT * FROM Users WHERE email = ?";
         List<User> results = jdbcTemplate.query(sql, this::mapRowToUser, email);
         return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 
-    String getUserId(User user) {
+    public String getUserId(User user) {
         String sql = "SELECT id FROM Users WHERE email = ?";
         return jdbcTemplate.queryForObject(sql, String.class, user.getEmail());
     }
 
-    String getUserType(User user) {
+    public String getUserType(User user) {
         String user_id = getUserId(user);
 
         boolean isStudent = jdbcTemplate.queryForObject(

@@ -21,7 +21,7 @@ public class StudentRepository {
     @Autowired
     private UserRepository userRepo;
 
-    void save(Student user) throws Exception {
+    public void save(Student user) throws Exception {
         User newUser = new User(user.getId(), user.getEmail(), user.getPassword(), user.getName());
         userRepo.save(newUser);
 
@@ -31,7 +31,7 @@ public class StudentRepository {
         jdbcTemplate.update(sql, user.getNpm(), user_id);
     }
 
-    Optional<Student> findByNPM(String npm) {
+    public Optional<Student> findByNPM(String npm) {
         String sql = "SELECT * FROM Students JOIN Users ON Users.id = Students.NPM WHERE NPM = ?";
         List<Student> results = jdbcTemplate.query(sql, this::mapRowToStudent, npm);
         return results.isEmpty() ? empty() : Optional.of(results.get(0));
