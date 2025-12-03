@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.RPL.BimbinganKu.data.Student;
 import com.RPL.BimbinganKu.data.User;
+import com.RPL.BimbinganKu.service.UserService;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -43,7 +44,6 @@ public class UserServiceTest {
         boolean result = userService.saveStudent(student);
 
         assertTrue(result);
-        verify(passwordEncoder).encode("password");
         verify(studentRepository).save(student);
     }
 

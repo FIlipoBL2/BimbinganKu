@@ -16,7 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.RPL.BimbinganKu.data.User;
-import com.RPL.BimbinganKu.repository.UserService;
+import com.RPL.BimbinganKu.service.UserService;
 
 @WebMvcTest(LoginController.class)
 @AutoConfigureMockMvc(addFilters = false) // Bypass Security Filters

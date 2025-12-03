@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // In LecturerRepository we mapped it to User object which has id, name, email.
                 // Wait, LecturerRepository returns User objects. User object doesn't have 'lecturerCode' field explicitly if it's just User class.
                 // Let's check User class. It has 'id'.
-                row.insertCell().textContent = item.id || 'N/A';
+                row.insertCell().textContent = item.lecturerCode || 'N/A';
                 row.insertCell().textContent = item.name;
                 row.insertCell().textContent = item.email;
             } else if (type === 'schedule') {
