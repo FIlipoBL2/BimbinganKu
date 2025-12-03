@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.RPL.BimbinganKu.data.Lecturer;
 import com.RPL.BimbinganKu.data.Student;
 import com.RPL.BimbinganKu.data.User;
 
@@ -42,7 +43,7 @@ public class UserService {
         return true;
     }
 
-    public boolean saveLecturer(User lecturer) {
+    public boolean saveLecturer(Lecturer lecturer) {
         lecturer = encodePassword(lecturer);
         try {
             // First save to Users table (handled by LecturerRepository.save which calls
@@ -52,7 +53,6 @@ public class UserService {
             // StudentRepository.save calls userRepo.save(newUser) then inserts into
             // Students.
             // So we should do the same here.
-            userRepository.save(lecturer);
             lecturerRepository.save(lecturer);
         } catch (Exception e) {
             return false;
