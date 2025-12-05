@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.RPL.BimbinganKu.data.Lecturer;
 import com.RPL.BimbinganKu.data.Student;
+import com.RPL.BimbinganKu.data.User;
 import com.RPL.BimbinganKu.repository.LecturerRepository;
 import com.RPL.BimbinganKu.repository.ScheduleRepository;
 import com.RPL.BimbinganKu.repository.StudentRepository;

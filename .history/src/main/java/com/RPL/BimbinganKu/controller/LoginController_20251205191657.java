@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.RPL.BimbinganKu.data.User;
-import com.RPL.BimbinganKu.data.UserType;
 import com.RPL.BimbinganKu.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -28,8 +27,7 @@ public class LoginController {
         
         if (user == null) {
             if (email.equals(admin.getEmail()) && password.equals(admin.getPassword())) {
-                session.setAttribute("curUser", UserType.ADMIN);
-                user = admin;
+                user = email;
                 role = "admin";
             } else {
                 model.addAttribute("status", "failed");
@@ -37,22 +35,18 @@ public class LoginController {
             }
         }
         
+        
         model.addAttribute("status", null);
         session.setAttribute("loggedUser", user);
         if (role.equals("")) role = userService.getUserType(user);
         
         switch (role) {
-            case "student" -> {
-                session.setAttribute("curUser", UserType.STUDENT);
-                return "redirect:/student/home";
-            }
-            case "lecturer" -> {
-                session.setAttribute("curUser", UserType.LECTURER);
-                return "redirect:/lecturer/home";
-            }
-            default -> {
-                return "redirect:/admin/dashboard";
-            }
+            case "student":
+            return "redirect:/student/home";
+            case "lecturer":
+            return "redirect:/lecturer/home";
+            default:
+            return "redirect:/admin/dashboard";
         }
     }
     
@@ -62,11 +56,12 @@ public class LoginController {
         User logged = (User) session.getAttribute("loggedUser");
         
         if (logged != null) {
-            // redirect based on session curUser attribute
+            // User already logged in → redirect based on role
+            String role = userService.getUserType(logged);
             
-            if (session.getAttribute("curUser").equals(UserType.STUDENT)) {
+            if (role.equals("student")) {
                 return "redirect:/student/home";
-            } else if (session.getAttribute("curUser").equals(UserType.LECTURER)) {
+            } else {
                 return "redirect:/lecturer/home";
             }
         }

@@ -42,17 +42,12 @@ public class LoginController {
         if (role.equals("")) role = userService.getUserType(user);
         
         switch (role) {
-            case "student" -> {
-                session.setAttribute("curUser", UserType.STUDENT);
-                return "redirect:/student/home";
-            }
-            case "lecturer" -> {
-                session.setAttribute("curUser", UserType.LECTURER);
-                return "redirect:/lecturer/home";
-            }
-            default -> {
-                return "redirect:/admin/dashboard";
-            }
+            case "student":
+            return "redirect:/student/home";
+            case "lecturer":
+            return "redirect:/lecturer/home";
+            default:
+            return "redirect:/admin/dashboard";
         }
     }
     
@@ -62,11 +57,12 @@ public class LoginController {
         User logged = (User) session.getAttribute("loggedUser");
         
         if (logged != null) {
-            // redirect based on session curUser attribute
+            // User already logged in → redirect based on role
+            String role = userService.getUserType(logged);
             
-            if (session.getAttribute("curUser").equals(UserType.STUDENT)) {
+            if (role.equals("student")) {
                 return "redirect:/student/home";
-            } else if (session.getAttribute("curUser").equals(UserType.LECTURER)) {
+            } else {
                 return "redirect:/lecturer/home";
             }
         }

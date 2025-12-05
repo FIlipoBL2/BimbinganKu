@@ -8,9 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.RPL.BimbinganKu.annotation.LoginRequired;
-import com.RPL.BimbinganKu.annotation.RequiresRole;
 import com.RPL.BimbinganKu.data.Student;
-import com.RPL.BimbinganKu.data.UserType;
 import com.RPL.BimbinganKu.repository.StudentRepository;
 
 import jakarta.servlet.http.HttpSession;
@@ -25,7 +23,6 @@ public class HomeController {
      * Maps to the student dashboard and fetches dynamic data from the database.
      */
     @LoginRequired
-    @RequiresRole({UserType.STUDENT})
     @GetMapping("/student/home")
     public String showStudentDashboard(Model model) {
         List<Student> students = studentRepo.findAll();
@@ -46,7 +43,6 @@ public class HomeController {
      * Maps to the lecturer dashboard.
      */
     @LoginRequired
-    @RequiresRole({UserType.LECTURER})
     @GetMapping("/lecturer/home")
     public String showLecturerDashboard(Model model) {
         // Here, you would fetch and add Lecturer-specific data using a LecturerDAO
@@ -58,7 +54,6 @@ public class HomeController {
      * Maps to the admin dashboard.
      */
     @LoginRequired
-    @RequiresRole({UserType.ADMIN})
     @GetMapping("/admin/dashboard")
     public String showAdminDashboard(Model model) {
         // Here, you would fetch data necessary for admin tables/reports
