@@ -25,7 +25,6 @@ public class HomeController {
      * Maps to the student dashboard and fetches dynamic data from the database.
      */
     @LoginRequired
-    @RequiresRole({UserType.STUDENT})
     @GetMapping("/student/home")
     public String showStudentDashboard(Model model) {
         List<Student> students = studentRepo.findAll();
@@ -58,7 +57,6 @@ public class HomeController {
      * Maps to the admin dashboard.
      */
     @LoginRequired
-    @RequiresRole({UserType.ADMIN})
     @GetMapping("/admin/dashboard")
     public String showAdminDashboard(Model model) {
         // Here, you would fetch data necessary for admin tables/reports

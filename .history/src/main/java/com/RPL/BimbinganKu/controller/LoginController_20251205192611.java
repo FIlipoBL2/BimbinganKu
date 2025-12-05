@@ -42,17 +42,14 @@ public class LoginController {
         if (role.equals("")) role = userService.getUserType(user);
         
         switch (role) {
-            case "student" -> {
+            case "student":
                 session.setAttribute("curUser", UserType.STUDENT);
                 return "redirect:/student/home";
-            }
-            case "lecturer" -> {
+            case "lecturer":
                 session.setAttribute("curUser", UserType.LECTURER);
                 return "redirect:/lecturer/home";
-            }
-            default -> {
+            default:
                 return "redirect:/admin/dashboard";
-            }
         }
     }
     
