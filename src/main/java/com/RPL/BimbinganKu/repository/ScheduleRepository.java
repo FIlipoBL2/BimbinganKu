@@ -9,30 +9,114 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ScheduleRepository {
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    // --- ADMIN / GLOBAL VIEW ---
     public List<Map<String, Object>> findAllSchedules() {
-        String sql = "SELECT 'Guidance' as type, topicCode as title, day, hourStart as \"startTime\", hourEnd as \"endTime\", notes as description FROM GuidanceSchedule";
+        String sql = "SELECT guidance_id as id, topicCode as title, date, hourStart as startTime, hourEnd as endTime, notes, place FROM GuidanceSchedule";
         return jdbcTemplate.queryForList(sql);
     }
 
-    public List<Map<String, Object>> findScheduleByUser(String userCode) {
-        String studentSql = "SELECT 'Student Class' as type, 'Class' as title, day, hourStart as \"startTime\", hourEnd as \"endTime\" FROM StudentSchedule WHERE NPM = ?";
-        List<Map<String, Object>> studentSchedules = jdbcTemplate.queryForList(studentSql, userCode);
+    // --- STUDENT VIEW ---
+    public List<Map<String, Object>> findScheduleByStudent(String npm) {
+        String guidanceSql = """
+            SELECT 
+                gs.guidance_id as id,
+                gs.date, 
+                TO_CHAR(gs.hourStart, 'HH24:MI') as time, 
+                t.topicName as topic, 
+                t.topicCode as topicCode,
+                gs.place as location,
+                gs.notes,
+                'guidance' as type
+            FROM GuidanceSchedule gs
+            JOIN Topic t ON gs.topicCode = t.topicCode
+            WHERE t.NPM = ?
+        """;
+        List<Map<String, Object>> schedules = jdbcTemplate.queryForList(guidanceSql, npm);
 
-        if (!studentSchedules.isEmpty()) {
-            return studentSchedules;
+        String classSql = """
+            SELECT 
+                day as day_name, 
+                TO_CHAR(hourStart, 'HH24:MI') as time, 
+                'Regular Class' as topic, 
+                'Classroom' as location,
+                '' as notes,
+                'class' as type
+            FROM StudentSchedule 
+            WHERE NPM = ?
+        """;
+        try {
+             schedules.addAll(jdbcTemplate.queryForList(classSql, npm));
+        } catch (Exception e) {
+            System.err.println("Error fetching Student Class Schedule: " + e.getMessage());
         }
-
-        // Check LecturerSchedule
-        String lecturerSql = "SELECT 'Lecturer Class' as type, 'Teaching' as title, day, hourStart as \"startTime\", hourEnd as \"endTime\" FROM LecturerSchedule WHERE lecturerCode = ?";
-        return jdbcTemplate.queryForList(lecturerSql, userCode);
+        
+        return schedules;
     }
 
-    public void saveGuidanceSchedule(String topicCode, String day, String startTime, String endTime, String notes,
-            String place) {
-        String sql = "INSERT INTO GuidanceSchedule (topicCode, day, hourStart, hourEnd, notes, place) VALUES (?, ?, ?::time, ?::time, ?, ?)";
-        jdbcTemplate.update(sql, topicCode, day, startTime, endTime, notes, place);
+    // --- LECTURER VIEW (FIXED) ---
+    public List<Map<String, Object>> findScheduleByLecturer(String code) {
+        // Updated Query: Correctly joins Topic table AND Users table to find student name
+        // The 'Students' table doesn't have 'name', 'Users' does.
+        String guidanceSql = """
+            SELECT 
+                gs.guidance_id as id,
+                gs.date, 
+                TO_CHAR(gs.hourStart, 'HH24:MI') as time, 
+                t.topicName as topic, 
+                t.topicCode as topicCode,
+                u.name as studentName,
+                gs.place as location,
+                gs.notes,
+                'guidance' as type
+            FROM GuidanceSchedule gs
+            INNER JOIN Topic t ON gs.topicCode = t.topicCode
+            INNER JOIN Students s ON t.NPM = s.NPM
+            INNER JOIN Users u ON s.NPM = u.id  -- Join Users to get the Name
+            WHERE t.lecturerCode = ?
+        """;
+        
+        try {
+            List<Map<String, Object>> schedules = jdbcTemplate.queryForList(guidanceSql, code);
+
+            // Get Teaching Schedule
+            String classSql = """
+                SELECT 
+                    day as day_name, 
+                    TO_CHAR(hourStart, 'HH24:MI') as time, 
+                    'Teaching Session' as topic, 
+                    'Classroom' as location,
+                    '' as studentName,
+                    '' as notes,
+                    'class' as type
+                FROM LecturerSchedule 
+                WHERE lecturerCode = ?
+            """;
+            try {
+                schedules.addAll(jdbcTemplate.queryForList(classSql, code));
+            } catch(Exception e) {
+                System.err.println("Error fetching Lecturer Class Schedule: " + e.getMessage());
+            }
+
+            return schedules;
+        } catch (Exception e) {
+            // Print FULL stack trace to see the SQL error details
+            System.err.println("CRITICAL SQL ERROR in findScheduleByLecturer:");
+            e.printStackTrace(); 
+            throw e; 
+        }
+    }
+
+    public void saveGuidanceSchedule(String topicCode, String date, String startTime, String endTime, String notes, String place) {
+        String sql = "INSERT INTO GuidanceSchedule (topicCode, date, hourStart, hourEnd, notes, place) VALUES (?, ?::date, ?::time, ?::time, ?, ?)";
+        jdbcTemplate.update(sql, topicCode, date, startTime, endTime, notes, place);
+    }
+
+    public void updateGuidanceSchedule(Long id, String topicCode, String date, String startTime, String endTime, String location, String notes) {
+        String sql = "UPDATE GuidanceSchedule SET topicCode = ?, date = ?::date, hourStart = ?::time, hourEnd = ?::time, place = ?, notes = ? WHERE guidance_id = ?";
+        jdbcTemplate.update(sql, topicCode, date, startTime, endTime, location, notes, id);
     }
 }

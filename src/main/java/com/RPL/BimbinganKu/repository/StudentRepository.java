@@ -21,35 +21,51 @@ public class StudentRepository {
     @Autowired
     private UserRepository userRepo;
 
-    public void save(Student user) throws Exception {
-        User newUser = new User(user.getId(), user.getEmail(), user.getPassword(), user.getName());
+    public void save(Student student) throws Exception {
+        // Fix: Use setters to ensure correct data mapping
+        User newUser = new User();
+        newUser.setId(student.getId());
+        newUser.setEmail(student.getEmail());
+        newUser.setPassword(student.getPassword());
+        newUser.setName(student.getName());
+
+        // Save generic User data first
         userRepo.save(newUser);
 
-        String user_id = userRepo.getUserId(newUser);
-
+        // Fix: Only pass 1 argument (npm) to the query
         String sql = "INSERT INTO Students (npm) VALUES (?)";
-        jdbcTemplate.update(sql, user.getNpm(), user_id);
+        jdbcTemplate.update(sql, student.getNpm());
     }
 
     public Optional<Student> findByNPM(String npm) {
-        String sql = "SELECT * FROM Students JOIN Users ON Users.id = Students.NPM WHERE NPM = ?";
+        String sql = """
+            SELECT u.email, u.password, u.name, s.npm, s.totalGuidanceUTS, s.totalGuidanceUAS 
+            FROM Students s 
+            JOIN Users u ON u.id = s.npm 
+            WHERE s.npm = ?
+        """;
         List<Student> results = jdbcTemplate.query(sql, this::mapRowToStudent, npm);
         return results.isEmpty() ? empty() : Optional.of(results.get(0));
     }
 
     public List<Student> findAll() {
-        String sql = "SELECT * FROM Students JOIN Users ON Students.NPM = Users.id";
-
+        String sql = """
+            SELECT u.email, u.password, u.name, s.npm, s.totalGuidanceUTS, s.totalGuidanceUAS 
+            FROM Students s 
+            JOIN Users u ON s.npm = u.id
+        """;
         return jdbcTemplate.query(sql, this::mapRowToStudent);
     }
 
     private Student mapRowToStudent(ResultSet resultSet, int rowNum) throws SQLException {
-        return new Student(
-                resultSet.getString("email"),
-                resultSet.getString("password"),
-                resultSet.getString("name"),
-                resultSet.getString("npm"),
-                resultSet.getInt("totalGuidanceUAS"),
-                resultSet.getInt("totalGuidanceUTS"));
+        // Use Setters instead of Constructor to avoid argument mismatches
+        Student student = new Student();
+        student.setNpm(resultSet.getString("npm"));
+        student.setEmail(resultSet.getString("email"));
+        student.setPassword(resultSet.getString("password"));
+        student.setName(resultSet.getString("name"));
+        student.setTotalGuidanceUAS(resultSet.getInt("totalGuidanceUAS"));
+        student.setTotalGuidanceUTS(resultSet.getInt("totalGuidanceUTS"));
+        return student;
     }
 }

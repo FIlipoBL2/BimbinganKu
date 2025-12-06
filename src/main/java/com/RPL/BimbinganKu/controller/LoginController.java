@@ -14,39 +14,47 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class LoginController {
+    
     @Autowired
     private UserService userService;
-    
-    User admin = new User("admin", "admin123", "admin", "admin");
 
     @PostMapping("/login")
     public String loginProcess(@RequestParam String email, @RequestParam String password, HttpSession session, Model model) {
     
+        // 1. Check for Admin Login FIRST (Hardcoded for now)
+        if ("admin".equals(email) && "admin123".equals(password)) {
+            User adminUser = new User();
+            // Fix: Use String ID "0"
+            adminUser.setId("0"); 
+            adminUser.setEmail("admin");
+            adminUser.setName("Administrator");
+            adminUser.setPassword("hidden");
+            
+            session.setAttribute("loggedUser", adminUser);
+            return "redirect:/admin/dashboard";
+        }
+
+        // 2. Check for Database User Login
         User user = userService.login(email, password);
-        String role = "";
         
         if (user == null) {
-            if (email.equals(admin.getEmail()) && password.equals(admin.getPassword())) {
-                user = admin;
-                role = "admin";
-            } else {
-                model.addAttribute("status", "failed");
-                return "login";
-            }
+            model.addAttribute("status", "failed");
+            return "login";
         }
         
-        
-        model.addAttribute("status", null);
+        // 3. Success - Set Session
         session.setAttribute("loggedUser", user);
-        if (role.equals("")) role = userService.getUserType(user);
         
-        switch (role) {
-            case "student":
+        // 4. Determine Role (Student or Lecturer)
+        String role = userService.getUserType(user);
+        
+        if ("student".equals(role)) {
             return "redirect:/student/home";
-            case "lecturer":
+        } else if ("lecturer".equals(role)) {
             return "redirect:/lecturer/home";
-            default:
-            return "redirect:/admin/dashboard";
+        } else {
+            // Fallback if role is undefined
+            return "redirect:/login?error=role_undefined";
         }
     }
     
@@ -56,12 +64,16 @@ public class LoginController {
         User logged = (User) session.getAttribute("loggedUser");
         
         if (logged != null) {
-            // User already logged in → redirect based on role
+            // Fix: Check String ID "0"
+            if ("0".equals(logged.getId()) && "admin".equals(logged.getEmail())) {
+                return "redirect:/admin/dashboard";
+            }
+
             String role = userService.getUserType(logged);
             
-            if (role.equals("student")) {
+            if ("student".equals(role)) {
                 return "redirect:/student/home";
-            } else {
+            } else if ("lecturer".equals(role)) {
                 return "redirect:/lecturer/home";
             }
         }
@@ -69,4 +81,9 @@ public class LoginController {
         return "login";
     }
     
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login";
+    }
 }

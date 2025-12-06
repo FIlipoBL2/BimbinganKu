@@ -4,12 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BimbinganKu - Admin Dashboard</title>
-    <link rel="stylesheet" th:href="@{/global.css}">
+    <link rel="stylesheet" th:href="@{/css/global.css}">
     <style>
         /* Admin-specific style override */
         .status-card { background-color: #e6f7ff; border-left: 5px solid #007bff; }
         .data-table-container { margin-top: 20px; }
         .tab-menu button.active { background-color: #007bff; color: white; }
+
+        /* FIX: Better Table Layout */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* Keeps columns stable */
+        }
+        
+        .data-table th, .data-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+            vertical-align: top; /* Aligns text to top if a row gets tall */
+        }
+
+        /* FIX: Email Column (3rd column) */
+        /* 'break-all' forces the text to wrap even if there are no spaces (like emails) */
+        .data-table td:nth-child(3) {
+            word-break: break-all; 
+            overflow-wrap: break-word;
+            width: 35%; /* Give email a bit more space if possible */
+        }
+
+        /* Adjust other columns slightly */
+        .data-table th:nth-child(1), .data-table td:nth-child(1) { width: 15%; } /* ID */
+        .data-table th:nth-child(2), .data-table td:nth-child(2) { width: 25%; } /* Name */
     </style>
 </head>
 <body>
@@ -23,7 +49,7 @@
     <main class="container">
         <section class="status-card">
             <h2>Admin Control Panel</h2>
-            <p>Welcome, Admin. Manage system data, schedules, and compliance.</p>
+            <p>Welcome, <span th:text="${adminName}">Admin</span>. Manage system data, schedules, and compliance.</p>
         </section>
 
         <section class="scheduling-section">
@@ -31,15 +57,17 @@
                 <button class="tab-btn-admin active" data-tab-content="data-preview-section">Data Preview</button>
                 <button class="tab-btn-admin" data-tab-content="import-schedules-section" id="admin-import-tab-btn">Import & Schedules</button>
             </div>
-            <hr> <div id="admin-tab-content">
+            <hr> 
+            
+            <div id="admin-tab-content">
                 
+                <!-- TAB 1: DATA PREVIEW -->
                 <div id="data-preview-section" class="tab-content-admin active">
                     <div class="schedule-controls" style="align-items: flex-start;">
                         <div class="tab-menu" id="admin-tabs">
                             <button class="tab-btn active" data-table="student">Student Table</button>
                             <button class="tab-btn" data-table="lecturer">Lecturer Table</button>
                             <button class="tab-btn" data-table="schedule">Schedule Table</button>
-                            <button class="tab-btn" data-table="compliance">Compliance Report</button>
                         </div>
                     </div>
 
@@ -49,10 +77,13 @@
                     
                     <div class="data-table-container">
                         <h3 id="table-title">Student Table</h3>
-                        <table id="admin-data-table" class="data-table"></table>
+                        <table id="admin-data-table" class="data-table">
+                            <!-- Populated by JS -->
+                        </table>
                     </div>
                 </div>
                 
+                <!-- TAB 2: IMPORT & SCHEDULES -->
                 <div id="import-schedules-section" class="tab-content-admin hidden">
                     <div class="section">
                         <h2>Database Management</h2>
@@ -60,32 +91,28 @@
                             <div class="card">
                                 <h3>Student Table</h3>
                                 <div class="button-row">
-                                    <button class="btn blue import-trigger">Import</button>
-                                    <button class="btn green update-trigger">Update</button>
+                                    <button class="btn blue import-trigger" data-target="student">Import</button>
                                 </div>
                             </div>
 
                             <div class="card">
                                 <h3>Lecturer Table</h3>
                                 <div class="button-row">
-                                    <button class="btn blue import-trigger">Import</button>
-                                    <button class="btn green update-trigger">Update</button>
+                                    <button class="btn blue import-trigger" data-target="lecturer">Import</button>
                                 </div>
                             </div>
 
                             <div class="card">
                                 <h3>Schedule Table</h3>
                                 <div class="button-row">
-                                    <button class="btn blue import-trigger">Import</button>
-                                    <button class="btn green update-trigger">Update</button>
+                                    <button class="btn blue import-trigger" data-target="schedule">Import</button>
                                 </div>
                             </div>
 
                             <div class="card">
-                                <h3>NPMTopicCode Table</h3>
+                                <h3>Topic Assignment</h3>
                                 <div class="button-row">
-                                    <button class="btn blue import-trigger">Import</button>
-                                    <button class="btn green update-trigger">Update</button>
+                                    <button class="btn blue import-trigger" data-target="npmtopic">Import</button>
                                 </div>
                             </div>
                         </div>
@@ -93,29 +120,16 @@
 
                     <div class="section">
                         <h2>User Schedule Preview</h2>
-                        <input type="text" id="user-code-input-new" class="search-input" placeholder="Search by Kode User...">
+                        <input type="text" id="user-code-input-new" class="search-input" placeholder="Search by NPM or Lecturer Code...">
                         <button id="search-schedule-btn-new" class="primary-btn" style="background-color: #17a2b8; margin-top: 15px;">View Schedule</button>
                         <div id="user-schedule-output-new" style="margin-top: 15px; background-color: #f9f9f9; padding: 10px; border-radius: 4px;"></div>
                     </div>
                 </div>
             </div>
-
-            <div class="data-table-container">
-                <h3 id="table-title">Student Table</h3>
-                <table id="admin-data-table" class="data-table">
-                    </table>
-            </div>
-
-            <div class="schedule-search-area">
-                <h3>🔍 Search User Schedule by Code</h3>
-                <input type="text" id="user-code-input" placeholder="Enter NPM/LecturerCode" style="padding: 8px;">
-                <button id="search-schedule-btn" class="primary-btn" style="background-color: #17a2b8;">View Schedule</button>
-                <div id="user-schedule-output" style="margin-top: 15px; background-color: #f9f9f9; padding: 10px; border-radius: 4px;">
-                    </div>
-            </div>
         </section>
     </main>
 
+    <!-- Import Modal -->
     <div id="import-modal" class="modal hidden">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
@@ -136,6 +150,8 @@
             </form>
         </div>
     </div>
+
+    <!-- Logout Modal -->
     <div id="logout-modal" class="modal hidden">
         <div class="modal-content">
             <h3>Confirm Logout</h3>
@@ -147,6 +163,6 @@
         </div>
     </div>
 
-    <script th:src="@{/admin.js}"></script>
+    <script th:src="@{/js/admin.js}"></script>
 </body>
 </html>

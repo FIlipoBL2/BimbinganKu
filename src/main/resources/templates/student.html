@@ -4,25 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>BimbinganKu - Student Home</title>
-    <link rel="stylesheet" th:href="@{/global.css}" href="/global.css">
-    
+    <link rel="stylesheet" th:href="@{/css/global.css}">
 </head>
 <body>
+    <input type="hidden" id="user-id" th:value="${npm}">
+
     <header>
         <div class="logo">BimbinganKU</div>
         <nav>
-            <!-- NEW: Inbox Button -->
             <div class="inbox-area">
-                <a th:href="@{/inbox(role='student')}" href="/inbox.html?role=student" id="inbox-link" title="Inbox">✉️ Inbox</a>
-                <!-- NOTE: Unread badge will NOT be here, it is only on notifications -->
+                <a th:href="@{/inbox(role='student')}" id="inbox-link" title="Inbox">✉️ Inbox</a>
             </div>
-
-            <!-- Notification Dropdown -->
             <div class="notification-area" id="notification-area">
-                <span id="notification-bell" role="button" aria-haspopup="true" aria-expanded="false">🔔</span>
-                <span id="unread-count" class="badge hidden" aria-live="polite">0</span>
-
-                <div id="notification-dropdown" class="dropdown-content hidden" aria-label="Notifications">
+                <span id="notification-bell" role="button">🔔</span>
+                <span id="unread-count" class="badge hidden">0</span>
+                <div id="notification-dropdown" class="dropdown-content hidden">
                     <p class="empty-message">No unread messages.</p>
                 </div>
             </div>
@@ -32,29 +28,28 @@
 
     <main class="container">
         <section class="status-card">
-            <h2 id="welcome-heading">Welcome Back, <span id="student-name">[Student Name]</span></h2>
+            <h2 id="welcome-heading">Welcome Back, <span id="student-name" th:text="${studentName}">[Student Name]</span></h2>
             <p>Your current Guidance Session Count:</p>
-
-            <div class="eligibility-bar-container" aria-hidden="true">
-                <div id="eligibility-bar" class="eligibility-bar blue" style="width: 60%;" data-count="3"></div>
+            <div class="eligibility-bar-container">
+                <div id="eligibility-bar" class="eligibility-bar blue" 
+                     th:style="'width: ' + ((${sessionCountUTS} + ${sessionCountUAS}) * 20) + '%;'" 
+                     th:data-count="${sessionCountUTS} + ${sessionCountUAS}"></div>
             </div>
-            <p><small>You have completed **3 out of 5** mandatory guidance sessions.</small></p>
-
-            </section>
+            <p><small>You have completed <strong th:text="${sessionCountUTS} + ${sessionCountUAS}">0</strong> out of 5 mandatory guidance sessions.</small></p>
+        </section>
 
         <section class="scheduling-section schedule-page-layout">
             <div class="mini-calendar-container">
                 <div id="mini-calendar" class="calendar-card">
                     <div class="calendar-header">
-                        <span class="arrow left-arrow" id="prev-month">&lt;</span>
-                        <span class="month-year" id="current-month-year">October 2025</span>
-                        <span class="arrow right-arrow" id="next-month">&gt;</span>
+                        <button class="arrow left-arrow" id="prev-month" style="background:none; border:none; cursor:pointer;">&lt;</button>
+                        <span class="month-year" id="month-year-display">October 2025</span>
+                        <button class="arrow right-arrow" id="next-month" style="background:none; border:none; cursor:pointer;">&gt;</button>
                     </div>
                     <div class="calendar-weekdays">
                         <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
                     </div>
-                    <div class="calendar-days" id="calendar-days">
-                        </div>
+                    <div class="calendar-days" id="calendar-grid"></div>
                 </div>
             </div>
 
@@ -62,83 +57,64 @@
                 <h3>🗓️ Weekly Schedule (Your Sessions)</h3>
                 
                 <div class="schedule-controls-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                    
                     <div id="lecturer-schedule-filter-container">
-                        <label for="lecturer-schedule-filter">Show Teaching Schedule For:</label>
+                        <label>Show Teaching Schedule For:</label>
                         <select id="lecturer-schedule-filter">
                             <option value="all">All Guiding Lecturers</option>
-                            </select>
+                        </select>
                     </div>
                     
                     <div id="new-session-action" class="session-actions">
-                        <button id="add-session-btn" class="primary-btn">➕ New Session</button>
+                        <button id="request-session-btn" class="primary-btn">➕ New Session</button>
                     </div>
-                    
                 </div>
+
                 <table id="weekly-schedule-table">
                     <thead>
                         <tr id="schedule-header-days">
-                            <th>Time</th>
-                            <th data-day="Sun">Sun</th>
-                            <th data-day="Mon">Mon</th>
-                            <th data-day="Tue">Tue</th>
-                            <th data-day="Wed">Wed</th>
-                            <th data-day="Thu">Thu</th>
-                            <th data-day="Fri">Fri</th>
-                            <th data-day="Sat">Sat</th>
+                            <th>Time</th><th data-day="0">Sun</th><th data-day="1">Mon</th><th data-day="2">Tue</th>
+                            <th data-day="3">Wed</th><th data-day="4">Thu</th><th data-day="5">Fri</th><th data-day="6">Sat</th>
                         </tr>
                     </thead>
                     <tbody id="schedule-body">
-                        <tr><td>07:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr>
-                            <td>08:00</td>
-                            <td class="teaching-schedule" data-lecturer-id="lx">Dr. X - C101</td> <td></td><td></td><td></td><td></td><td></td><td></td>
-                        </tr>
-                        <tr>
-                            <td>09:00</td>
-                            <td></td> <td class="session">Dr. X</td> <td></td><td></td><td></td><td></td><td></td>
-                        </tr>
-                        <tr><td>10:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr>
-                            <td>11:00</td>
-                            <td></td> <td class="study-schedule">Group Study</td> <td></td>
-                            <td class="session">Dr. Y</td> <td></td><td></td><td></td>
-                        </tr>
-                        <tr><td>12:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td>13:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr>
-                            <td>14:00</td>
-                            <td></td><td></td>
-                            <td class="teaching-schedule" data-lecturer-id="lz">Dr. Z - C201</td> <td></td><td></td><td></td><td></td>
-                        </tr>
-                        <tr><td>15:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td>16:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td>17:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td>18:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td>19:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="07:00"><td>07:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="08:00"><td>08:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="09:00"><td>09:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="10:00"><td>10:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="11:00"><td>11:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="12:00"><td>12:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="13:00"><td>13:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="14:00"><td>14:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="15:00"><td>15:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="16:00"><td>16:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="17:00"><td>17:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                     </tbody>
                 </table>
             </div>
         </section>
 
         <section id="history-section" class="scheduling-section">
-            <h3>📚 Session History</h3>
-            <div id="history-list">
-                <p>Loading session history...</p>
-            </div>
+            <h3>📚 Upcoming Sessions & History</h3>
+            <ul id="upcoming-list" class="upcoming-list" style="list-style: none; padding: 0;">
+                <li>Loading session history...</li>
+            </ul>
         </section>
     </main>
 
-    <div id="session-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="session-modal-title">
+    <!-- Session Modal -->
+    <div id="session-modal" class="modal hidden">
         <div class="modal-content">
-            <span class="close-btn" id="close-session-modal" role="button" aria-label="Close modal">&times;</span>
-            <h3 id="session-modal-title">Manage Session</h3>
-
+            <span class="close-btn">&times;</span>
+            <h3 id="modal-title">Book a Session</h3>
             <form id="session-form">
-                <label for="session-lecturer">Lecturer:</label>
-                <select id="session-lecturer" required>
-                    <option value="">Select Lecturer</option>
-                    </select>
+                <!-- NEW HIDDEN ID FIELD -->
+                <input type="hidden" id="session-id">
+
+                <label for="session-topic">Topic:</label>
+                <select id="session-topic" required>
+                    <option value="" disabled selected>Select a topic...</option>
+                    <option value="TA-001">Final Project</option>
+                </select>
 
                 <label for="session-date">Date:</label>
                 <input type="date" id="session-date" required>
@@ -148,17 +124,20 @@
 
                 <label for="session-location">Location:</label>
                 <select id="session-location" required>
-                    </select>
-                <input type="text" id="session-custom-location" placeholder="Enter custom location (e.g., Library Study Room)" class="hidden" style="margin-top: 5px;">
+                    <option value="Lecturer Room">Lecturer Room</option>
+                    <option value="Online">Online</option>
+                    <option value="Library">Library</option>
+                </select>
+                
                 <button type="submit" id="save-session-btn" class="primary-btn">Save Session</button>
-                <button type="button" id="delete-session-btn" class="delete-btn hidden">Delete</button>
             </form>
         </div>
     </div>
 
-    <div id="logout-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="logout-modal-title">
+    <!-- Logout Modal -->
+    <div id="logout-modal" class="modal hidden">
         <div class="modal-content">
-            <h3 id="logout-modal-title">Confirm Logout</h3>
+            <h3>Confirm Logout</h3>
             <p>Are you sure you want to log out of BimbinganKU?</p>
             <div class="modal-actions">
                 <button id="confirm-logout-btn" class="primary-btn">Yes, Logout</button>
@@ -167,6 +146,6 @@
         </div>
     </div>
 
-    <script th:src="@{/student.js}" src="/student.js"></script>
+    <script th:src="@{/js/student.js}"></script>
 </body>
 </html>

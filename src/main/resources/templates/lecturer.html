@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BimbinganKu - Lecturer Home</title>
-    <link rel="stylesheet" th:href="@{/global.css}"> 
-    </head>
+    <link rel="stylesheet" th:href="@{/css/global.css}"> 
+</head>
 <body>
-<body>
+    <!-- CONNECT TO BACKEND -->
+    <input type="hidden" id="user-id" th:value="${lecturerCode}">
+
     <header>
         <div class="logo">BimbinganKU (Lecturer)</div>
         <nav>
-            <!-- NEW: Inbox Button -->
+            <!-- Inbox Button -->
             <div class="inbox-area">
-                <a th:href="@{/inbox(role='lecturer')}" href="/inbox.html?role=lecturer" id="inbox-link" title="Inbox">✉️</a>
-                <!-- NOTE: Unread badge will NOT be here, it is only on notifications -->
+                <a th:href="@{/inbox(role='lecturer')}" id="inbox-link" title="Inbox">✉️</a>
             </div>
 
             <!-- Notification Dropdown -->
@@ -32,29 +33,31 @@
 
     <main class="container">
         <section class="status-card">
-            <h2>Welcome Back, [Lecturer Name]</h2>
-            <p>Your Code: **L-12345**</p>
-            <p>You have **3 active student sessions** this week.</p>
+            <!-- Dynamic Name & Code -->
+            <h2>Welcome Back, <span th:text="${lecturerName}">[Lecturer Name]</span></h2>
+            <p>Your Code: <strong th:text="${lecturerCode}">L-12345</strong></p>
+            <p>You have <strong>Active Sessions</strong> this week.</p>
         </section>
 
         <section class="scheduling-section schedule-page-layout">
             <div class="mini-calendar-container">
                 <div id="mini-calendar" class="calendar-card">
                     <div class="calendar-header">
-                        <span class="arrow left-arrow" id="prev-month">&lt;</span>
-                        <span class="month-year" id="current-month-year">October 2025</span>
-                        <span class="arrow right-arrow" id="next-month">&gt;</span>
+                        <!-- MATCHING JS ID -->
+                        <button class="arrow left-arrow" id="prev-month" style="background:none; border:none; cursor:pointer;">&lt;</button>
+                        <span class="month-year" id="month-year-display">October 2025</span>
+                        <button class="arrow right-arrow" id="next-month" style="background:none; border:none; cursor:pointer;">&gt;</button>
                     </div>
                     <div class="calendar-weekdays">
                         <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
                     </div>
-                    <div class="calendar-days" id="calendar-days">
-                    </div>
+                    <!-- MATCHING JS ID -->
+                    <div class="calendar-days" id="calendar-grid"></div>
                 </div>
-                
             </div>
 
-            <div class="schedule-table-wrapper"> <h3>🗓️ Weekly Schedule (This Week)</h3>
+            <div class="schedule-table-wrapper"> 
+                <h3>🗓️ Weekly Schedule (This Week)</h3>
                 
                 <div class="schedule-controls-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
                     
@@ -62,77 +65,65 @@
                         <label for="student-schedule-filter">Show Student Study Schedule For:</label>
                         <select id="student-schedule-filter">
                             <option value="all">All Students</option>
-                            </select>
+                        </select>
                     </div>
                     
+                    <!-- Hidden for now as creating session is primarily student-driven, but kept for UI consistency -->
                     <div id="new-session-action" class="session-actions">
-                        <button id="add-session-btn" class="primary-btn">➕ New Session</button>
+                        <button id="add-session-btn" class="primary-btn" style="visibility: hidden;">➕ New Session</button>
                     </div>
                     
                 </div>
+                
+                <!-- WEEKLY TABLE -->
+                <!-- Added 'data-time' attributes so JS can place events -->
                 <table id="weekly-schedule-table">
                     <thead>
                         <tr id="schedule-header-days"> 
-                            <th>Time</th>
-                            <th data-day="Sun">Sunday</th>
-                            <th data-day="Mon">Monday</th>
-                            <th data-day="Tue">Tuesday</th>
-                            <th data-day="Wed">Wednesday</th>
-                            <th data-day="Thu">Thursday</th>
-                            <th data-day="Fri">Friday</th>
-                            <th data-day="Sat">Saturday</th>
+                            <th>Time</th><th data-day="0">Sunday</th><th data-day="1">Monday</th><th data-day="2">Tuesday</th>
+                            <th data-day="3">Wednesday</th><th data-day="4">Thursday</th><th data-day="5">Friday</th><th data-day="6">Saturday</th>
                         </tr>
                     </thead>
                     <tbody id="schedule-body">
-                        <tr><td>07:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr>
-                            <td>08:00</td>
-                            <td class="study-schedule" data-student-id="s1">Study Session<br>(Student A)</td> <td></td> <td class="session">Session A<br> (Student X)</td> <td></td> <td></td> <td></td> <td></td> </tr>
-                        <tr>
-                            <td>09:00</td>
-                            <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
-                        <tr><td>10:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr>
-                            <td>11:00</td>
-                            <td></td><td></td><td></td><td></td><td></td>
-                            <td class="study-schedule" data-student-id="s2">Group Work<br>(Student Y)</td> <td></td>
-                        </tr>
-                        <tr><td>12:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td>13:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td>14:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td>15:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td>16:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td>17:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td>18:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td>19:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="07:00"><td>07:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="08:00"><td>08:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="09:00"><td>09:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="10:00"><td>10:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="11:00"><td>11:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="12:00"><td>12:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="13:00"><td>13:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="14:00"><td>14:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="15:00"><td>15:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="16:00"><td>16:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="17:00"><td>17:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="18:00"><td>18:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="19:00"><td>19:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                     </tbody>
                 </table>
             </div>
         </section>
         
         <section id="history-section" class="scheduling-section">
-            <h3>📚 Session History</h3>
-            <div style="margin-bottom: 15px;">
-                <label for="history-student-filter">Filter by Student:</label>
-                <select id="history-student-filter">
-                    <option value="all">All Students</option>
-                    </select>
-            </div>
-            <div id="history-list">
-                <p>Loading session history...</p>
-            </div>
+            <h3>📚 Upcoming Sessions</h3>
+            <!-- MATCHING JS ID -->
+            <ul id="upcoming-list" class="upcoming-list" style="list-style: none; padding: 0;">
+                <li>Loading session history...</li>
+            </ul>
         </section>
     </main>
 
+    <!-- Modal for Sessions -->
     <div id="session-modal" class="modal hidden">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
-            <h3>Manage Session</h3>
+            <h3 id="modal-title">Manage Session</h3>
             <form id="session-form">
-                <label for="session-student">Student:</label>
-                <select id="session-student" required>
-                    <option value="">Select Student</option>
-                </select>
+                <!-- HIDDEN ID -->
+                <input type="hidden" id="session-id">
+
+                <label for="session-topic">Student / Topic:</label>
+                <!-- Simplified for now -->
+                <input type="text" id="session-topic" placeholder="Topic Code (e.g. TA-001)" required>
 
                 <label for="session-date">Date:</label>
                 <input type="date" id="session-date" required>
@@ -142,16 +133,20 @@
                 
                 <label for="session-location">Location:</label>
                 <select id="session-location" required>
-                    </select>
-                <input type="text" id="session-custom-location" placeholder="Enter custom location (e.g., Office A-101)" class="hidden" style="margin-top: 5px;">
+                    <option value="Lecturer Room">Lecturer Room</option>
+                    <option value="Online">Online</option>
+                    <option value="Lab">Lab</option>
+                </select>
+                
                 <label for="session-notes">Notes (Lecturer Only):</label>
-                <textarea id="session-notes" placeholder="Write session notes here..." rows="4"></textarea> 
+                <textarea id="session-notes" rows="4" placeholder="Add notes for student..."></textarea> 
                 
                 <button type="submit" id="save-session-btn" class="primary-btn">Save Session</button>
-                <button type="button" id="delete-session-btn" class="delete-btn hidden">Delete</button>
             </form>
         </div>
     </div>
+
+    <!-- Logout Modal -->
     <div id="logout-modal" class="modal hidden">
         <div class="modal-content">
             <h3>Confirm Logout</h3>
@@ -163,6 +158,6 @@
         </div>
     </div>
 
-    <script th:src="@{/lecturer.js}"></script>
+    <script th:src="@{/js/lecturer.js}"></script>
 </body>
 </html>

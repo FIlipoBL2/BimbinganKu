@@ -1,13 +1,14 @@
 package com.RPL.BimbinganKu.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.RPL.BimbinganKu.data.Lecturer;
 import com.RPL.BimbinganKu.data.Student;
+import com.RPL.BimbinganKu.data.User;
+import com.RPL.BimbinganKu.repository.LecturerRepository;
 import com.RPL.BimbinganKu.repository.StudentRepository;
 
 import jakarta.servlet.http.HttpSession;
@@ -17,51 +18,62 @@ public class HomeController {
 
     @Autowired
     private StudentRepository studentRepo;
+    
+    @Autowired
+    private LecturerRepository lecturerRepo;
 
-    /**
-     * Maps to the student dashboard and fetches dynamic data from the database.
-     */
     @GetMapping("/student/home")
-    public String showStudentDashboard(Model model) {
-        List<Student> students = studentRepo.findAll();
+    public String showStudentDashboard(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("loggedUser");
         
-        if (!students.isEmpty()) {
-            Student currentStudent = students.get(0);
-            model.addAttribute("studentName", currentStudent.getName()); 
-            model.addAttribute("sessionCount", currentStudent.getTotalGuidanceUTS());
-        } else {
-            model.addAttribute("studentName", "[No Student Data]");
-            model.addAttribute("sessionCount", 0);
+        if (user == null) {
+            return "redirect:/login";
+        }
+        
+        // Fix: Use String ID directly
+        Student student = studentRepo.findByNPM(user.getId()).orElse(null);
+        
+        if (student != null) {
+            model.addAttribute("student", student);
+            model.addAttribute("studentName", student.getName());
+            model.addAttribute("npm", student.getId()); 
+            model.addAttribute("sessionCountUTS", student.getTotalGuidanceUTS());
+            model.addAttribute("sessionCountUAS", student.getTotalGuidanceUAS());
         }
         
         return "student";
     }
 
-    /**
-     * Maps to the lecturer dashboard.
-     */
     @GetMapping("/lecturer/home")
-    public String showLecturerDashboard(Model model) {
-        // Here, you would fetch and add Lecturer-specific data using a LecturerDAO
-        model.addAttribute("lecturerName", "Dr. Smith");
+    public String showLecturerDashboard(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("loggedUser");
+
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        // Fix: Use String ID directly
+        Lecturer lecturer = lecturerRepo.findByLecturerCode(user.getId()).orElse(null);
+
+        if (lecturer != null) {
+            model.addAttribute("lecturer", lecturer);
+            model.addAttribute("lecturerName", lecturer.getName());
+            model.addAttribute("lecturerCode", lecturer.getId());
+        }
+
         return "lecturer";
     }
 
-    /**
-     * Maps to the admin dashboard.
-     */
     @GetMapping("/admin/dashboard")
-    public String showAdminDashboard(Model model) {
-        // Here, you would fetch data necessary for admin tables/reports
-        return "admin";
-    }
+    public String showAdminDashboard(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("loggedUser");
 
-    /**
-     * Handles the logout request and redirects to the login page.
-     */
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/login"; // Redirects to the /login path mapped in showLogin()
+        // Fix: Check String ID "0"
+        if (user == null || !"0".equals(user.getId())) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("adminName", user.getName());
+        return "admin";
     }
 }
