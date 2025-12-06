@@ -9,12 +9,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.RPL.BimbinganKu.data.Lecturer;
 import com.RPL.BimbinganKu.data.Student;
+import com.RPL.BimbinganKu.repository.ScheduleRepository;
+import com.RPL.BimbinganKu.repository.TopicRepository;
 
 @Service
 public class CsvImportService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TopicRepository topicRepo;
+
+    @Autowired
+    private ScheduleRepository scheduleRepo;
 
     public void importStudents(MultipartFile file) throws Exception {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
@@ -27,13 +35,14 @@ public class CsvImportService {
                 }
                 String[] values = line.split(",");
                 if (values.length >= 4) {
-                    // Assuming CSV format: NPM, Name, Email, Password
+                    // CSV Format: NPM, Name, Email, Password
+                    // FIX: No parsing to Long needed. Just use Strings.
                     String npm = values[0].trim();
                     String name = values[1].trim();
                     String email = values[2].trim();
                     String password = values[3].trim();
 
-                    // Create Student object (assuming default 0 for guidance counts)
+                    // Create Student using String ID constructor
                     Student student = new Student(email, password, name, npm, 0, 0);
                     userService.saveStudent(student);
                 }
@@ -52,21 +61,20 @@ public class CsvImportService {
                 }
                 String[] values = line.split(",");
                 if (values.length >= 4) {
-                    // LecturerCode, Name, Email, Password
+                    // CSV Format: Code, Name, Email, Password
+                    // FIX: No parsing to Long needed.
                     String code = values[0].trim();
                     String name = values[1].trim();
                     String email = values[2].trim();
                     String password = values[3].trim();
 
+                    // Create Lecturer using String ID constructor
                     Lecturer lecturer = new Lecturer(email, password, name, code);
                     userService.saveLecturer(lecturer);
                 }
             }
         }
     }
-
-    @Autowired
-    private com.RPL.BimbinganKu.repository.TopicRepository topicRepo;
 
     public void importTopics(MultipartFile file) throws Exception {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
@@ -79,7 +87,6 @@ public class CsvImportService {
                 }
                 String[] values = line.split(",");
                 if (values.length >= 4) {
-                    // TopicCode, NPM, LecturerCode, TopicName
                     String topicCode = values[0].trim();
                     String npm = values[1].trim();
                     String lecturerCode = values[2].trim();
@@ -90,9 +97,6 @@ public class CsvImportService {
             }
         }
     }
-
-    @Autowired
-    private com.RPL.BimbinganKu.repository.ScheduleRepository scheduleRepo;
 
     public void importSchedules(MultipartFile file) throws Exception {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
@@ -105,7 +109,6 @@ public class CsvImportService {
                 }
                 String[] values = line.split(",");
                 if (values.length >= 6) {
-                    // TopicCode, Day, StartTime, EndTime, Notes, Place
                     String topicCode = values[0].trim();
                     String day = values[1].trim();
                     String startTime = values[2].trim();

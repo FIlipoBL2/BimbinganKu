@@ -8,53 +8,54 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.RPL.BimbinganKu.data.User;
-import com.RPL.BimbinganKu.data.UserType;
 import com.RPL.BimbinganKu.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class LoginController {
+
     @Autowired
     private UserService userService;
-
-    User admin = new User("admin", "admin", "admin123", "admin");
 
     @PostMapping("/login")
     public String loginProcess(@RequestParam String email, @RequestParam String password, HttpSession session,
             Model model) {
 
-        User user = userService.login(email, password);
-        String role = "";
+        // 1. Check for Admin Login FIRST (Hardcoded for now)
+        if ("admin".equals(email) && "admin123".equals(password)) {
+            User adminUser = new User();
+            // Fix: Use String ID "0"
+            adminUser.setId("0");
+            adminUser.setEmail("admin");
+            adminUser.setName("Administrator");
+            adminUser.setPassword("hidden");
 
-        if (user == null) {
-            if (email.equals(admin.getEmail()) && password.equals(admin.getPassword())) {
-                session.setAttribute("curUser", UserType.ADMIN);
-                user = admin;
-                role = "admin";
-            } else {
-                model.addAttribute("status", "failed");
-                return "login";
-            }
+            session.setAttribute("loggedUser", adminUser);
+            return "redirect:/admin/dashboard";
         }
 
-        model.addAttribute("status", null);
-        session.setAttribute("loggedUser", user);
-        if (role.equals(""))
-            role = userService.getUserType(user);
+        // 2. Check for Database User Login
+        User user = userService.login(email, password);
 
-        switch (role) {
-            case "student" -> {
-                session.setAttribute("curUser", UserType.STUDENT);
-                return "redirect:/student/home";
-            }
-            case "lecturer" -> {
-                session.setAttribute("curUser", UserType.LECTURER);
-                return "redirect:/lecturer/home";
-            }
-            default -> {
-                return "redirect:/admin/dashboard";
-            }
+        if (user == null) {
+            model.addAttribute("status", "failed");
+            return "login";
+        }
+
+        // 3. Success - Set Session
+        session.setAttribute("loggedUser", user);
+
+        // 4. Determine Role (Student or Lecturer)
+        String role = userService.getUserType(user);
+
+        if ("student".equals(role)) {
+            return "redirect:/student/home";
+        } else if ("lecturer".equals(role)) {
+            return "redirect:/lecturer/home";
+        } else {
+            // Fallback if role is undefined
+            return "redirect:/login?error=role_undefined";
         }
     }
 
@@ -64,11 +65,16 @@ public class LoginController {
         User logged = (User) session.getAttribute("loggedUser");
 
         if (logged != null) {
-            // redirect based on session curUser attribute
+            // Fix: Check String ID "0"
+            if ("0".equals(logged.getId()) && "admin".equals(logged.getEmail())) {
+                return "redirect:/admin/dashboard";
+            }
 
-            if (session.getAttribute("curUser").equals(UserType.STUDENT)) {
+            String role = userService.getUserType(logged);
+
+            if ("student".equals(role)) {
                 return "redirect:/student/home";
-            } else if (session.getAttribute("curUser").equals(UserType.LECTURER)) {
+            } else if ("lecturer".equals(role)) {
                 return "redirect:/lecturer/home";
             }
         }
@@ -76,4 +82,9 @@ public class LoginController {
         return "login";
     }
 
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login";
+    }
 }

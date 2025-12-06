@@ -3,6 +3,7 @@ package com.RPL.BimbinganKu.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.RPL.BimbinganKu.data.Lecturer;
 import com.RPL.BimbinganKu.data.Student;
@@ -13,6 +14,7 @@ import com.RPL.BimbinganKu.repository.UserRepository;
 
 @Service
 public class UserService {
+
     @Autowired
     private UserRepository userRepository;
 
@@ -27,7 +29,6 @@ public class UserService {
 
     private <T extends User> T encodePassword(T user) {
         user.setPassword(passwordEncoder.encode(user.getPassword().trim()));
-
         return user;
     }
 
@@ -35,37 +36,44 @@ public class UserService {
         return passwordEncoder.encode(password.trim());
     }
 
+    @Transactional
     public boolean saveStudent(Student student) {
-        student = encodePassword(student);
-
         try {
+            student = encodePassword(student);
+            // studentRepository handles the split save (Users + Students tables)
             studentRepository.save(student);
+            return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
-        return true;
     }
 
+    @Transactional
     public boolean saveLecturer(Lecturer lecturer) {
-        lecturer = encodePassword(lecturer);
         try {
+            lecturer = encodePassword(lecturer);
             lecturerRepository.save(lecturer);
+            return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
-        return true;
     }
 
     public User login(String email, String password) {
+        // findByEmail is now available in UserRepository
         User user = userRepository.findByEmail(email.trim()).orElse(null);
 
-        if (user == null)
+        if (user == null) {
             return null;
+        }
 
         if (passwordEncoder.matches(password.trim(), user.getPassword())) {
             return user;
-        } else
+        } else {
             return null;
+        }
     }
 
     public String getUserType(User user) {

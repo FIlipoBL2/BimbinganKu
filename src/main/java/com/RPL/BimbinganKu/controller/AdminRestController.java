@@ -25,57 +25,99 @@ import com.RPL.BimbinganKu.service.CsvImportService;
 public class AdminRestController {
 
     @Autowired
+    private ScheduleRepository scheduleRepo;
+
+    @Autowired
     private StudentRepository studentRepo;
 
     @Autowired
     private LecturerRepository lecturerRepo;
 
     @Autowired
-    private ScheduleRepository scheduleRepo;
-
-    @Autowired
     private CsvImportService csvImportService;
 
+    // --- NEW: Endpoints for Data Preview Tabs ---
+
     @GetMapping("/students")
-    public List<Student> getAllStudents() {
-        return studentRepo.findAll();
+    public ResponseEntity<?> getAllStudents() {
+        try {
+            System.out.println("Admin requesting all students...");
+            List<Student> students = studentRepo.findAll();
+            System.out.println("Found " + students.size() + " students.");
+            return ResponseEntity.ok(students);
+        } catch (Exception e) {
+            e.printStackTrace(); 
+            // Return JSON so frontend doesn't crash
+            return ResponseEntity.internalServerError().body(Map.of("error", "Database Error: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/lecturers")
-    public List<Lecturer> getAllLecturers() {
-        return lecturerRepo.findAll();
+    public ResponseEntity<?> getAllLecturers() {
+        try {
+            System.out.println("Admin requesting all lecturers...");
+            List<Lecturer> lecturers = lecturerRepo.findAll();
+            return ResponseEntity.ok(lecturers);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(Map.of("error", "Database Error: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/schedules")
-    public List<Map<String, Object>> getAllSchedules() {
-        return scheduleRepo.findAllSchedules();
+    public ResponseEntity<?> getAllSchedules() {
+        try {
+            System.out.println("Admin requesting all schedules...");
+            List<Map<String, Object>> schedules = scheduleRepo.findAllSchedules();
+            return ResponseEntity.ok(schedules);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(Map.of("error", "Database Error: " + e.getMessage()));
+        }
     }
+
+    // --- Individual Schedule Lookup ---
 
     @GetMapping("/schedule/{userCode}")
-    public List<Map<String, Object>> getUserSchedule(@PathVariable String userCode) {
-        return scheduleRepo.findScheduleByUser(userCode);
+    public ResponseEntity<?> getUserSchedule(@PathVariable String userCode) {
+        try {
+            // Try to find student schedule first
+            List<Map<String, Object>> schedule = scheduleRepo.findScheduleByStudent(userCode);
+            
+            // If empty, try to find lecturer schedule
+            if (schedule.isEmpty()) {
+                schedule = scheduleRepo.findScheduleByLecturer(userCode);
+            }
+            return ResponseEntity.ok(schedule);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(Map.of("error", "Database Error: " + e.getMessage()));
+        }
     }
 
+    // --- Import Handler ---
+
     @PostMapping("/import")
-    public ResponseEntity<String> importFile(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<?> importFile(@RequestParam("file") MultipartFile file,
             @RequestParam("table") String table) {
         try {
             if ("student".equalsIgnoreCase(table)) {
                 csvImportService.importStudents(file);
-                return ResponseEntity.ok("Students imported successfully");
+                return ResponseEntity.ok(Map.of("message", "Students imported successfully"));
             } else if ("lecturer".equalsIgnoreCase(table)) {
                 csvImportService.importLecturers(file);
-                return ResponseEntity.ok("Lecturers imported successfully");
+                return ResponseEntity.ok(Map.of("message", "Lecturers imported successfully"));
             } else if ("schedule".equalsIgnoreCase(table)) {
                 csvImportService.importSchedules(file);
-                return ResponseEntity.ok("Schedules imported successfully");
+                return ResponseEntity.ok(Map.of("message", "Schedules imported successfully"));
             } else if ("npmtopic".equalsIgnoreCase(table)) {
                 csvImportService.importTopics(file);
-                return ResponseEntity.ok("Topics imported successfully");
+                return ResponseEntity.ok(Map.of("message", "Topics imported successfully"));
             }
-            return ResponseEntity.badRequest().body("Unknown table type: " + table);
+            return ResponseEntity.badRequest().body(Map.of("error", "Unknown table type: " + table));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Import failed: " + e.getMessage());
+            e.printStackTrace(); 
+            return ResponseEntity.internalServerError().body(Map.of("error", "Import failed: " + e.getMessage()));
         }
     }
 }

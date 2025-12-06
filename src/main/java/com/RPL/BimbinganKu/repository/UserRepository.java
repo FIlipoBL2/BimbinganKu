@@ -17,14 +17,9 @@ public class UserRepository {
     private JdbcTemplate jdbcTemplate;
 
     public void save(User user) throws Exception {
-        String sql = "INSERT INTO Users (name, email, password) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, user.getName(), user.getEmail(), user.getPassword());
-    }
-
-    public Optional<User> findByName(String name) {
-        String sql = "SELECT * FROM Users WHERE name = ?";
-        List<User> results = jdbcTemplate.query(sql, this::mapRowToUser, name);
-        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+        // Explicitly saving ID, Name, Email, Password
+        String sql = "INSERT INTO Users (id, name, email, password) VALUES (?, ?, ?, ?)";
+        jdbcTemplate.update(sql, user.getId(), user.getName(), user.getEmail(), user.getPassword());
     }
 
     public Optional<User> findByEmail(String email) {
@@ -33,37 +28,41 @@ public class UserRepository {
         return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 
-    public String getUserId(User user) {
-        String sql = "SELECT id FROM Users WHERE email = ?";
-        return jdbcTemplate.queryForObject(sql, String.class, user.getEmail());
-    }
-
     public String getUserType(User user) {
-        String user_id = getUserId(user);
+        String userId = user.getId();
 
-        boolean isStudent = jdbcTemplate.queryForObject(
-                "SELECT EXISTS(SELECT 1 FROM Students WHERE NPM = ?)",
-                Boolean.class,
-                user_id);
-
-        boolean isLecturer = jdbcTemplate.queryForObject(
-                "SELECT EXISTS(SELECT 1 FROM Lecturers WHERE lecturerCode = ?)",
-                Boolean.class,
-                user_id);
-
-        if (isStudent)
+        // 1. Check if ID exists in Students table
+        String studentSql = "SELECT COUNT(*) FROM Students WHERE npm = ?";
+        Integer studentCount = jdbcTemplate.queryForObject(studentSql, Integer.class, userId);
+        
+        if (studentCount != null && studentCount > 0) {
             return "student";
-        else if (isLecturer)
+        }
+
+        // 2. Check if ID exists in Lecturers table
+        String lecturerSql = "SELECT COUNT(*) FROM Lecturers WHERE lecturerCode = ?";
+        Integer lecturerCount = jdbcTemplate.queryForObject(lecturerSql, Integer.class, userId);
+        
+        if (lecturerCount != null && lecturerCount > 0) {
             return "lecturer";
-        else
-            return null;
+        }
+
+        // 3. Fallback (likely Admin)
+        return "admin";
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
-        return new User(
-                resultSet.getString("id"),
-                resultSet.getString("email"),
-                resultSet.getString("password"),
-                resultSet.getString("name"));
+        // FIX: Use Setters to avoid constructor order mismatch
+        User user = new User();
+        user.setId(resultSet.getString("id"));
+        user.setEmail(resultSet.getString("email"));
+        user.setPassword(resultSet.getString("password")); 
+        user.setName(resultSet.getString("name"));
+        return user;
+    }
+    
+    // Helper to get ID if needed
+    public String getUserId(User user) {
+         return user.getId();
     }
 }
