@@ -22,17 +22,14 @@ public class StudentRepository {
     private UserRepository userRepo;
 
     public void save(Student student) throws Exception {
-        // Fix: Use setters to ensure correct data mapping
         User newUser = new User();
         newUser.setId(student.getId());
         newUser.setEmail(student.getEmail());
         newUser.setPassword(student.getPassword());
         newUser.setName(student.getName());
 
-        // Save generic User data first
         userRepo.save(newUser);
 
-        // Fix: Only pass 1 argument (npm) to the query
         String sql = "INSERT INTO Students (npm) VALUES (?)";
         jdbcTemplate.update(sql, student.getNpm());
     }
@@ -57,10 +54,22 @@ public class StudentRepository {
         return jdbcTemplate.query(sql, this::mapRowToStudent);
     }
 
+    // NEW: Find students assigned to a specific lecturer
+    public List<Student> findStudentsByLecturer(String lecturerCode) {
+        String sql = """
+            SELECT u.email, u.password, u.name, s.npm, s.totalGuidanceUTS, s.totalGuidanceUAS 
+            FROM Students s 
+            JOIN Users u ON s.npm = u.id
+            JOIN Topic t ON s.npm = t.NPM
+            WHERE t.lecturerCode = ?
+        """;
+        return jdbcTemplate.query(sql, this::mapRowToStudent, lecturerCode);
+    }
+
     private Student mapRowToStudent(ResultSet resultSet, int rowNum) throws SQLException {
-        // Use Setters instead of Constructor to avoid argument mismatches
         Student student = new Student();
         student.setNpm(resultSet.getString("npm"));
+        student.setId(resultSet.getString("npm"));
         student.setEmail(resultSet.getString("email"));
         student.setPassword(resultSet.getString("password"));
         student.setName(resultSet.getString("name"));

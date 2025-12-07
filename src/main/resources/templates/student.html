@@ -5,6 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>BimbinganKu - Student Home</title>
     <link rel="stylesheet" th:href="@{/css/global.css}">
+    <style>
+        /* Tab Styles */
+        .tabs { display: flex; border-bottom: 2px solid #ddd; margin-bottom: 15px; }
+        .tab-btn { 
+            padding: 10px 20px; cursor: pointer; border: none; background: none; font-size: 16px; font-weight: bold; color: #666;
+            border-bottom: 3px solid transparent; 
+        }
+        .tab-btn.active { color: #007bff; border-bottom-color: #007bff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Session List Styling (Card Look) */
+        .upcoming-list { 
+            list-style: none; 
+            padding: 0; 
+        }
+        .session-item {
+            background: #fff;
+            margin-bottom: 12px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #e0e0e0;
+        }
+        .session-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: #007bff;
+        }
+        
+        /* Inner text styling */
+        .session-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .session-title {
+            font-size: 1.05rem;
+            color: #333;
+        }
+        .session-date {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        /* Location badge styling */
+        .session-location {
+            font-size: 0.85rem;
+            color: #555;
+            background-color: #f8f9fa;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #eee;
+            white-space: nowrap;
+            margin-left: 15px;
+        }
+    </style>
 </head>
 <body>
     <input type="hidden" id="user-id" th:value="${npm}">
@@ -63,7 +125,6 @@
                             <option value="all">All Guiding Lecturers</option>
                         </select>
                     </div>
-                    
                     <div id="new-session-action" class="session-actions">
                         <button id="request-session-btn" class="primary-btn">➕ New Session</button>
                     </div>
@@ -88,53 +149,55 @@
                         <tr data-time="15:00"><td>15:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                         <tr data-time="16:00"><td>16:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                         <tr data-time="17:00"><td>17:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="18:00"><td>18:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="19:00"><td>19:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                     </tbody>
                 </table>
             </div>
         </section>
 
+        <!-- NEW: Tabbed Session Section -->
         <section id="history-section" class="scheduling-section">
-            <h3>📚 Upcoming Sessions & History</h3>
-            <ul id="upcoming-list" class="upcoming-list" style="list-style: none; padding: 0;">
-                <li>Loading session history...</li>
-            </ul>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="upcoming">Upcoming Sessions</button>
+                <button class="tab-btn" data-tab="history">Session History</button>
+            </div>
+
+            <div id="upcoming-tab" class="tab-content active">
+                <ul id="upcoming-list" class="upcoming-list">
+                    <li>Loading upcoming sessions...</li>
+                </ul>
+            </div>
+
+            <div id="history-tab" class="tab-content">
+                <ul id="history-list" class="upcoming-list">
+                    <li>Loading session history...</li>
+                </ul>
+            </div>
         </section>
     </main>
 
-    <!-- Session Modal -->
     <div id="session-modal" class="modal hidden">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
             <h3 id="modal-title">Book a Session</h3>
             <form id="session-form">
-                <!-- NEW HIDDEN ID FIELD -->
                 <input type="hidden" id="session-id">
-
-                <label for="session-topic">Topic:</label>
-                <select id="session-topic" required>
-                    <option value="" disabled selected>Select a topic...</option>
-                    <option value="TA-001">Final Project</option>
-                </select>
-
                 <label for="session-date">Date:</label>
                 <input type="date" id="session-date" required>
-
                 <label for="session-time">Time:</label>
                 <input type="time" id="session-time" required>
-
                 <label for="session-location">Location:</label>
                 <select id="session-location" required>
                     <option value="Lecturer Room">Lecturer Room</option>
                     <option value="Online">Online</option>
                     <option value="Library">Library</option>
                 </select>
-                
                 <button type="submit" id="save-session-btn" class="primary-btn">Save Session</button>
             </form>
         </div>
     </div>
 
-    <!-- Logout Modal -->
     <div id="logout-modal" class="modal hidden">
         <div class="modal-content">
             <h3>Confirm Logout</h3>

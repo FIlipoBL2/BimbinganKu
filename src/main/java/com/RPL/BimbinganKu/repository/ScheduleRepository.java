@@ -50,17 +50,14 @@ public class ScheduleRepository {
         """;
         try {
              schedules.addAll(jdbcTemplate.queryForList(classSql, npm));
-        } catch (Exception e) {
-            System.err.println("Error fetching Student Class Schedule: " + e.getMessage());
-        }
+        } catch (Exception e) {}
         
         return schedules;
     }
 
-    // --- LECTURER VIEW (FIXED) ---
+    // --- LECTURER VIEW ---
     public List<Map<String, Object>> findScheduleByLecturer(String code) {
-        // Updated Query: Correctly joins Topic table AND Users table to find student name
-        // The 'Students' table doesn't have 'name', 'Users' does.
+        // Updated: Now selects s.npm as 'studentNpm' so we can pre-fill the edit modal
         String guidanceSql = """
             SELECT 
                 gs.guidance_id as id,
@@ -68,6 +65,7 @@ public class ScheduleRepository {
                 TO_CHAR(gs.hourStart, 'HH24:MI') as time, 
                 t.topicName as topic, 
                 t.topicCode as topicCode,
+                s.npm as studentNpm,  -- Added this!
                 u.name as studentName,
                 gs.place as location,
                 gs.notes,
@@ -75,14 +73,13 @@ public class ScheduleRepository {
             FROM GuidanceSchedule gs
             INNER JOIN Topic t ON gs.topicCode = t.topicCode
             INNER JOIN Students s ON t.NPM = s.NPM
-            INNER JOIN Users u ON s.NPM = u.id  -- Join Users to get the Name
+            INNER JOIN Users u ON s.NPM = u.id 
             WHERE t.lecturerCode = ?
         """;
         
         try {
             List<Map<String, Object>> schedules = jdbcTemplate.queryForList(guidanceSql, code);
 
-            // Get Teaching Schedule
             String classSql = """
                 SELECT 
                     day as day_name, 
@@ -90,6 +87,7 @@ public class ScheduleRepository {
                     'Teaching Session' as topic, 
                     'Classroom' as location,
                     '' as studentName,
+                    '' as studentNpm,
                     '' as notes,
                     'class' as type
                 FROM LecturerSchedule 
@@ -97,14 +95,10 @@ public class ScheduleRepository {
             """;
             try {
                 schedules.addAll(jdbcTemplate.queryForList(classSql, code));
-            } catch(Exception e) {
-                System.err.println("Error fetching Lecturer Class Schedule: " + e.getMessage());
-            }
+            } catch(Exception e) {}
 
             return schedules;
         } catch (Exception e) {
-            // Print FULL stack trace to see the SQL error details
-            System.err.println("CRITICAL SQL ERROR in findScheduleByLecturer:");
             e.printStackTrace(); 
             throw e; 
         }

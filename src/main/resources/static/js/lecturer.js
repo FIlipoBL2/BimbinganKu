@@ -4,18 +4,27 @@ document.addEventListener('DOMContentLoaded', function () {
     const dayMap = { "Sunday": 0, "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5, "Saturday": 6 };
     let schedules = {}; 
     let weeklySchedules = []; 
-    let selectedDate = new Date(); // Defaults to today
+    let selectedDate = new Date();
+    let currentFilter = 'all';
+    let currentListFilter = 'all';
     
     const codeField = document.getElementById('user-id');
     const lecturerCode = codeField ? codeField.value : null;
 
-    // --- DOM Elements (Matched to your HTML) ---
-    const calendarGrid = document.getElementById('calendar-grid'); // HTML ID is calendar-grid
-    const monthYearDisplay = document.getElementById('month-year-display'); // HTML ID is month-year-display
+    // Elements
+    const calendarGrid = document.getElementById('calendar-grid'); 
+    const monthYearDisplay = document.getElementById('month-year-display');
     const prevMonthBtn = document.getElementById('prev-month');
     const nextMonthBtn = document.getElementById('next-month');
-    const upcomingList = document.getElementById('upcoming-list'); // HTML ID is upcoming-list
     const weeklyTableBody = document.getElementById('schedule-body');
+    const filterSelect = document.getElementById('student-schedule-filter');
+    const listFilterSelect = document.getElementById('list-student-filter');
+
+    // List & Tab Elements
+    const upcomingList = document.getElementById('upcoming-list');
+    const historyList = document.getElementById('history-list'); 
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
 
     // Modal Elements
     const sessionModal = document.getElementById('session-modal');
@@ -24,16 +33,35 @@ document.addEventListener('DOMContentLoaded', function () {
     const sessionForm = document.getElementById('session-form');
     const saveSessionBtn = document.getElementById('save-session-btn');
     const sessionIdField = document.getElementById('session-id');
+    const studentSelect = document.getElementById('session-student');
+    const addSessionBtn = document.getElementById('add-session-btn');
+    const deleteSessionBtn = document.getElementById('delete-session-btn'); 
+    
+    // Time Restriction
+    const timeInput = document.getElementById('session-time');
+    if (timeInput) {
+        timeInput.min = "07:00";
+        timeInput.max = "19:00"; 
+        timeInput.step = "3600";
+    }
+
+    // FIX: Hide Topic Input
+    const topicInput = document.getElementById('session-topic');
+    if (topicInput) {
+        topicInput.style.display = 'none'; 
+        topicInput.removeAttribute('required'); 
+        const topicLabel = document.querySelector('label[for="session-topic"]');
+        if (topicLabel) topicLabel.style.display = 'none'; 
+    }
 
     // --- INIT ---
     if (lecturerCode) {
         console.log("Loaded Lecturer JS for Code:", lecturerCode);
-        fetchSchedules();
-    } else {
-        console.error("Lecturer Code is missing in hidden input!");
+        fetchStudents().then(() => {
+            fetchSchedules();
+        });
     }
     
-    // Force render immediately
     renderCalendar(selectedDate);
 
     // --- HELPERS ---
@@ -53,19 +81,88 @@ document.addEventListener('DOMContentLoaded', function () {
         return target < today;
     }
 
-    // --- FETCH ---
-    function fetchSchedules() {
-        // Debugging URL
-        const url = `/api/lecturer/schedule/${lecturerCode}`;
-        console.log("Fetching from URL:", url);
+    // --- TABS LOGIC ---
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            btn.classList.add('active');
+            const targetId = btn.getAttribute('data-tab');
+            if (targetId === 'upcoming') {
+                document.getElementById('upcoming-tab').classList.add('active');
+            } else {
+                document.getElementById('history-tab').classList.add('active');
+            }
+        });
+    });
 
-        fetch(url)
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to fetch schedule');
-                return response.json();
+    // --- 1. FETCH STUDENTS ---
+    function fetchStudents() {
+        return fetch(`/api/lecturer/students/${lecturerCode}`)
+            .then(res => res.json())
+            .then(students => {
+                if (filterSelect) filterSelect.innerHTML = '<option value="all">All Students</option>';
+                if (listFilterSelect) listFilterSelect.innerHTML = '<option value="all">All Students</option>';
+                if (studentSelect) studentSelect.innerHTML = '<option value="" disabled selected>Select Student</option>';
+
+                students.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.npm; 
+                    opt.textContent = `${s.name} (${s.npm})`;
+                    if(filterSelect) filterSelect.appendChild(opt);
+
+                    const opt2 = opt.cloneNode(true);
+                    if(listFilterSelect) listFilterSelect.appendChild(opt2);
+                    
+                    if(studentSelect) {
+                        const modalOpt = document.createElement('option');
+                        modalOpt.value = s.npm; 
+                        modalOpt.textContent = `${s.name} (${s.npm})`;
+                        studentSelect.appendChild(modalOpt);
+                    }
+                });
             })
+            .catch(err => console.error("Error loading students:", err));
+    }
+
+    // --- 2. FILTERS ---
+    if (filterSelect) {
+        filterSelect.addEventListener('change', (e) => {
+            currentFilter = e.target.value;
+            const startOfWeek = new Date(selectedDate);
+            startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
+            renderWeeklySchedule(startOfWeek);
+            renderCalendar(selectedDate);
+        });
+    }
+
+    if (listFilterSelect) {
+        listFilterSelect.addEventListener('change', (e) => {
+            currentListFilter = e.target.value;
+            renderLists(); 
+        });
+    }
+
+    function matchesFilter(session) {
+        if (currentFilter === 'all') return true;
+        let sNpm = session.studentNpm || session.studentnpm; 
+        return sNpm === currentFilter;
+    }
+
+    function matchesListFilter(session) {
+        if (currentListFilter === 'all') return true;
+        let sNpm = session.studentNpm || session.studentnpm; 
+        return sNpm === currentListFilter;
+    }
+
+    // --- 3. FETCH SCHEDULES ---
+    function fetchSchedules() {
+        const url = `/api/lecturer/schedule/${lecturerCode}`;
+        fetch(url)
+            .then(response => response.json())
             .then(data => {
-                console.log("Schedule data received:", data);
+                console.log("Schedule data:", data);
                 schedules = {}; 
                 weeklySchedules = [];
 
@@ -79,20 +176,75 @@ document.addEventListener('DOMContentLoaded', function () {
                         weeklySchedules.push(session);
                     }
                 });
-                // Re-render with data
                 renderCalendar(selectedDate);
-                renderUpcomingSessions(); // Changed to match function name below
+                renderLists();
                 selectDate(selectedDate);
             })
             .catch(error => console.error('Error fetching schedules:', error));
     }
 
-    // --- CALENDAR ---
+    // --- 4. RENDER LISTS ---
+    function renderLists() {
+        if (!upcomingList || !historyList) return;
+        upcomingList.innerHTML = '';
+        historyList.innerHTML = '';
+        
+        let allSessions = [];
+        for (const [date, sessions] of Object.entries(schedules)) {
+            allSessions = allSessions.concat(sessions);
+        }
+        
+        allSessions = allSessions.filter(s => matchesListFilter(s));
+        allSessions.sort((a, b) => a.date.localeCompare(b.date));
+
+        let hasUpcoming = false;
+        let hasHistory = false;
+
+        allSessions.forEach(session => {
+            const past = isPast(session.date);
+            const li = createSessionListItem(session, past);
+            
+            if (past) {
+                historyList.appendChild(li);
+                hasHistory = true;
+            } else {
+                upcomingList.appendChild(li);
+                hasUpcoming = true;
+            }
+        });
+
+        if (!hasUpcoming) upcomingList.innerHTML = '<li>No upcoming sessions.</li>';
+        if (!hasHistory) historyList.innerHTML = '<li>No session history found.</li>';
+    }
+
+    // FIX: Updated to match Student Dashboard styling
+    function createSessionListItem(session, isPast) {
+        const li = document.createElement('li');
+        li.className = 'session-item';
+        
+        // Status color for left border logic (green future, grey past)
+        const statusColor = isPast ? '#6c757d' : '#28a745';
+        
+        let sName = session.studentName || session.studentname;
+        let display = sName ? `${sName} - ${session.topic}` : session.topic;
+        let timeDisplay = session.time.substring(0, 5);
+
+        li.innerHTML = `
+            <div class="session-info" style="border-left: 4px solid ${statusColor}; padding-left: 8px;">
+                <span class="session-title">${display}</span>
+                <span class="session-date">${session.date} | ${timeDisplay}</span>
+            </div>
+            <span class="session-location">📍 ${session.location}</span>
+        `;
+        
+        li.addEventListener('click', () => openSessionModal(session, 'edit'));
+        return li;
+    }
+
+    // --- 5. CALENDAR & TABLE ---
     function selectDate(date) {
         selectedDate = new Date(date);
         renderCalendar(selectedDate);
-        
-        // Calculate start of week (Sunday)
         const startOfWeek = new Date(selectedDate);
         startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
         renderWeeklySchedule(startOfWeek);
@@ -102,18 +254,15 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!calendarGrid) return;
         const year = date.getFullYear();
         const month = date.getMonth();
-        
-        // Update header text
-        if(monthYearDisplay) {
-            monthYearDisplay.textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
-        }
+        if(monthYearDisplay) monthYearDisplay.textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
 
         calendarGrid.innerHTML = '';
-        const firstDay = new Date(year, month, 1).getDay();
+        const firstDayOfMonth = new Date(year, month, 1);
+        const firstDayIndex = firstDayOfMonth.getDay(); 
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const selectedStr = selectedDate.toDateString();
+        const totalCells = 42; 
 
-        for (let i = 0; i < firstDay; i++) {
+        for (let i = 0; i < firstDayIndex; i++) {
             const empty = document.createElement('div');
             empty.classList.add('calendar-day', 'empty');
             calendarGrid.appendChild(empty);
@@ -126,25 +275,34 @@ document.addEventListener('DOMContentLoaded', function () {
             const currentDayObj = new Date(year, month, day);
             const dateStr = toLocalDateString(currentDayObj);
 
-            if (currentDayObj.toDateString() === selectedStr) {
+            if (currentDayObj.toDateString() === selectedDate.toDateString()) {
                 dayCell.classList.add('today');
                 dayCell.style.backgroundColor = '#007bff';
                 dayCell.style.color = 'white';
             }
-            if (schedules[dateStr] && schedules[dateStr].length > 0) {
-                dayCell.classList.add('has-session');
+            
+            let hasEvent = false;
+            if (schedules[dateStr]) {
+                hasEvent = schedules[dateStr].some(s => matchesFilter(s));
             }
+            if (hasEvent) dayCell.classList.add('has-session');
+            
             dayCell.addEventListener('click', () => selectDate(currentDayObj));
             calendarGrid.appendChild(dayCell);
         }
+        
+        const remainingCells = totalCells - (firstDayIndex + daysInMonth);
+        for(let i=0; i<remainingCells; i++) {
+             const empty = document.createElement('div');
+             empty.classList.add('calendar-day', 'empty');
+             calendarGrid.appendChild(empty);
+        }
     }
 
-    // --- TABLE ---
     function renderWeeklySchedule(startOfWeek) {
         if (!weeklyTableBody) return;
         const rows = weeklyTableBody.querySelectorAll('tr');
         
-        // Clear previous
         rows.forEach(row => {
             const cells = row.querySelectorAll('td');
             for (let i = 1; i < cells.length; i++) {
@@ -162,7 +320,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const dateStr = toLocalDateString(currentDay);
 
             if (schedules[dateStr]) {
-                schedules[dateStr].forEach(session => {
+                schedules[dateStr].filter(s => matchesFilter(s)).forEach(session => {
                     placeSessionInTable(session, i, 'session');
                 });
             }
@@ -173,10 +331,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
         
-        // Highlight header
         const dayHeaders = document.querySelectorAll('#schedule-header-days th');
         dayHeaders.forEach(th => th.style.backgroundColor = ''); 
-        // +1 index offset for Time column
         if(dayHeaders[selectedDate.getDay() + 1]) {
             dayHeaders[selectedDate.getDay() + 1].style.backgroundColor = '#e6f7ff'; 
         }
@@ -184,96 +340,76 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function placeSessionInTable(session, dayIndex, cssClass) {
         let timeKey = session.time.substring(0, 5);
-        const row = weeklyTableBody.querySelector(`tr[data-time="${timeKey}"]`);
+        let hour = timeKey.split(':')[0];
+        let rowKey = `${hour}:00`;
+        
+        const row = weeklyTableBody.querySelector(`tr[data-time="${rowKey}"]`);
         if (row) {
             const cell = row.children[dayIndex + 1];
             if (cell) {
                 cell.classList.add(cssClass);
                 let title = session.studentName ? `${session.studentName}<br>(${session.topic})` : session.topic;
-                cell.innerHTML = `<small><strong>${title}</strong></small>`;
+                cell.innerHTML = `<small><strong>${title}</strong><br>${timeKey}</small>`;
                 
                 if (cssClass === 'session') {
                     cell.style.cursor = 'pointer';
                     cell.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        openSessionModal(session);
+                        openSessionModal(session, 'edit');
                     });
                 }
             }
         }
     }
 
-    // --- LIST (Upcoming Sessions) ---
-    function renderUpcomingSessions() {
-        if (!upcomingList) return;
-        upcomingList.innerHTML = '';
-        let allUpcoming = [];
-        
-        for (const [date, sessions] of Object.entries(schedules)) {
-            allUpcoming = allUpcoming.concat(sessions);
-        }
-        allUpcoming.sort((a, b) => a.date.localeCompare(b.date));
-
-        if (allUpcoming.length === 0) {
-            upcomingList.innerHTML = '<li>No sessions found.</li>';
-            return;
-        }
-
-        allUpcoming.forEach(session => {
-            const li = document.createElement('li');
-            li.className = 'session-item';
-            const past = isPast(session.date);
-            const statusColor = past ? '#6c757d' : '#28a745';
-            
-            let display = session.studentName ? `${session.studentName} - ${session.topic}` : session.topic;
-
-            li.innerHTML = `
-                <div class="session-info" style="border-left: 4px solid ${statusColor}; padding-left: 8px;">
-                    <span class="session-title"><strong>${display}</strong></span>
-                    <span class="session-date">${session.date} | ${session.time.substring(0,5)}</span>
-                </div>
-                <span class="session-location">📍 ${session.location}</span>
-            `;
-            li.style.cursor = 'pointer';
-            li.addEventListener('click', () => openSessionModal(session));
-            upcomingList.appendChild(li);
-        });
-    }
-
-    // --- MODAL ---
-    function openSessionModal(session) {
+    // --- 6. MODAL & SAVE ---
+    function openSessionModal(session, mode) {
         sessionModal.classList.remove('hidden');
-        if(sessionModalTitle) sessionModalTitle.textContent = "Edit Session Details";
+        sessionForm.reset();
         
-        // Fill Data
-        if(sessionIdField) sessionIdField.value = session.id;
-        
-        // Safely set values if elements exist
-        const topicInput = document.getElementById('session-topic');
-        if(topicInput) topicInput.value = session.topicCode || session.topic;
-        
-        const dateInput = document.getElementById('session-date');
-        if(dateInput) dateInput.value = session.date;
-        
-        const timeInput = document.getElementById('session-time');
-        if(timeInput) timeInput.value = session.time.substring(0,5);
-        
-        const locInput = document.getElementById('session-location');
-        if(locInput) locInput.value = session.location;
-        
-        const notesInput = document.getElementById('session-notes');
-        if(notesInput) notesInput.value = session.notes || ""; 
+        if (mode === 'create') {
+            if(sessionModalTitle) sessionModalTitle.textContent = "Book New Session";
+            sessionIdField.value = "";
+            document.getElementById('session-date').value = toLocalDateString(selectedDate);
+            if(studentSelect) {
+                studentSelect.disabled = false;
+                studentSelect.value = ""; 
+            }
+            if(deleteSessionBtn) deleteSessionBtn.classList.add('hidden'); 
+        } 
+        else {
+            if(sessionModalTitle) sessionModalTitle.textContent = "Edit Session Details";
+            sessionIdField.value = session.id;
+            
+            document.getElementById('session-date').value = session.date;
+            document.getElementById('session-time').value = session.time.substring(0,5);
+            document.getElementById('session-location').value = session.location;
+            document.getElementById('session-notes').value = session.notes || ""; 
+            
+            let studentVal = session.studentNpm || session.studentnpm;
+            if(studentSelect && studentVal) {
+                studentSelect.value = studentVal;
+                studentSelect.disabled = true; 
+            }
+            if(deleteSessionBtn) deleteSessionBtn.classList.remove('hidden'); 
+        }
     }
 
     if (sessionForm) {
         sessionForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
+            const timeVal = document.getElementById('session-time').value;
+            if (timeVal < "07:00" || timeVal > "19:00") {
+                alert("Session time must be between 07:00 and 19:00.");
+                return;
+            }
+
             const formData = {
                 id: sessionIdField.value,
-                topicCode: document.getElementById('session-topic').value,
+                studentNpm: studentSelect ? studentSelect.value : null,
                 date: document.getElementById('session-date').value,
-                time: document.getElementById('session-time').value,
+                time: timeVal,
                 location: document.getElementById('session-location').value,
                 notes: document.getElementById('session-notes').value 
             };
@@ -285,7 +421,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(res => {
                 if(res.ok) {
-                    alert("Session updated successfully!");
+                    alert("Session saved successfully!");
                     sessionModal.classList.add('hidden');
                     fetchSchedules();
                 } else {
@@ -296,23 +432,48 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    if (deleteSessionBtn) {
+        deleteSessionBtn.addEventListener('click', () => {
+            const id = sessionIdField.value;
+            if (!id) return;
+
+            if (confirm("Are you sure you want to delete this session?")) {
+                fetch(`/api/session/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(res => {
+                    if (res.ok) {
+                        alert("Session deleted.");
+                        sessionModal.classList.add('hidden');
+                        fetchSchedules();
+                    } else {
+                        alert("Failed to delete session.");
+                    }
+                })
+                .catch(err => alert("Network Error: " + err));
+            }
+        });
+    }
+
     if (closeBtn) closeBtn.addEventListener('click', () => sessionModal.classList.add('hidden'));
     
-    // Listeners - Added safety checks
     if (prevMonthBtn) {
         prevMonthBtn.addEventListener('click', () => { 
             selectedDate.setMonth(selectedDate.getMonth() - 1); 
-            selectDate(selectedDate); // Re-renders cal
+            selectDate(selectedDate);
         });
     }
     if (nextMonthBtn) {
         nextMonthBtn.addEventListener('click', () => { 
             selectedDate.setMonth(selectedDate.getMonth() + 1); 
-            selectDate(selectedDate); // Re-renders cal
+            selectDate(selectedDate);
         });
     }
+    
+    if (addSessionBtn) {
+        addSessionBtn.addEventListener('click', () => openSessionModal(null, 'create'));
+    }
 
-    // Logout
     const logoutBtn = document.getElementById('logout-btn');
     const logoutModal = document.getElementById('logout-modal');
     if (logoutBtn) logoutBtn.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });

@@ -2,37 +2,58 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // --- 1. CONFIG & STATE ---
     const dayMap = { "Sunday": 0, "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5, "Saturday": 6 };
-    let schedules = {};      // Map: "YYYY-MM-DD" -> Array of Session Objects
-    let weeklySchedules = []; // Array of Recurring Classes
+    let schedules = {};      
+    let weeklySchedules = []; 
     let selectedDate = new Date();
     
     const npmField = document.getElementById('user-id');
     const npm = npmField ? npmField.value : null; 
 
-    // DOM Elements
+    // Elements
     const calendarGrid = document.getElementById('calendar-grid');
     const monthYearDisplay = document.getElementById('month-year-display');
     const prevMonthBtn = document.getElementById('prev-month');
     const nextMonthBtn = document.getElementById('next-month');
-    const upcomingList = document.getElementById('upcoming-list');
     const weeklyTableBody = document.getElementById('schedule-body');
+    
+    // List Elements
+    const upcomingList = document.getElementById('upcoming-list');
+    const historyList = document.getElementById('history-list'); // New
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
 
-    // Modal Elements
     const sessionModal = document.getElementById('session-modal');
     const sessionModalTitle = document.getElementById('modal-title');
     const requestSessionBtn = document.getElementById('request-session-btn');
     const closeBtn = sessionModal ? sessionModal.querySelector('.close-btn') : null;
     const sessionForm = document.getElementById('session-form');
     const saveSessionBtn = document.getElementById('save-session-btn');
-    
-    // Hidden Input for ID
     const sessionIdField = document.getElementById('session-id');
+    
+    // Time Restriction
+    const timeInput = document.getElementById('session-time');
+    if (timeInput) {
+        timeInput.min = "07:00";
+        timeInput.max = "19:00"; 
+        timeInput.step = "3600"; 
+    }
 
-    // --- INITIALIZATION ---
+    // Hide Topic Input
+    const topicInput = document.getElementById('session-topic');
+    if (topicInput) {
+        topicInput.style.display = 'none'; 
+        topicInput.removeAttribute('required'); 
+        const topicLabel = document.querySelector('label[for="session-topic"]');
+        if (topicLabel) topicLabel.style.display = 'none'; 
+    }
+
+    // --- INIT ---
     if (npm) {
         console.log("Loaded Student JS for NPM:", npm);
         fetchSchedules(); 
     }
+    
+    renderCalendar(selectedDate);
 
     // --- HELPER: Local Date String ---
     function toLocalDateString(date) {
@@ -42,7 +63,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return `${year}-${month}-${day}`;
     }
 
-    // --- HELPER: Check if Date is Past ---
     function isPast(dateStr) {
         const today = new Date();
         today.setHours(0, 0, 0, 0); 
@@ -51,6 +71,22 @@ document.addEventListener('DOMContentLoaded', function () {
         target.setFullYear(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
         return target < today;
     }
+
+    // --- TABS LOGIC ---
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            btn.classList.add('active');
+            const targetId = btn.getAttribute('data-tab');
+            if (targetId === 'upcoming') {
+                document.getElementById('upcoming-tab').classList.add('active');
+            } else {
+                document.getElementById('history-tab').classList.add('active');
+            }
+        });
+    });
 
     // --- 2. FETCH DATA ---
     function fetchSchedules() {
@@ -75,13 +111,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
                 renderCalendar(selectedDate);
-                renderUpcomingSessions();
+                renderLists(); // Render both lists
                 selectDate(selectedDate); 
             })
-            .catch(error => { console.error('Error:', error); });
+            .catch(error => console.error('Error:', error));
     }
 
-    // --- 3. INTERACTIVE CALENDAR ---
+    // --- 3. CALENDAR ---
     function selectDate(date) {
         selectedDate = new Date(date); 
         renderCalendar(selectedDate); 
@@ -94,13 +130,15 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!calendarGrid) return;
         const year = date.getFullYear();
         const month = date.getMonth();
-        monthYearDisplay.textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
+        if(monthYearDisplay) monthYearDisplay.textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
+        
         calendarGrid.innerHTML = ''; 
-        const firstDay = new Date(year, month, 1).getDay();
+        const firstDayOfMonth = new Date(year, month, 1);
+        const firstDayIndex = firstDayOfMonth.getDay(); 
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const selectedStr = selectedDate.toDateString(); 
+        const totalCells = 42; 
 
-        for (let i = 0; i < firstDay; i++) {
+        for (let i = 0; i < firstDayIndex; i++) {
             const empty = document.createElement('div');
             empty.classList.add('calendar-day', 'empty');
             calendarGrid.appendChild(empty);
@@ -113,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const currentDayObj = new Date(year, month, day);
             const dateStr = toLocalDateString(currentDayObj);
 
-            if (currentDayObj.toDateString() === selectedStr) {
+            if (currentDayObj.toDateString() === selectedDate.toDateString()) {
                 dayCell.classList.add('today'); 
                 dayCell.style.backgroundColor = '#007bff';
                 dayCell.style.color = 'white';
@@ -124,9 +162,16 @@ document.addEventListener('DOMContentLoaded', function () {
             dayCell.addEventListener('click', () => selectDate(currentDayObj));
             calendarGrid.appendChild(dayCell);
         }
+        
+        const remainingCells = totalCells - (firstDayIndex + daysInMonth);
+        for(let i=0; i<remainingCells; i++) {
+             const empty = document.createElement('div');
+             empty.classList.add('calendar-day', 'empty');
+             calendarGrid.appendChild(empty);
+        }
     }
 
-    // --- 4. RENDER WEEKLY TABLE ---
+    // --- 4. TABLE ---
     function renderWeeklySchedule(startOfWeek) {
         if (!weeklyTableBody) return;
         const rows = weeklyTableBody.querySelectorAll('tr');
@@ -167,12 +212,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function placeSessionInTable(session, dayIndex, cssClass) {
         let timeKey = session.time.substring(0, 5); 
-        const row = weeklyTableBody.querySelector(`tr[data-time="${timeKey}"]`);
+        let hour = timeKey.split(':')[0];
+        let rowKey = `${hour}:00`;
+        
+        const row = weeklyTableBody.querySelector(`tr[data-time="${rowKey}"]`);
         if (row) {
             const cell = row.children[dayIndex + 1]; 
             if (cell) {
                 cell.classList.add(cssClass);
-                cell.innerHTML = `<strong>${session.topic}</strong><br><small>${session.location || ''}</small>`;
+                
+                let displayTime = session.time.substring(0, 5); 
+                cell.innerHTML = `<strong>${session.topic}</strong><br><small>${session.location || ''}<br>${displayTime}</small>`;
+                
                 if (cssClass === 'session') {
                     cell.style.cursor = 'pointer';
                     cell.addEventListener('click', (e) => {
@@ -184,26 +235,25 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // --- 5. RENDER LIST ---
-    function renderUpcomingSessions() {
-        if (!upcomingList) return;
-        upcomingList.innerHTML = ''; 
-        const todayStr = toLocalDateString(new Date());
-        let allUpcoming = [];
+    // --- 5. RENDER LISTS ---
+    function renderLists() {
+        if (!upcomingList || !historyList) return;
+        upcomingList.innerHTML = '';
+        historyList.innerHTML = '';
+        
+        let allSessions = [];
         for (const [date, sessions] of Object.entries(schedules)) {
-            allUpcoming = allUpcoming.concat(sessions);
+            allSessions = allSessions.concat(sessions);
         }
-        allUpcoming.sort((a, b) => a.date.localeCompare(b.date));
+        allSessions.sort((a, b) => a.date.localeCompare(b.date));
 
-        if (allUpcoming.length === 0) {
-            upcomingList.innerHTML = '<li>No sessions found.</li>';
-            return;
-        }
+        let hasUpcoming = false;
+        let hasHistory = false;
 
-        allUpcoming.forEach(session => {
+        allSessions.forEach(session => {
+            const past = isPast(session.date);
             const li = document.createElement('li');
             li.className = 'session-item';
-            const past = isPast(session.date);
             const statusColor = past ? '#6c757d' : '#28a745'; 
             
             li.innerHTML = `
@@ -215,57 +265,47 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
             li.style.cursor = 'pointer';
             li.addEventListener('click', () => openSessionModal(session, 'edit'));
-            upcomingList.appendChild(li);
+            
+            if (past) {
+                historyList.appendChild(li);
+                hasHistory = true;
+            } else {
+                upcomingList.appendChild(li);
+                hasUpcoming = true;
+            }
         });
+
+        if (!hasUpcoming) upcomingList.innerHTML = '<li>No upcoming guidance sessions.</li>';
+        if (!hasHistory) historyList.innerHTML = '<li>No session history found.</li>';
     }
 
     // --- 6. MODAL & SAVE ---
     function openSessionModal(session = null, mode = 'create') {
         sessionModal.classList.remove('hidden');
-        const topicSelect = document.getElementById('session-topic');
-        const dateInput = document.getElementById('session-date');
-        const timeInput = document.getElementById('session-time');
-        const locSelect = document.getElementById('session-location');
+        sessionForm.reset(); 
         
-        sessionForm.reset();
-        
-        // Reset Inputs
-        topicSelect.disabled = false;
-        dateInput.disabled = false;
-        timeInput.disabled = false;
-        locSelect.disabled = false;
-        saveSessionBtn.classList.remove('hidden');
-
         if (mode === 'create') {
-            sessionModalTitle.textContent = "Book a New Session";
-            saveSessionBtn.textContent = "Save Session";
-            dateInput.value = toLocalDateString(selectedDate);
-            sessionIdField.value = ""; // Clear ID for new session
+            if(sessionModalTitle) sessionModalTitle.textContent = "Book New Session";
+            sessionIdField.value = "";
+            document.getElementById('session-date').value = toLocalDateString(selectedDate);
+            saveSessionBtn.classList.remove('hidden');
         } 
         else if (mode === 'edit') {
-            sessionIdField.value = session.id; // SET ID for update
-
+            sessionIdField.value = session.id; 
             const past = isPast(session.date);
+            
             if (past) {
-                sessionModalTitle.textContent = "Session Details (Completed)";
-                topicSelect.value = session.topicCode || ""; 
-                dateInput.value = session.date;
-                timeInput.value = session.time.substring(0,5);
-                locSelect.value = session.location;
-                
-                topicSelect.disabled = true;
-                dateInput.disabled = true;
-                timeInput.disabled = true;
-                locSelect.disabled = true;
+                if(sessionModalTitle) sessionModalTitle.textContent = "Session Details (Completed)";
+                document.getElementById('session-date').value = session.date;
+                document.getElementById('session-time').value = session.time.substring(0,5);
+                document.getElementById('session-location').value = session.location;
                 saveSessionBtn.classList.add('hidden');
             } else {
-                sessionModalTitle.textContent = "Update Session";
-                saveSessionBtn.textContent = "Update Changes";
-                // Pre-fill
-                topicSelect.value = "TA-001"; // Simplify for demo
-                dateInput.value = session.date;
-                timeInput.value = session.time.substring(0,5);
-                locSelect.value = session.location;
+                if(sessionModalTitle) sessionModalTitle.textContent = "Update Session";
+                saveSessionBtn.classList.remove('hidden');
+                document.getElementById('session-date').value = session.date;
+                document.getElementById('session-time').value = session.time.substring(0,5);
+                document.getElementById('session-location').value = session.location;
             }
         }
     }
@@ -274,12 +314,19 @@ document.addEventListener('DOMContentLoaded', function () {
         sessionForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
+            const timeVal = document.getElementById('session-time').value;
+            // UPDATE: Check 19:00
+            if (timeVal < "07:00" || timeVal > "19:00") {
+                alert("Session time must be between 07:00 and 19:00.");
+                return;
+            }
+
             const formData = {
-                id: sessionIdField.value, // SEND ID to Backend
-                topicCode: document.getElementById('session-topic').value,
+                id: sessionIdField.value,
+                studentNpm: npm, 
                 date: document.getElementById('session-date').value,
-                time: document.getElementById('session-time').value,
-                location: document.getElementById('session-location').value
+                time: timeVal,
+                location: document.getElementById('session-location').value,
             };
 
             fetch('/api/student/session', {
@@ -289,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(res => {
                 if(res.ok) {
-                    alert("Session saved successfully!");
+                    alert("Session booked successfully!");
                     sessionModal.classList.add('hidden');
                     fetchSchedules(); 
                 } else {
@@ -316,6 +363,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const logoutBtn = document.getElementById('logout-btn');
     const logoutModal = document.getElementById('logout-modal');
     if (logoutBtn) logoutBtn.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
-    document.getElementById('cancel-logout-btn').addEventListener('click', () => logoutModal.classList.add('hidden'));
-    document.getElementById('confirm-logout-btn').addEventListener('click', () => window.location.href = '/logout');
+    if (document.getElementById('cancel-logout-btn')) document.getElementById('cancel-logout-btn').addEventListener('click', () => logoutModal.classList.add('hidden'));
+    if (document.getElementById('confirm-logout-btn')) document.getElementById('confirm-logout-btn').addEventListener('click', () => window.location.href = '/logout');
 });

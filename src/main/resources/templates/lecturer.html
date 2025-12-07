@@ -5,25 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BimbinganKu - Lecturer Home</title>
     <link rel="stylesheet" th:href="@{/css/global.css}"> 
+    <style>
+        /* Tab Styles */
+        .tabs { display: flex; border-bottom: 2px solid #ddd; margin-bottom: 15px; }
+        .tab-btn { 
+            padding: 10px 20px; cursor: pointer; border: none; background: none; font-size: 16px; font-weight: bold; color: #666;
+            border-bottom: 3px solid transparent; 
+        }
+        .tab-btn.active { color: #007bff; border-bottom-color: #007bff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Filter Styles for List */
+        .list-filter-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .list-filter-bar select { padding: 5px; }
+
+        /* --- NEW: Session Card Styling (Matches Student View) --- */
+        .upcoming-list { 
+            list-style: none; 
+            padding: 0; 
+        }
+        .session-item {
+            background: #fff;
+            margin-bottom: 12px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #e0e0e0;
+        }
+        .session-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: #007bff;
+        }
+        
+        /* Inner text styling */
+        .session-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            /* Border left color will be set dynamically via JS style attribute */
+        }
+        .session-title {
+            font-size: 1.05rem;
+            color: #333;
+            font-weight: bold;
+            display: block;
+        }
+        .session-date {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        /* Location badge styling */
+        .session-location {
+            font-size: 0.85rem;
+            color: #555;
+            background-color: #f8f9fa;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #eee;
+            white-space: nowrap;
+            margin-left: 15px;
+            display: block;
+        }
+    </style>
 </head>
 <body>
-    <!-- CONNECT TO BACKEND -->
     <input type="hidden" id="user-id" th:value="${lecturerCode}">
 
     <header>
         <div class="logo">BimbinganKU (Lecturer)</div>
         <nav>
-            <!-- Inbox Button -->
             <div class="inbox-area">
-                <a th:href="@{/inbox(role='lecturer')}" id="inbox-link" title="Inbox">✉️</a>
+                <a th:href="@{/inbox(role='lecturer')}" id="inbox-link" title="Inbox">✉️ Inbox</a>
             </div>
-
-            <!-- Notification Dropdown -->
             <div class="notification-area" id="notification-area">
-                <span id="notification-bell" role="button" aria-haspopup="true" aria-expanded="false">🔔</span>
-                <span id="unread-count" class="badge hidden" aria-live="polite">0</span>
-
-                <div id="notification-dropdown" class="dropdown-content hidden" aria-label="Notifications">
+                <span id="notification-bell" role="button">🔔</span>
+                <span id="unread-count" class="badge hidden">0</span>
+                <div id="notification-dropdown" class="dropdown-content hidden">
                     <p class="empty-message">No unread messages.</p>
                 </div>
             </div>
@@ -33,7 +98,6 @@
 
     <main class="container">
         <section class="status-card">
-            <!-- Dynamic Name & Code -->
             <h2>Welcome Back, <span th:text="${lecturerName}">[Lecturer Name]</span></h2>
             <p>Your Code: <strong th:text="${lecturerCode}">L-12345</strong></p>
             <p>You have <strong>Active Sessions</strong> this week.</p>
@@ -43,7 +107,6 @@
             <div class="mini-calendar-container">
                 <div id="mini-calendar" class="calendar-card">
                     <div class="calendar-header">
-                        <!-- MATCHING JS ID -->
                         <button class="arrow left-arrow" id="prev-month" style="background:none; border:none; cursor:pointer;">&lt;</button>
                         <span class="month-year" id="month-year-display">October 2025</span>
                         <button class="arrow right-arrow" id="next-month" style="background:none; border:none; cursor:pointer;">&gt;</button>
@@ -51,7 +114,6 @@
                     <div class="calendar-weekdays">
                         <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
                     </div>
-                    <!-- MATCHING JS ID -->
                     <div class="calendar-days" id="calendar-grid"></div>
                 </div>
             </div>
@@ -60,23 +122,17 @@
                 <h3>🗓️ Weekly Schedule (This Week)</h3>
                 
                 <div class="schedule-controls-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                    
                     <div id="student-schedule-filter-container">
                         <label for="student-schedule-filter">Show Student Study Schedule For:</label>
                         <select id="student-schedule-filter">
                             <option value="all">All Students</option>
                         </select>
                     </div>
-                    
-                    <!-- Hidden for now as creating session is primarily student-driven, but kept for UI consistency -->
                     <div id="new-session-action" class="session-actions">
-                        <button id="add-session-btn" class="primary-btn" style="visibility: hidden;">➕ New Session</button>
+                        <button id="add-session-btn" class="primary-btn">➕ New Session</button>
                     </div>
-                    
                 </div>
                 
-                <!-- WEEKLY TABLE -->
-                <!-- Added 'data-time' attributes so JS can place events -->
                 <table id="weekly-schedule-table">
                     <thead>
                         <tr id="schedule-header-days"> 
@@ -104,49 +160,64 @@
         </section>
         
         <section id="history-section" class="scheduling-section">
-            <h3>📚 Upcoming Sessions</h3>
-            <!-- MATCHING JS ID -->
-            <ul id="upcoming-list" class="upcoming-list" style="list-style: none; padding: 0;">
-                <li>Loading session history...</li>
-            </ul>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="upcoming">Upcoming Sessions</button>
+                <button class="tab-btn" data-tab="history">Session History</button>
+            </div>
+
+            <!-- List Filter -->
+            <div class="list-filter-bar">
+                <label>Filter by Student: 
+                    <select id="list-student-filter">
+                        <option value="all">All Students</option>
+                    </select>
+                </label>
+            </div>
+
+            <div id="upcoming-tab" class="tab-content active">
+                <ul id="upcoming-list" class="upcoming-list">
+                    <li>Loading upcoming sessions...</li>
+                </ul>
+            </div>
+
+            <div id="history-tab" class="tab-content">
+                <ul id="history-list" class="upcoming-list">
+                    <li>Loading session history...</li>
+                </ul>
+            </div>
         </section>
     </main>
 
-    <!-- Modal for Sessions -->
     <div id="session-modal" class="modal hidden">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
             <h3 id="modal-title">Manage Session</h3>
             <form id="session-form">
-                <!-- HIDDEN ID -->
                 <input type="hidden" id="session-id">
-
-                <label for="session-topic">Student / Topic:</label>
-                <!-- Simplified for now -->
-                <input type="text" id="session-topic" placeholder="Topic Code (e.g. TA-001)" required>
-
+                <label for="session-student">Student:</label>
+                <select id="session-student" required>
+                    <option value="" disabled selected>Select Student</option>
+                </select>
+                <label for="session-topic">Topic Code:</label>
+                <input type="text" id="session-topic" placeholder="e.g. TA-001" required>
                 <label for="session-date">Date:</label>
                 <input type="date" id="session-date" required>
-
                 <label for="session-time">Time:</label>
                 <input type="time" id="session-time" required>
-                
                 <label for="session-location">Location:</label>
                 <select id="session-location" required>
                     <option value="Lecturer Room">Lecturer Room</option>
                     <option value="Online">Online</option>
                     <option value="Lab">Lab</option>
                 </select>
-                
                 <label for="session-notes">Notes (Lecturer Only):</label>
                 <textarea id="session-notes" rows="4" placeholder="Add notes for student..."></textarea> 
-                
                 <button type="submit" id="save-session-btn" class="primary-btn">Save Session</button>
+                <button type="button" id="delete-session-btn" class="delete-btn hidden">Delete</button>
             </form>
         </div>
     </div>
 
-    <!-- Logout Modal -->
     <div id="logout-modal" class="modal hidden">
         <div class="modal-content">
             <h3>Confirm Logout</h3>
