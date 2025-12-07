@@ -4,24 +4,44 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>BimbinganKu - Inbox</title>
-    <link rel="stylesheet" th:href="@{/global.css}"> 
-    <!-- Note: Header and footer are intentionally omitted for simplicity, 
-         as navigation back to home is managed by the browser (back button) 
-         or a dedicated link if needed. -->
+    <link rel="stylesheet" th:href="@{/css/global.css}"> 
+    <style>
+        /* Card Styling for Inbox Items */
+        .inbox-list { list-style: none; padding: 0; }
+        .session-item {
+            background: #fff;
+            margin-bottom: 12px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e0e0e0;
+            transition: transform 0.2s;
+        }
+        .session-item:hover { transform: translateY(-2px); border-color: #007bff; }
+        .session-info { display: flex; flex-direction: column; gap: 4px; }
+        .session-title { font-size: 1.05rem; color: #333; display: block; }
+        .session-date { font-size: 0.9rem; color: #666; }
+        
+        .inbox-filter-bar { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .filter-group { display: flex; gap: 10px; }
+    </style>
 </head>
 <body>
     <header>
         <div class="logo">BimbinganKU - Inbox</div>
         <nav>
-            <!-- Link back to the main user dashboard -->
-            <a th:href="@{/student.html}" href="/student.html" id="back-to-home-link">Go to Dashboard</a>
+            <!-- Dynamic Back Link using Thymeleaf -->
+            <a th:href="@{${role == 'lecturer' ? '/lecturer/home' : '/student/home'}}" id="back-to-home-link">Go to Dashboard</a>
         </nav>
     </header>
 
     <main class="container">
         <section class="status-card">
             <h2>Message History</h2>
-            <p>View, search, and manage all notifications and system messages.</p>
+            <p>Welcome, <span th:text="${userName}">User</span>. View your system messages.</p>
         </section>
 
         <!-- Filter and Actions Bar -->
@@ -35,19 +55,17 @@
                 </select>
                 <input type="text" id="search-inbox" placeholder="Search messages..." />
             </div>
-            
-            <button id="mark-all-read-btn">Mark All As Read</button>
         </div>
 
         <!-- Inbox List -->
-        <div class="status-card" style="padding: 0;">
+        <div class="status-card" style="padding: 0; background: transparent; border: none; box-shadow: none;">
             <ul id="inbox-list" class="inbox-list">
-                <!-- Messages will be rendered here by inbox.js -->
+                <!-- Messages rendered by JS -->
             </ul>
-            <p id="empty-inbox-message" class="empty-message hidden" style="padding: 20px;">Your inbox is empty!</p>
+            <p id="empty-inbox-message" class="empty-message hidden" style="padding: 20px; text-align: center; color: #666;">Your inbox is empty!</p>
         </div>
     </main>
 
-    <script src="/inbox.js"></script>
+    <script th:src="@{/js/inbox.js}"></script>
 </body>
 </html>

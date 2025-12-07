@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.RPL.BimbinganKu.data.Lecturer;
 import com.RPL.BimbinganKu.data.Student;
@@ -30,7 +31,6 @@ public class HomeController {
             return "redirect:/login";
         }
 
-        // Fix: Use String ID directly
         Student student = studentRepo.findByNPM(user.getId()).orElse(null);
 
         if (student != null) {
@@ -52,7 +52,6 @@ public class HomeController {
             return "redirect:/login";
         }
 
-        // Fix: Use String ID directly
         Lecturer lecturer = lecturerRepo.findByLecturerCode(user.getId()).orElse(null);
 
         if (lecturer != null) {
@@ -68,12 +67,27 @@ public class HomeController {
     public String showAdminDashboard(HttpSession session, Model model) {
         User user = (User) session.getAttribute("loggedUser");
 
-        // Fix: Check String ID "0"
         if (user == null || !"0".equals(user.getId())) {
             return "redirect:/login";
         }
 
         model.addAttribute("adminName", user.getName());
         return "admin";
+    }
+
+    // --- Inbox Endpoint ---
+    @GetMapping("/inbox")
+    public String showInbox(@RequestParam(required = false) String role, HttpSession session, Model model) {
+        User user = (User) session.getAttribute("loggedUser");
+
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        // Pass role to the view so 'Back to Dashboard' link works correctly
+        model.addAttribute("role", role != null ? role : "student");
+        model.addAttribute("userName", user.getName());
+
+        return "inbox";
     }
 }
