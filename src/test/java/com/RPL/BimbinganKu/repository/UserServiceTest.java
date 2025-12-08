@@ -49,7 +49,7 @@ public class UserServiceTest {
 
     @Test
     public void testLoginSuccess() {
-        User mockUser = new User("test@test.com", "encodedPassword", "9876543210", "Test User");
+        User mockUser = new User("9876543210", "test@test.com", "encodedPassword", "Test User");
         when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches("password", "encodedPassword")).thenReturn(true);
 
@@ -61,7 +61,7 @@ public class UserServiceTest {
 
     @Test
     public void testLoginWrongPassword() {
-        User mockUser = new User("test@test.com", "encodedPassword", "HEH", "Test User");
+        User mockUser = new User("HEH", "test@test.com", "encodedPassword", "Test User");
         when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches("wrongpass", "encodedPassword")).thenReturn(false);
 
@@ -81,7 +81,7 @@ public class UserServiceTest {
 
     @Test
     public void testGetUserType() {
-        User mockUser = new User("test@test.com", "password", "test", "Test User");
+        User mockUser = new User("test", "test@test.com", "password", "Test User");
         when(userRepository.getUserType(mockUser)).thenReturn("student");
 
         String role = userService.getUserType(mockUser);

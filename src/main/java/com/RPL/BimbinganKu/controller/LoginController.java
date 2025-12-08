@@ -17,15 +17,16 @@ import jakarta.servlet.http.HttpSession;
 public class LoginController {
     @Autowired
     private UserService userService;
-    
-    User admin = new User("admin", "admin123", "admin", "admin");
+
+    User admin = new User("admin", "admin", "admin123", "admin");
 
     @PostMapping("/login")
-    public String loginProcess(@RequestParam String email, @RequestParam String password, HttpSession session, Model model) {
-    
+    public String loginProcess(@RequestParam String email, @RequestParam String password, HttpSession session,
+            Model model) {
+
         User user = userService.login(email, password);
         String role = "";
-        
+
         if (user == null) {
             if (email.equals(admin.getEmail()) && password.equals(admin.getPassword())) {
                 session.setAttribute("curUser", UserType.ADMIN);
@@ -36,11 +37,12 @@ public class LoginController {
                 return "login";
             }
         }
-        
+
         model.addAttribute("status", null);
         session.setAttribute("loggedUser", user);
-        if (role.equals("")) role = userService.getUserType(user);
-        
+        if (role.equals(""))
+            role = userService.getUserType(user);
+
         switch (role) {
             case "student" -> {
                 session.setAttribute("curUser", UserType.STUDENT);
@@ -55,23 +57,23 @@ public class LoginController {
             }
         }
     }
-    
+
     @GetMapping("/login")
     public String loginPage(HttpSession session) {
-        
+
         User logged = (User) session.getAttribute("loggedUser");
-        
+
         if (logged != null) {
             // redirect based on session curUser attribute
-            
+
             if (session.getAttribute("curUser").equals(UserType.STUDENT)) {
                 return "redirect:/student/home";
             } else if (session.getAttribute("curUser").equals(UserType.LECTURER)) {
                 return "redirect:/lecturer/home";
             }
         }
-        
+
         return "login";
     }
-    
+
 }

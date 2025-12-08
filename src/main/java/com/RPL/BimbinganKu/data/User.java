@@ -12,6 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class User {
     @NotBlank
+    @Size(max = 10)
+    private String id;
+
+    @NotBlank
     @Email
     @Size(max = 255)
     private String email;
@@ -19,10 +23,6 @@ public class User {
     @NotBlank
     @Size(min = 8, max = 255)
     private String password;
-
-    @NotBlank
-    @Size(max = 10)
-    private String id;
 
     @NotBlank
     @Size(max = 255)

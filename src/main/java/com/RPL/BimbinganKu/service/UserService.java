@@ -49,13 +49,6 @@ public class UserService {
     public boolean saveLecturer(Lecturer lecturer) {
         lecturer = encodePassword(lecturer);
         try {
-            // First save to Users table (handled by LecturerRepository.save which calls
-            // jdbcTemplate for Lecturers,
-            // but wait, LecturerRepository.save only inserts into Lecturers table.
-            // We need to insert into Users table first.
-            // StudentRepository.save calls userRepo.save(newUser) then inserts into
-            // Students.
-            // So we should do the same here.
             lecturerRepository.save(lecturer);
         } catch (Exception e) {
             return false;

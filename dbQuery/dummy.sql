@@ -1,13 +1,13 @@
 -- Insert dummy data into Users table
 -- All passwords are "password123" hashed with Bcrypt
 INSERT INTO Users (id, name, email, password) VALUES 
-('GDK', 'Gede Karyana', 'Gede@university.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36jbMFSm'),
-('HUH', 'Husnul Hakim', 'Husnul@university.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36jbMFSm'),
-('ELH', 'Elisati', 'Elisati@university.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36jbMFSm'),
-('6182301004','Filipo Bintang Lautan', '6182301004@student.university.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36jbMFSm'),
-('6182301024','Vince Farrel Nathaniel', '6182301024.brown@university.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36jbMFSm'),
-('6182301032','Basilius Mozes', '6182301032@student.university.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36jbMFSm'),
-('6182101099','Womby', '6182101099@student.university.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36jbMFSm');
+('GDK', 'Gede Karyana', 'Gede@university.edu', '$2a$10$JpnDNHCZCegp4/TWbhVfluN4QDGIuZKCyjYb0h9aDfcsPfhWZsgL2'),
+('HUH', 'Husnul Hakim', 'Husnul@university.edu', '$2a$10$JpnDNHCZCegp4/TWbhVfluN4QDGIuZKCyjYb0h9aDfcsPfhWZsgL2'),
+('ELH', 'Elisati', 'Elisati@university.edu', '$2a$10$JpnDNHCZCegp4/TWbhVfluN4QDGIuZKCyjYb0h9aDfcsPfhWZsgL2'),
+('6182301004','Filipo Bintang Lautan', '6182301004@student.university.edu', '$2a$10$JpnDNHCZCegp4/TWbhVfluN4QDGIuZKCyjYb0h9aDfcsPfhWZsgL2'),
+('6182301024','Vince Farrel Nathaniel', '6182301024.brown@university.edu', '$2a$10$JpnDNHCZCegp4/TWbhVfluN4QDGIuZKCyjYb0h9aDfcsPfhWZsgL2'),
+('6182301032','Basilius Mozes', '6182301032@student.university.edu', '$2a$10$JpnDNHCZCegp4/TWbhVfluN4QDGIuZKCyjYb0h9aDfcsPfhWZsgL2'),
+('6182101099','Womby', '6182101099@student.university.edu', '$2a$10$JpnDNHCZCegp4/TWbhVfluN4QDGIuZKCyjYb0h9aDfcsPfhWZsgL2');
 
 -- Insert dummy data into Students table
 INSERT INTO Students (NPM, totalGuidanceUTS, totalGuidanceUAS) VALUES

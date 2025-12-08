@@ -39,7 +39,7 @@ public class LoginControllerTest {
 
     @Test
     public void testStudentLoginSuccess() throws Exception {
-        User mockUser = new User("student@test.com", "password", "9876543210", "Student Name");
+        User mockUser = new User("9876543210", "student@test.com", "password", "Student Name");
         when(userService.login(anyString(), anyString())).thenReturn(mockUser);
         when(userService.getUserType(mockUser)).thenReturn("student");
 
@@ -52,7 +52,7 @@ public class LoginControllerTest {
 
     @Test
     public void testLecturerLoginSuccess() throws Exception {
-        User mockUser = new User("lecturer@test.com", "password", "HEH", "Lecturer Name");
+        User mockUser = new User("HEH", "lecturer@test.com", "password", "Lecturer Name");
         when(userService.login(anyString(), anyString())).thenReturn(mockUser);
         when(userService.getUserType(mockUser)).thenReturn("lecturer");
 
