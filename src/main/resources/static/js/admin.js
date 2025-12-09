@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const subTabs = document.querySelectorAll('#admin-tabs .tab-btn');
     const tableTitle = document.getElementById('table-title');
     const dataTable = document.getElementById('admin-data-table');
+    const exportBtn = document.getElementById('export-student-pdf-btn');
     const searchInput = document.getElementById('search-input');
 
     // Import Elements
@@ -81,6 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         tableTitle.textContent = title;
+        // Only show the export button for the Student table
+        try {
+            if (exportBtn) exportBtn.style.display = (type === 'student') ? 'inline-block' : 'none';
+        } catch (e) { /* ignore */ }
         dataTable.innerHTML = '<tr><td>Loading...</td></tr>';
 
         fetch(url)

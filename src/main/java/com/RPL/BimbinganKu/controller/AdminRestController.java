@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +21,7 @@ import com.RPL.BimbinganKu.repository.LecturerRepository;
 import com.RPL.BimbinganKu.repository.ScheduleRepository;
 import com.RPL.BimbinganKu.repository.StudentRepository;
 import com.RPL.BimbinganKu.service.CsvImportService;
+import com.RPL.BimbinganKu.service.PDFService;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -35,6 +38,9 @@ public class AdminRestController {
 
     @Autowired
     private CsvImportService csvImportService;
+
+    @Autowired
+    private PDFService pdfService;
 
     // --- NEW: Endpoints for Data Preview Tabs ---
 
@@ -142,4 +148,29 @@ public class AdminRestController {
             return ResponseEntity.internalServerError().body(Map.of("error", "Import failed: " + e.getMessage()));
         }
     }
+
+    // --- NEW: Export Student Table as PDF ---
+
+    @GetMapping("/export-student-pdf")
+    public ResponseEntity<byte[]> exportStudentTablePdf() {
+        try {
+            System.out.println("Admin requesting student table PDF export...");
+            List<Student> students = studentRepo.findAll();
+            byte[] pdfBytes = pdfService.generateStudentTablePdf(students);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=student-table.pdf");
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentLength(pdfBytes.length);
+            
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("PDF export error: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
 }

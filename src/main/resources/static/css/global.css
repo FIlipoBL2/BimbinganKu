@@ -304,6 +304,16 @@ header nav a:hover {
     border-color: #007bff;
 }
 
+/* Ensure tab buttons sit above any modal overlay or table rows */
+.tab-menu button,
+.tab-btn-admin,
+.button-row .btn,
+.primary-btn,
+.import-trigger {
+    position: relative;
+    z-index: 2100;
+}
+
 
 /* --- Modal Styles --- */
 .modal {
