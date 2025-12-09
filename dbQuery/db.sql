@@ -91,7 +91,9 @@ CREATE TABLE GuidanceSchedule (
     hourEnd TIME NOT NULL,
     notes TEXT,
     place VARCHAR(100),
-    FOREIGN KEY (topicCode) REFERENCES Topic(topicCode) ON DELETE CASCADE
+    additionalLecturer VARCHAR(50), -- New column for Co-Lecturer/Additional Lecturer
+    FOREIGN KEY (topicCode) REFERENCES Topic(topicCode) ON DELETE CASCADE,
+    FOREIGN KEY (additionalLecturer) REFERENCES Lecturers(lecturerCode) ON DELETE SET NULL
 );
 
 -- =============================================
@@ -113,7 +115,8 @@ INSERT INTO Users (id, name, email, password) VALUES
 ('KAP', 'Kapi Kapibara', 'kapi@unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
 ('LNV', 'Lionov', 'lnv@unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
 ('MTA', 'Mariskha', 'mta@unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
-('GDK', 'Gede Karya', 'gdk@unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy');
+('GDK', 'Gede Karya', 'gdk@unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
+('NAT', 'Natalia', 'nat@unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy');
 
 -- STUDENTS as Users
 INSERT INTO Users (id, name, email, password) VALUES 
@@ -121,13 +124,18 @@ INSERT INTO Users (id, name, email, password) VALUES
 ('6182101002', 'Budi Santoso', '6182101002@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
 ('6182101003', 'Siti Aminah', '6182101003@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
 ('6182101004', 'Andi Pratama', '6182101004@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
-('6182101005', 'Dewi Lestari', '6182101005@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy');
+('6182101005', 'Dewi Lestari', '6182101005@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
+('6182301004', 'Filipo Bintang Lautan', '6182301004@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
+('6182301032', 'Basilius Mozes', '6182301032@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
+('6182301024', 'Vince Farrel Natanael', '6182301024@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
+('6182301063', 'Antonius Revan Hariputera', '6182301063@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
+('6182101037', 'I Gusti Kamasan Putu Arsava Waradana', '6182101037@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy');
 
 -- =============================================
 -- LECTURERS TABLE
 -- =============================================
 INSERT INTO Lecturers (lecturerCode) VALUES 
-('CEN'), ('KAP'), ('LNV'), ('MTA'), ('GDK');
+('CEN'), ('KAP'), ('LNV'), ('MTA'), ('GDK'), ('NAT');
 
 -- =============================================
 -- STUDENTS TABLE
@@ -137,7 +145,12 @@ INSERT INTO Students (npm, totalGuidanceUTS, totalGuidanceUAS) VALUES
 ('6182101002', 2, 1),
 ('6182101003', 4, 3),
 ('6182101004', 1, 0),
-('6182101005', 5, 4);
+('6182101005', 5, 4),
+('6182301004', 2, 1),
+('6182301032', 3, 2),
+('6182301024', 1, 0),
+('6182301063', 4, 3),
+('6182101037', 2, 2);
 
 -- =============================================
 -- INBOX TABLE (Notifications)
@@ -153,11 +166,16 @@ INSERT INTO Inbox (date, time, msgType, message) VALUES
 -- TOPIC TABLE (Links Student <-> Lecturer)
 -- =============================================
 INSERT INTO Topic (topicCode, npm, lecturerCode, topicName) VALUES 
-('TA-001', '6182101001', 'KAP', 'Implementasi Machine Learning untuk Prediksi Poop Wombat'),  -- Wom with Kapi
-('TA-002', '6182101002', 'CEN', 'Pengembangan Aplikasi Mobile E-Commerce'),
-('TA-003', '6182101003', 'LNV', 'Analisis Sentimen Media Sosial dengan NLP'),
-('TA-004', '6182101004', 'MTA', 'Sistem Rekomendasi Film Berbasis AI'),
-('TA-005', '6182101005', 'GDK', 'Keamanan Siber pada Aplikasi Web');
+('KAP-1', '6182101001', 'KAP', 'Implementasi Machine Learning untuk Prediksi Poop Wombat'),  -- Wom with Kapi
+('CEN-1', '6182101002', 'CEN', 'Pengembangan Aplikasi Mobile E-Commerce'),
+('LNV-1', '6182101003', 'LNV', 'Analisis Sentimen Media Sosial dengan NLP'),
+('MTA-1', '6182101004', 'MTA', 'Sistem Rekomendasi Film Berbasis AI'),
+('GDK-1', '6182101005', 'GDK', 'Keamanan Siber pada Aplikasi Web'),
+('KAP-2', '6182301004', 'KAP', 'Optimasi Algoritma Genetika untuk Jadwal Kuliah'),
+('CEN-2', '6182301032', 'CEN', 'Rancang Bangun Sistem Smart Home Berbasis IoT'),
+('LNV-2', '6182301024', 'LNV', 'Penerapan Blockchain untuk Rekam Medis'),
+('MTA-2', '6182301063', 'MTA', 'Analisis Performa Jaringan 5G'),
+('GDK-2', '6182101037', 'GDK', 'Deteksi Intrusi Menggunakan Deep Learning');
 
 -- =============================================
 -- STUDENT SCHEDULE TABLE (Weekly Class Schedule)
@@ -200,27 +218,60 @@ INSERT INTO LecturerSchedule (lecturerCode, akademik_ID, day, hourStart, hourEnd
 ('MTA', 1, 'Thursday', '08:00', '10:00'),
 -- Gede's schedule
 ('GDK', 1, 'Wednesday', '10:00', '12:00'),
-('GDK', 1, 'Friday', '13:00', '15:00');
+('GDK', 1, 'Friday', '13:00', '15:00'),
+-- Natalia's schedule (Additional Lecturer - No Topics)
+('NAT', 1, 'Monday', '08:00', '10:00'),
+('NAT', 1, 'Wednesday', '08:00', '10:00');
 
 -- =============================================
 -- GUIDANCE SCHEDULE TABLE (Specific Guidance Sessions)
 -- =============================================
-INSERT INTO GuidanceSchedule (topicCode, date, hourStart, hourEnd, notes, place) VALUES 
--- Wom's sessions with Kapi
-('TA-001', '2025-12-10', '09:00', '10:00', 'Review proposal dan timeline', 'Ruang Dosen KAP'),
-('TA-001', '2025-12-17', '09:00', '10:00', 'Diskusi Bab 1 - Pendahuluan', 'Ruang Dosen KAP'),
-('TA-001', '2025-12-24', '14:00', '15:00', 'Review implementasi ML model', 'Lab Komputer'),
--- Budi's sessions
-('TA-002', '2025-12-11', '10:00', '11:00', 'Review wireframe aplikasi', 'Ruang Dosen CEN'),
-('TA-002', '2025-12-18', '10:00', '11:00', 'Diskusi database design', 'Online Meet'),
--- Siti's sessions
-('TA-003', '2025-12-12', '14:00', '15:00', 'Analisis dataset Twitter', 'Lab NLP'),
-('TA-003', '2025-12-19', '14:00', '15:00', 'Review hasil sentiment analysis', 'Online Meet'),
--- Andi's sessions
-('TA-004', '2025-12-13', '09:00', '10:00', 'Proposal sistem rekomendasi', 'Ruang Dosen MTA'),
--- Dewi's sessions
-('TA-005', '2025-12-14', '10:00', '11:00', 'Pentest planning', 'Lab Security'),
-('TA-005', '2025-12-21', '10:00', '11:00', 'Review vulnerability report', 'Ruang Dosen GDK');
+INSERT INTO GuidanceSchedule (topicCode, date, hourStart, hourEnd, notes, place, additionalLecturer) VALUES 
+-- KAP-1 (Wom)
+('KAP-1', '2025-12-10', '09:00', '10:00', 'Review proposal dan timeline', 'Ruang Dosen KAP', 'NAT'), -- NAT joins
+('KAP-1', '2025-12-17', '09:00', '10:00', 'Diskusi Bab 1 - Pendahuluan', 'Ruang Dosen KAP', NULL),
+-- KAP-2 (Filipo)
+('KAP-2', '2025-12-11', '13:00', '14:00', 'Diskusi algoritma genetika', 'Ruang Dosen KAP', NULL),
+('KAP-2', '2025-12-18', '13:00', '14:00', 'Review coding', 'Lab Komputer', NULL),
+-- CEN-1 (Budi)
+('CEN-1', '2025-12-11', '10:00', '11:00', 'Review wireframe aplikasi', 'Ruang Dosen CEN', 'NAT'), -- NAT joins
+('CEN-1', '2025-12-18', '10:00', '11:00', 'Diskusi database design', 'Online Meet', NULL),
+-- CEN-2 (Mozes)
+('CEN-2', '2025-12-12', '10:00', '11:00', 'IoT Architecture review', 'Ruang Dosen CEN', NULL),
+('CEN-2', '2025-12-19', '10:00', '11:00', 'Sensor selection', 'Lab IoT', NULL),
+-- LNV-1 (Siti)
+('LNV-1', '2025-12-12', '14:00', '15:00', 'Analisis dataset Twitter', 'Lab NLP', NULL),
+('LNV-1', '2025-12-19', '14:00', '15:00', 'Review hasil sentiment analysis', 'Online Meet', NULL),
+
+-- LNV-2 (Vince)
+('LNV-2', '2025-12-13', '14:00', '15:00', 'Blockchain fundamentals', 'Ruang Dosen LNV', NULL),
+('LNV-2', '2025-12-20', '14:00', '15:00', 'Smart contract logic', 'Online Meet', NULL),
+
+-- MTA-1 (Andi)
+('MTA-1', '2025-12-13', '09:00', '10:00', 'Proposal sistem rekomendasi', 'Ruang Dosen MTA', NULL),
+('MTA-1', '2025-12-20', '09:00', '10:00', 'Collaborative filtering discussion', 'Online Meet', NULL),
+-- MTA-2 (Antonius)
+('MTA-2', '2025-12-10', '11:00', '12:00', '5G Network constraints', 'Ruang Dosen MTA', NULL),
+('MTA-2', '2025-12-17', '11:00', '12:00', 'Simulation setup', 'Lab Jaringan', NULL),
+-- GDK-1 (Dewi)
+('GDK-1', '2025-12-14', '10:00', '11:00', 'Pentest planning', 'Lab Security', NULL),
+('GDK-1', '2025-12-21', '10:00', '11:00', 'Review vulnerability report', 'Ruang Dosen GDK', NULL),
+-- GDK-2 (I Gusti)
+('GDK-2', '2025-12-11', '15:00', '16:00', 'Deep Learning model selection', 'Ruang Dosen GDK', NULL),
+('GDK-2', '2025-12-18', '15:00', '16:00', 'Dataset preprocessing', 'Lab AI', NULL),
+
+-- PAST SESSIONS (For History)
+('KAP-1', '2025-12-01', '09:00', '10:00', 'Initial brainstorming', 'Ruang Dosen KAP', 'NAT'), -- NAT joined past session
+('CEN-1', '2025-12-01', '10:00', '11:00', 'Idea validation', 'Ruang Dosen CEN', NULL),
+('LNV-1', '2025-12-01', '14:00', '15:00', 'Data collection strategy', 'Lab NLP', NULL),
+('MTA-1', '2025-12-01', '09:00', '10:00', 'Algorithm choice', 'Ruang Dosen MTA', NULL),
+('GDK-1', '2025-12-01', '10:00', '11:00', 'Scope definition', 'Lab Security', NULL),
+('KAP-2', '2025-12-01', '13:00', '14:00', 'Problem statement', 'Ruang Dosen KAP', NULL),
+('CEN-2', '2025-12-01', '10:00', '11:00', 'Hardware list', 'Ruang Dosen CEN', NULL),
+('LNV-2', '2025-12-01', '14:00', '15:00', 'Tech stack review', 'Ruang Dosen LNV', NULL),
+('MTA-2', '2025-12-01', '11:00', '12:00', 'Literature review', 'Ruang Dosen MTA', NULL),
+('GDK-2', '2025-12-01', '15:00', '16:00', 'Dataset search', 'Lab AI', NULL);
+
 
 -- =============================================
 -- TEST CREDENTIALS SUMMARY:
