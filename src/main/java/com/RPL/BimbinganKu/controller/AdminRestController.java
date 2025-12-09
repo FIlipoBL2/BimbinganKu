@@ -46,7 +46,7 @@ public class AdminRestController {
             System.out.println("Found " + students.size() + " students.");
             return ResponseEntity.ok(students);
         } catch (Exception e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
             // Return JSON so frontend doesn't crash
             return ResponseEntity.internalServerError().body(Map.of("error", "Database Error: " + e.getMessage()));
         }
@@ -76,6 +76,28 @@ public class AdminRestController {
         }
     }
 
+    @GetMapping("/topics")
+    public ResponseEntity<?> getAllTopics() {
+        try {
+            List<Map<String, Object>> topics = scheduleRepo.findAllTopicsWithDetails();
+            return ResponseEntity.ok(topics);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(Map.of("error", "Database Error: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/sessions")
+    public ResponseEntity<?> getAllSessions() {
+        try {
+            List<Map<String, Object>> sessions = scheduleRepo.findAllGuidanceSessions();
+            return ResponseEntity.ok(sessions);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(Map.of("error", "Database Error: " + e.getMessage()));
+        }
+    }
+
     // --- Individual Schedule Lookup ---
 
     @GetMapping("/schedule/{userCode}")
@@ -83,7 +105,7 @@ public class AdminRestController {
         try {
             // Try to find student schedule first
             List<Map<String, Object>> schedule = scheduleRepo.findScheduleByStudent(userCode);
-            
+
             // If empty, try to find lecturer schedule
             if (schedule.isEmpty()) {
                 schedule = scheduleRepo.findScheduleByLecturer(userCode);
@@ -116,7 +138,7 @@ public class AdminRestController {
             }
             return ResponseEntity.badRequest().body(Map.of("error", "Unknown table type: " + table));
         } catch (Exception e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
             return ResponseEntity.internalServerError().body(Map.of("error", "Import failed: " + e.getMessage()));
         }
     }

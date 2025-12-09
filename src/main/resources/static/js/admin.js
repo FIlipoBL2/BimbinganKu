@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
     const topAdminTabs = document.querySelectorAll('.tab-btn-admin');
     const tabContents = document.querySelectorAll('.tab-content-admin');
-    
+
     // Data Preview Elements
     const subTabs = document.querySelectorAll('#admin-tabs .tab-btn');
     const tableTitle = document.getElementById('table-title');
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             subTabs.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
+
             const type = btn.getAttribute('data-table');
             fetchAndRenderData(type);
         });
@@ -68,13 +68,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (type === 'student') {
             url = '/api/admin/students';
-            title = 'Student Table';
+            title = 'Students';
         } else if (type === 'lecturer') {
             url = '/api/admin/lecturers';
-            title = 'Lecturer Table';
-        } else if (type === 'schedule') {
-            url = '/api/admin/schedules';
-            title = 'Global Schedule Table';
+            title = 'Lecturers';
+        } else if (type === 'topic') {
+            url = '/api/admin/topics';
+            title = 'Topics';
+        } else if (type === 'session') {
+            url = '/api/admin/sessions';
+            title = 'Guidance Sessions';
         }
 
         tableTitle.textContent = title;
@@ -93,36 +96,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderTable(data, type) {
-        dataTable.innerHTML = ''; // Clear existing
+        dataTable.innerHTML = '';
 
         if (!data || data.length === 0) {
             dataTable.innerHTML = '<tr><td>No data available.</td></tr>';
             return;
         }
 
-        // Generate Header
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
-        
-        // Define columns based on type
+
         let columns = [];
+        let headers = [];
+
         if (type === 'student') {
             columns = ['id', 'name', 'email', 'totalGuidanceUTS', 'totalGuidanceUAS'];
+            headers = ['NPM', 'Name', 'Email', 'UTS', 'UAS'];
         } else if (type === 'lecturer') {
             columns = ['id', 'name', 'email'];
-        } else if (type === 'schedule') {
-            columns = ['title', 'day', 'startTime', 'endTime', 'place'];
+            headers = ['Code', 'Name', 'Email'];
+        } else if (type === 'topic') {
+            columns = ['topiccode', 'topicname', 'studentname', 'lecturername'];
+            headers = ['Code', 'Topic', 'Student', 'Lecturer'];
+        } else if (type === 'session') {
+            columns = ['date', 'starttime', 'topicname', 'studentname', 'lecturername', 'place'];
+            headers = ['Date', 'Time', 'Topic', 'Student', 'Lecturer', 'Place'];
         }
 
-        columns.forEach(col => {
+        headers.forEach(h => {
             const th = document.createElement('th');
-            th.textContent = col.toUpperCase();
+            th.textContent = h;
             headerRow.appendChild(th);
         });
         thead.appendChild(headerRow);
         dataTable.appendChild(thead);
 
-        // Generate Body
         const tbody = document.createElement('tbody');
         data.forEach(item => {
             const tr = document.createElement('tr');
@@ -142,11 +150,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentData) return;
 
         const filtered = currentData.filter(item => {
-            return Object.values(item).some(val => 
+            return Object.values(item).some(val =>
                 String(val).toLowerCase().includes(term)
             );
         });
-        
+
         // Check which tab is active to know how to render
         const activeType = document.querySelector('#admin-tabs .active').getAttribute('data-table');
         renderTable(filtered, activeType);
@@ -154,12 +162,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- 4. IMPORT LOGIC ---
-    
+
     // Open Modal
     importTriggerBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             const target = e.target.getAttribute('data-target');
-            if(target) targetTableSelect.value = target;
+            if (target) targetTableSelect.value = target;
             importModal.classList.remove('hidden');
         });
     });
@@ -178,18 +186,18 @@ document.addEventListener('DOMContentLoaded', () => {
             method: 'POST',
             body: formData
         })
-        .then(res => {
-            if (res.ok) {
-                alert('Import Successful!');
-                importModal.classList.add('hidden');
-                // Refresh current table if applicable
-                const activeType = document.querySelector('#admin-tabs .active').getAttribute('data-table');
-                fetchAndRenderData(activeType);
-            } else {
-                res.text().then(text => alert('Error: ' + text));
-            }
-        })
-        .catch(err => alert('Import Failed: ' + err));
+            .then(res => {
+                if (res.ok) {
+                    alert('Import Successful!');
+                    importModal.classList.add('hidden');
+                    // Refresh current table if applicable
+                    const activeType = document.querySelector('#admin-tabs .active').getAttribute('data-table');
+                    fetchAndRenderData(activeType);
+                } else {
+                    res.text().then(text => alert('Error: ' + text));
+                }
+            })
+            .catch(err => alert('Import Failed: ' + err));
     });
 
 
@@ -211,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let html = '<ul style="list-style:none; padding:0;">';
                 data.forEach(s => {
                     // Handle both class (day_name) and guidance (date)
-                    let time = `${s.time || ''}`; 
+                    let time = `${s.time || ''}`;
                     let when = s.date ? s.date : s.day_name;
                     html += `<li style="margin-bottom:5px; border-bottom:1px solid #ccc; padding:5px;">
                         <strong>${s.topic || 'Session'}</strong> <br>
@@ -239,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     confirmLogoutBtn.addEventListener('click', () => {
         // Redirect to the backend logout endpoint
-        window.location.href = '/logout'; 
+        window.location.href = '/logout';
     });
 
 

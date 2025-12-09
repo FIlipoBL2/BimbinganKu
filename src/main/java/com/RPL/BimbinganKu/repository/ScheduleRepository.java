@@ -19,6 +19,39 @@ public class ScheduleRepository {
         return jdbcTemplate.queryForList(sql);
     }
 
+    public List<Map<String, Object>> findAllTopicsWithDetails() {
+        String sql = """
+            SELECT 
+                t.topicCode,
+                t.topicName,
+                us.name as studentName,
+                ul.name as lecturerName
+            FROM Topic t
+            JOIN Users us ON t.npm = us.id
+            JOIN Users ul ON t.lecturerCode = ul.id
+            ORDER BY ul.name, t.topicCode
+        """;
+        return jdbcTemplate.queryForList(sql);
+    }
+
+    public List<Map<String, Object>> findAllGuidanceSessions() {
+        String sql = """
+            SELECT 
+                gs.date,
+                TO_CHAR(gs.hourStart, 'HH24:MI') as startTime,
+                t.topicName,
+                us.name as studentName,
+                ul.name as lecturerName,
+                gs.place
+            FROM GuidanceSchedule gs
+            JOIN Topic t ON gs.topicCode = t.topicCode
+            JOIN Users us ON t.npm = us.id
+            JOIN Users ul ON t.lecturerCode = ul.id
+            ORDER BY gs.date DESC, gs.hourStart
+        """;
+        return jdbcTemplate.queryForList(sql);
+    }
+
     // --- STUDENT VIEW ---
     public List<Map<String, Object>> findScheduleByStudent(String npm) {
         String guidanceSql = """
