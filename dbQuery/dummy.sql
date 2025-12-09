@@ -1,59 +1,71 @@
--- Insert dummy data into Users table
--- All passwords are "password123" hashed with Bcrypt
+-- ACADEMIC YEAR
+INSERT INTO Akademik (year, semester) VALUES ('2023/2024', 'Genap');
+
+-- LECTURERS (All with password 'password123' BCrypt hashed)
 INSERT INTO Users (id, name, email, password) VALUES 
-('GDK', 'Gede Karyana', 'Gede@university.edu', '$2a$10$JpnDNHCZCegp4/TWbhVfluN4QDGIuZKCyjYb0h9aDfcsPfhWZsgL2'),
-('HUH', 'Husnul Hakim', 'Husnul@university.edu', '$2a$10$JpnDNHCZCegp4/TWbhVfluN4QDGIuZKCyjYb0h9aDfcsPfhWZsgL2'),
-('ELH', 'Elisati', 'Elisati@university.edu', '$2a$10$JpnDNHCZCegp4/TWbhVfluN4QDGIuZKCyjYb0h9aDfcsPfhWZsgL2'),
-('6182301004','Filipo Bintang Lautan', '6182301004@student.university.edu', '$2a$10$JpnDNHCZCegp4/TWbhVfluN4QDGIuZKCyjYb0h9aDfcsPfhWZsgL2'),
-('6182301024','Vince Farrel Nathaniel', '6182301024.brown@university.edu', '$2a$10$JpnDNHCZCegp4/TWbhVfluN4QDGIuZKCyjYb0h9aDfcsPfhWZsgL2'),
-('6182301032','Basilius Mozes', '6182301032@student.university.edu', '$2a$10$JpnDNHCZCegp4/TWbhVfluN4QDGIuZKCyjYb0h9aDfcsPfhWZsgL2'),
-('6182101099','Womby', '6182101099@student.university.edu', '$2a$10$JpnDNHCZCegp4/TWbhVfluN4QDGIuZKCyjYb0h9aDfcsPfhWZsgL2');
+('CEN', 'C.E. Nugraheni', 'cen@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('ELH', 'Elisati', 'elh@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('GDK', 'Gede Karya', 'gdk@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('HUH', 'Husnul', 'huh@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('KAL', 'Keenan', 'kal@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('LCA', 'Luciana', 'lca@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('LNV', 'Lionov', 'lnv@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('MTA', 'Mariskha', 'mta@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('MVC', 'Maria', 'mvc@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('PAN', 'Pascal', 'pan@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('RCP', 'Raymond', 'rcp@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('VAN', 'Vania', 'van@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('VSM', 'Veronica SM', 'vsm@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('NAT', 'Natalia', 'nat@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('ABS', 'Bagoes', 'abs@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('RDL', 'Rosa', 'rdl@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('JNH', 'Joanna Helga', 'jnh@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('ALB', 'Aldo', 'alb@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6');
 
--- Insert dummy data into Students table
-INSERT INTO Students (NPM, totalGuidanceUTS, totalGuidanceUAS) VALUES
-(6182301004, 3, 2),
-(6182301024, 2, 1),
-(6182301032, 4, 3),
-(6182101099, 0, 0);
+INSERT INTO Lecturers (lecturerCode) VALUES 
+('CEN'), ('ELH'), ('GDK'), ('HUH'), ('KAL'), 
+('LCA'), ('LNV'), ('MTA'), ('MVC'), ('PAN'), 
+('RCP'), ('VAN'), ('VSM'), ('NAT'), ('ABS'), 
+('RDL'), ('JNH'), ('ALB');
 
--- Insert dummy data into Lecturers table
-INSERT INTO Lecturers (lecturerCode) VALUES
-('HUH'),
-('GDK'),
-('ELH');
+-- STUDENTS (All with password 'password123' BCrypt hashed)
+INSERT INTO Users (id, name, email, password) VALUES 
+('6182101001', 'Budi Santoso', '6182101001@student.unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('6182101002', 'Siti Aminah', '6182101002@student.unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('6182101003', 'Andi Pratama', '6182101003@student.unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('6182101004', 'Dewi Lestari', '6182101004@student.unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
+('6182101005', 'Eko Purnomo', '6182101005@student.unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6');
 
--- Insert dummy data into Akademik table
-INSERT INTO Akademik (akademik_ID, year, semester) VALUES
-(1, '2023', 'Ganjil'),
-(2, '2023', 'Genap'),
-(3, '2024', 'Ganjil'),
-(4, '2024', 'Genap');
+INSERT INTO Students (npm, totalGuidanceUTS, totalGuidanceUAS) VALUES 
+('6182101001', 2, 1),
+('6182101002', 5, 3),
+('6182101003', 0, 0),
+('6182101004', 3, 3),
+('6182101005', 1, 0);
 
--- Insert dummy data into StudentSchedule table
-INSERT INTO StudentSchedule (NPM, akademik_ID, day, hourStart, hourEnd) VALUES
-(6182301004, 1, 'Senin', '08:00:00', '10:00:00'),
-(6182301024, 1, 'Rabu', '10:00:00', '12:00:00'),
-(6182301032, 1, 'Selasa', '09:00:00', '11:00:00'),
-(6182101099, 2, 'Kamis', '13:00:00', '15:00:00');
+-- TOPICS
+INSERT INTO Topic (topicCode, npm, lecturerCode, topicName) VALUES 
+('TA-001', '6182101001', 'CEN', 'Implementasi AI dalam Pertanian'),
+('TA-002', '6182101002', 'LNV', 'Pengembangan Game Edukasi VR'),
+('TA-003', '6182101003', 'MTA', 'Analisis Big Data Twitter'),
+('TA-004', '6182101004', 'GDK', 'Sistem Keamanan Jaringan IoT'),
+('TA-005', '6182101005', 'RDL', 'Aplikasi Mobile untuk Disabilitas');
 
--- Insert dummy data into LecturerSchedule table
-INSERT INTO LecturerSchedule (lecturerCode, akademik_ID, day, hourStart, hourEnd) VALUES
-('HUH', 1, 'Senin', '08:00:00', '12:00:00'),
-('GDK', 1, 'Rabu', '14:00:00', '16:00:00'),
-('ELH', 1, 'Selasa', '09:00:00', '13:00:00'),
-('HUH', 2, 'Kamis', '10:00:00', '14:00:00');
+-- WEEKLY SCHEDULES
+-- Student 6182101001: Class on Monday & Wednesday
+INSERT INTO StudentSchedule (npm, akademik_ID, day, hourStart, hourEnd) VALUES 
+('6182101001', 1, 'Monday', '08:00', '10:00'),
+('6182101001', 1, 'Wednesday', '13:00', '15:00');
 
--- Insert dummy data into Topic table
-INSERT INTO Topic (topicCode, NPM, lecturerCode, topicName) VALUES
-('GDK5801ADS', '6182301004', 'GDK', 'Web Development with Big Data'),
-('HUH2101ACS', '6182301024', 'HUH', 'Database Design and Optimization'),
-('ELH2390CCS', '6182301032', 'ELH', 'Mobile Application Development'),
-('HUH2102BCS', '6182101099', 'HUH', 'RESTful API Design');
+-- Lecturer CEN: Teaching on Tuesday & Thursday
+INSERT INTO LecturerSchedule (lecturerCode, akademik_ID, day, hourStart, hourEnd) VALUES 
+('CEN', 1, 'Tuesday', '08:00', '10:00'),
+('CEN', 1, 'Thursday', '10:00', '12:00');
 
--- Insert dummy data into GuidanceSchedule table
-INSERT INTO GuidanceSchedule (topicCode, day, hourStart, hourEnd, notes, place) VALUES
-('GDK5801ADS', 'Senin', '08:00:00', '09:00:00', 'Discuss project architecture and framework selection', 'Room 1'),
-('HUH2101ACS', 'Rabu', '10:00:00', '11:00:00', 'Review code and provide feedback', 'Room 2'),
-('ELH2390CCS', 'Selasa', '09:00:00', '10:00:00', 'Database schema review', 'Room 3'),
-('HUH2102BCS', 'Kamis', '13:00:00', '14:00:00', 'Discuss UI/UX design patterns', 'Room 2'),
-('HUH2101ACS', 'Jumat', '11:00:00', '12:00:00', 'API testing and documentation review', 'Room 1');
+-- GUIDANCE SESSIONS (Specific Dates)
+-- Ensure these dates are in the future relative to when you test!
+INSERT INTO GuidanceSchedule (topicCode, date, hourStart, hourEnd, notes, place) VALUES 
+('TA-001', '2025-12-10', '09:00', '10:00', 'Bab 1 Review', 'Ruang Dosen CEN'),
+('TA-001', '2025-12-17', '09:00', '10:00', 'Bab 2 Discussion', 'Ruang Dosen CEN'),
+('TA-002', '2025-12-11', '14:00', '15:00', 'Game Design Doc', 'Lab VR'),
+('TA-005', '2025-12-12', '10:00', '11:00', 'Requirement Gathering', 'Online Meet');
