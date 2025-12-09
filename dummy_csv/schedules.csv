@@ -1,6 +1,6 @@
-TopicCode,Day,StartTime,EndTime,Notes,Place
-TOP001,Senin,09:00:00,10:00:00,Initial proposal review,Room 101
-TOP002,Rabu,13:00:00,14:00:00,Chapter 1 discussion,Room 102
-TOP003,Jumat,10:00:00,11:00:00,Methodology check,Online
-TOP004,Selasa,14:00:00,15:00:00,User testing plan,Room 103
-TOP005,Kamis,11:00:00,12:00:00,Hardware selection,Lab A
+TopicCode,Day,StartTime,EndTime,Notes,Place,AdditionalLecturer
+TOP001,Senin,09:00:00,10:00:00,Initial proposal review,Room 101,L006
+TOP002,Rabu,13:00:00,14:00:00,Chapter 1 discussion,Room 102,
+TOP003,Jumat,10:00:00,11:00:00,Methodology check,Online,L007
+TOP004,Selasa,14:00:00,15:00:00,User testing plan,Room 103,
+TOP005,Kamis,11:00:00,12:00:00,Hardware selection,Lab A,L005
