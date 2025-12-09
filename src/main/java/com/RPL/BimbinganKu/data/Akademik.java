@@ -22,6 +22,9 @@ public class Akademik {
     @Column(nullable = false)
     private String semester;
 
+    @Column(name = "semester_start")
+    private LocalDate semesterStart;
+
     @Column(name = "uts_deadline")
     private LocalDate utsDeadline;
 

@@ -18,13 +18,14 @@ CREATE TABLE Users (
     password VARCHAR(255) NOT NULL    -- Stores BCrypt Hash
 );
 
--- AKADEMIK: Stores active year/semester
+-- AKADEMIK: Stores active year/semester with timeframe boundaries
 CREATE TABLE Akademik (
     akademik_ID SERIAL PRIMARY KEY,
     year VARCHAR(20) NOT NULL,
     semester VARCHAR(20) NOT NULL,
-    uts_deadline DATE,
-    uas_deadline DATE
+    semester_start DATE,              -- When semester begins
+    uts_deadline DATE,                -- End of UTS period
+    uas_deadline DATE                 -- End of UAS period (semester end)
 );
 
 -- STUDENTS: Extends Users
@@ -102,9 +103,12 @@ CREATE TABLE GuidanceSchedule (
 -- INSERT DUMMY DATA
 -- =============================================
 
--- AKADEMIK: Academic Year/Semester
-INSERT INTO Akademik (year, semester, uts_deadline, uas_deadline) VALUES 
-('2025/2026', 'Ganjil', '2025-10-20', '2026-01-15');
+-- AKADEMIK: Academic Year/Semester with timeframe
+-- Semester Ganjil 2025/2026: Aug 2025 - Jan 2026
+-- UTS period: Aug 18 - Oct 20 (before uts_deadline)
+-- UAS period: Oct 21 - Jan 15 (after uts_deadline, before uas_deadline)
+INSERT INTO Akademik (year, semester, semester_start, uts_deadline, uas_deadline) VALUES 
+('2025/2026', 'Ganjil', '2025-08-18', '2025-10-20', '2026-01-15');
 
 -- =============================================
 -- USERS TABLE (Base for all users)
