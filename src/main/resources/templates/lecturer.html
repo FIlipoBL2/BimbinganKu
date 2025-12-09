@@ -450,6 +450,15 @@
                 </select>
                 <label for="session-notes">Notes (Lecturer Only):</label>
                 <textarea id="session-notes" rows="4" placeholder="Add notes for student..."></textarea>
+
+                <label for="session-additional-lecturer">Additional Lecturer (Optional):</label>
+                <select id="session-additional-lecturer">
+                    <option value="">-- None --</option>
+                    <option th:each="l : ${allLecturers}" th:value="${l.lecturerCode}"
+                        th:text="${l.name + ' (' + l.lecturerCode + ')'}">
+                    </option>
+                </select>
+
                 <button type="submit" id="save-session-btn" class="primary-btn">Save Session</button>
                 <button type="button" id="delete-session-btn" class="delete-btn hidden">Delete</button>
             </form>

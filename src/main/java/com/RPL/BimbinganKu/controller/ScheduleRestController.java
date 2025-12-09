@@ -26,23 +26,23 @@ public class ScheduleRestController {
 
     @Autowired
     private ScheduleRepository scheduleRepo;
-    
+
     @Autowired
     private StudentRepository studentRepo;
-    
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @GetMapping("/student/schedule/{npm}")
     public List<Map<String, Object>> getStudentSchedule(@PathVariable String npm) {
-        return scheduleRepo.findScheduleByStudent(npm); 
+        return scheduleRepo.findScheduleByStudent(npm);
     }
 
     @GetMapping("/lecturer/schedule/{code}")
     public List<Map<String, Object>> getLecturerSchedule(@PathVariable String code) {
         return scheduleRepo.findScheduleByLecturer(code);
     }
-    
+
     @GetMapping("/lecturer/students/{code}")
     public List<Student> getLecturerStudents(@PathVariable String code) {
         return studentRepo.findStudentsByLecturer(code);
@@ -53,41 +53,49 @@ public class ScheduleRestController {
         try {
             String idStr = payload.get("id");
             String topicCode = payload.get("topicCode");
-            String studentNpm = payload.get("studentNpm"); 
-            
+            String studentNpm = payload.get("studentNpm");
+
             String date = payload.get("date");
             String time = payload.get("time");
             String location = payload.get("location");
             String notes = payload.get("notes");
-            
-            if (notes == null) notes = "";
+            String additionalLecturer = payload.get("additionalLecturer"); // Task 4: New Field
+
+            if (notes == null)
+                notes = "";
+            if (additionalLecturer != null && additionalLecturer.trim().isEmpty()) {
+                additionalLecturer = null; // Convert empty string to null for DB
+            }
 
             String endTime = time;
             try {
                 LocalTime startTimeObj = LocalTime.parse(time);
                 endTime = startTimeObj.plusHours(1).format(DateTimeFormatter.ofPattern("HH:mm"));
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             if ((topicCode == null || topicCode.isEmpty()) && studentNpm != null) {
                 try {
                     String sql = "SELECT topicCode FROM Topic WHERE NPM = ? LIMIT 1";
                     topicCode = jdbcTemplate.queryForObject(sql, String.class, studentNpm);
                 } catch (Exception e) {
-                    return ResponseEntity.badRequest().body(Map.of("error", "Student " + studentNpm + " has no assigned Topic."));
+                    return ResponseEntity.badRequest()
+                            .body(Map.of("error", "Student " + studentNpm + " has no assigned Topic."));
                 }
             }
 
             if (idStr != null && !idStr.isEmpty()) {
                 // UPDATE
                 Long id = Long.parseLong(idStr);
-                scheduleRepo.updateGuidanceSchedule(id, topicCode, date, time, endTime, location, notes);
+                scheduleRepo.updateGuidanceSchedule(id, topicCode, date, time, endTime, location, notes,
+                        additionalLecturer);
                 return ResponseEntity.ok(Map.of("message", "Session updated successfully"));
             } else {
                 // CREATE
-                scheduleRepo.saveGuidanceSchedule(topicCode, date, time, endTime, notes, location);
+                scheduleRepo.saveGuidanceSchedule(topicCode, date, time, endTime, notes, location, additionalLecturer);
                 return ResponseEntity.ok(Map.of("message", "Session created successfully"));
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));

@@ -116,7 +116,7 @@ public class CsvImportService {
                     String notes = values[4].trim();
                     String place = values[5].trim();
 
-                    scheduleRepo.saveGuidanceSchedule(topicCode, day, startTime, endTime, notes, place);
+                    scheduleRepo.saveGuidanceSchedule(topicCode, day, startTime, endTime, notes, place, null);
                 }
             }
         }

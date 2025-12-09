@@ -13,6 +13,8 @@ import com.RPL.BimbinganKu.repository.LecturerRepository;
 import com.RPL.BimbinganKu.repository.StudentRepository;
 
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class HomeController {
@@ -63,16 +65,24 @@ public class HomeController {
             return "redirect:/login";
         }
 
-        Lecturer lecturer = lecturerRepo.findByLecturerCode(user.getId()).orElse(null);
+        String lecturerCode = user.getId();
+        Optional<Lecturer> lecturerOpt = lecturerRepo.findByLecturerCode(lecturerCode);
 
-        if (lecturer != null) {
-            model.addAttribute("lecturer", lecturer);
-            model.addAttribute("lecturerName", lecturer.getName());
-            model.addAttribute("lecturerName", lecturer.getName());
-            model.addAttribute("lecturerCode", lecturer.getId());
+        if (lecturerOpt.isPresent()) {
+            model.addAttribute("lecturer", lecturerOpt.get());
+            model.addAttribute("userName", lecturerOpt.get().getName());
+            model.addAttribute("lecturerCode", lecturerCode);
+
+            // Task 4: Fetch all other lecturers for "Additional Lecturer" dropdown
+            List<Lecturer> allLecturers = lecturerRepo.findAll();
+            // Optional: Filter out current lecturer?
+            // allLecturers.removeIf(l -> l.getLecturerCode().equals(lecturerCode));
+            model.addAttribute("allLecturers", allLecturers);
+        } else {
+            return "redirect:/login";
         }
 
-        // Add Academic Info
+        // Academic Info & Deadlines
         akademikRepo.findCurrentAkademik().ifPresent(ak -> {
             model.addAttribute("currentYear", ak.getYear());
             model.addAttribute("currentSemester", ak.getSemester());

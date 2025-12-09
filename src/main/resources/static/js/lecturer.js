@@ -1,18 +1,18 @@
 document.addEventListener('DOMContentLoaded', function () {
-    
+
     // --- CONFIG ---
     const dayMap = { "Sunday": 0, "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5, "Saturday": 6 };
-    let schedules = {}; 
-    let weeklySchedules = []; 
+    let schedules = {};
+    let weeklySchedules = [];
     let selectedDate = new Date();
     let currentFilter = 'all';
     let currentListFilter = 'all';
-    
+
     const codeField = document.getElementById('user-id');
     const lecturerCode = codeField ? codeField.value : null;
 
     // Elements
-    const calendarGrid = document.getElementById('calendar-grid'); 
+    const calendarGrid = document.getElementById('calendar-grid');
     const monthYearDisplay = document.getElementById('month-year-display');
     const prevMonthBtn = document.getElementById('prev-month');
     const nextMonthBtn = document.getElementById('next-month');
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // List & Tab Elements
     const upcomingList = document.getElementById('upcoming-list');
-    const historyList = document.getElementById('history-list'); 
+    const historyList = document.getElementById('history-list');
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
 
@@ -35,23 +35,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const sessionIdField = document.getElementById('session-id');
     const studentSelect = document.getElementById('session-student');
     const addSessionBtn = document.getElementById('add-session-btn');
-    const deleteSessionBtn = document.getElementById('delete-session-btn'); 
-    
+    const deleteSessionBtn = document.getElementById('delete-session-btn');
+
     // Time Restriction
     const timeInput = document.getElementById('session-time');
     if (timeInput) {
         timeInput.min = "07:00";
-        timeInput.max = "19:00"; 
+        timeInput.max = "19:00";
         timeInput.step = "3600";
     }
 
     // FIX: Hide Topic Input
     const topicInput = document.getElementById('session-topic');
     if (topicInput) {
-        topicInput.style.display = 'none'; 
-        topicInput.removeAttribute('required'); 
+        topicInput.style.display = 'none';
+        topicInput.removeAttribute('required');
         const topicLabel = document.querySelector('label[for="session-topic"]');
-        if (topicLabel) topicLabel.style.display = 'none'; 
+        if (topicLabel) topicLabel.style.display = 'none';
     }
 
     // --- INIT ---
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
             fetchSchedules();
         });
     }
-    
+
     renderCalendar(selectedDate);
 
     // --- HELPERS ---
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function isPast(dateStr) {
         const today = new Date();
-        today.setHours(0, 0, 0, 0); 
+        today.setHours(0, 0, 0, 0);
         const target = new Date(dateStr);
         const parts = dateStr.split('-');
         target.setFullYear(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener('click', () => {
             tabBtns.forEach(b => b.classList.remove('active'));
             tabContents.forEach(c => c.classList.remove('active'));
-            
+
             btn.classList.add('active');
             const targetId = btn.getAttribute('data-tab');
             if (targetId === 'upcoming') {
@@ -108,16 +108,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 students.forEach(s => {
                     const opt = document.createElement('option');
-                    opt.value = s.npm; 
+                    opt.value = s.npm;
                     opt.textContent = `${s.name} (${s.npm})`;
-                    if(filterSelect) filterSelect.appendChild(opt);
+                    if (filterSelect) filterSelect.appendChild(opt);
 
                     const opt2 = opt.cloneNode(true);
-                    if(listFilterSelect) listFilterSelect.appendChild(opt2);
-                    
-                    if(studentSelect) {
+                    if (listFilterSelect) listFilterSelect.appendChild(opt2);
+
+                    if (studentSelect) {
                         const modalOpt = document.createElement('option');
-                        modalOpt.value = s.npm; 
+                        modalOpt.value = s.npm;
                         modalOpt.textContent = `${s.name} (${s.npm})`;
                         studentSelect.appendChild(modalOpt);
                     }
@@ -140,19 +140,19 @@ document.addEventListener('DOMContentLoaded', function () {
     if (listFilterSelect) {
         listFilterSelect.addEventListener('change', (e) => {
             currentListFilter = e.target.value;
-            renderLists(); 
+            renderLists();
         });
     }
 
     function matchesFilter(session) {
         if (currentFilter === 'all') return true;
-        let sNpm = session.studentNpm || session.studentnpm; 
+        let sNpm = session.studentNpm || session.studentnpm;
         return sNpm === currentFilter;
     }
 
     function matchesListFilter(session) {
         if (currentListFilter === 'all') return true;
-        let sNpm = session.studentNpm || session.studentnpm; 
+        let sNpm = session.studentNpm || session.studentnpm;
         return sNpm === currentListFilter;
     }
 
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 console.log("Schedule data:", data);
-                schedules = {}; 
+                schedules = {};
                 weeklySchedules = [];
 
                 data.forEach(session => {
@@ -188,12 +188,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!upcomingList || !historyList) return;
         upcomingList.innerHTML = '';
         historyList.innerHTML = '';
-        
+
         let allSessions = [];
         for (const [date, sessions] of Object.entries(schedules)) {
             allSessions = allSessions.concat(sessions);
         }
-        
+
         allSessions = allSessions.filter(s => matchesListFilter(s));
         allSessions.sort((a, b) => a.date.localeCompare(b.date));
 
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
         allSessions.forEach(session => {
             const past = isPast(session.date);
             const li = createSessionListItem(session, past);
-            
+
             if (past) {
                 historyList.appendChild(li);
                 hasHistory = true;
@@ -221,10 +221,10 @@ document.addEventListener('DOMContentLoaded', function () {
     function createSessionListItem(session, isPast) {
         const li = document.createElement('li');
         li.className = 'session-item';
-        
+
         // Status color for left border logic (green future, grey past)
         const statusColor = isPast ? '#6c757d' : '#28a745';
-        
+
         let sName = session.studentName || session.studentname;
         let display = sName ? `${sName} - ${session.topic}` : session.topic;
         let timeDisplay = session.time.substring(0, 5);
@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
             <span class="session-location">📍 ${session.location}</span>
         `;
-        
+
         li.addEventListener('click', () => openSessionModal(session, 'edit'));
         return li;
     }
@@ -254,13 +254,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!calendarGrid) return;
         const year = date.getFullYear();
         const month = date.getMonth();
-        if(monthYearDisplay) monthYearDisplay.textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
+        if (monthYearDisplay) monthYearDisplay.textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
 
         calendarGrid.innerHTML = '';
         const firstDayOfMonth = new Date(year, month, 1);
-        const firstDayIndex = firstDayOfMonth.getDay(); 
+        const firstDayIndex = firstDayOfMonth.getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const totalCells = 42; 
+        const totalCells = 42;
 
         for (let i = 0; i < firstDayIndex; i++) {
             const empty = document.createElement('div');
@@ -280,29 +280,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 dayCell.style.backgroundColor = '#007bff';
                 dayCell.style.color = 'white';
             }
-            
+
             let hasEvent = false;
             if (schedules[dateStr]) {
                 hasEvent = schedules[dateStr].some(s => matchesFilter(s));
             }
             if (hasEvent) dayCell.classList.add('has-session');
-            
+
             dayCell.addEventListener('click', () => selectDate(currentDayObj));
             calendarGrid.appendChild(dayCell);
         }
-        
+
         const remainingCells = totalCells - (firstDayIndex + daysInMonth);
-        for(let i=0; i<remainingCells; i++) {
-             const empty = document.createElement('div');
-             empty.classList.add('calendar-day', 'empty');
-             calendarGrid.appendChild(empty);
+        for (let i = 0; i < remainingCells; i++) {
+            const empty = document.createElement('div');
+            empty.classList.add('calendar-day', 'empty');
+            calendarGrid.appendChild(empty);
         }
     }
 
     function renderWeeklySchedule(startOfWeek) {
         if (!weeklyTableBody) return;
         const rows = weeklyTableBody.querySelectorAll('tr');
-        
+
         rows.forEach(row => {
             const cells = row.querySelectorAll('td');
             for (let i = 1; i < cells.length; i++) {
@@ -330,11 +330,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-        
+
         const dayHeaders = document.querySelectorAll('#schedule-header-days th');
-        dayHeaders.forEach(th => th.style.backgroundColor = ''); 
-        if(dayHeaders[selectedDate.getDay() + 1]) {
-            dayHeaders[selectedDate.getDay() + 1].style.backgroundColor = '#e6f7ff'; 
+        dayHeaders.forEach(th => th.style.backgroundColor = '');
+        if (dayHeaders[selectedDate.getDay() + 1]) {
+            dayHeaders[selectedDate.getDay() + 1].style.backgroundColor = '#e6f7ff';
         }
     }
 
@@ -342,7 +342,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let timeKey = session.time.substring(0, 5);
         let hour = timeKey.split(':')[0];
         let rowKey = `${hour}:00`;
-        
+
         const row = weeklyTableBody.querySelector(`tr[data-time="${rowKey}"]`);
         if (row) {
             const cell = row.children[dayIndex + 1];
@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 cell.classList.add(cssClass);
                 let title = session.studentName ? `${session.studentName}<br>(${session.topic})` : session.topic;
                 cell.innerHTML = `<small><strong>${title}</strong><br>${timeKey}</small>`;
-                
+
                 if (cssClass === 'session') {
                     cell.style.cursor = 'pointer';
                     cell.addEventListener('click', (e) => {
@@ -366,39 +366,45 @@ document.addEventListener('DOMContentLoaded', function () {
     function openSessionModal(session, mode) {
         sessionModal.classList.remove('hidden');
         sessionForm.reset();
-        
+
         if (mode === 'create') {
-            if(sessionModalTitle) sessionModalTitle.textContent = "Book New Session";
+            if (sessionModalTitle) sessionModalTitle.textContent = "Book New Session";
             sessionIdField.value = "";
             document.getElementById('session-date').value = toLocalDateString(selectedDate);
-            if(studentSelect) {
+            if (studentSelect) {
                 studentSelect.disabled = false;
-                studentSelect.value = ""; 
+                studentSelect.value = "";
             }
-            if(deleteSessionBtn) deleteSessionBtn.classList.add('hidden'); 
-        } 
+            if (deleteSessionBtn) deleteSessionBtn.classList.add('hidden');
+        }
         else {
-            if(sessionModalTitle) sessionModalTitle.textContent = "Edit Session Details";
+            if (sessionModalTitle) sessionModalTitle.textContent = "Edit Session Details";
             sessionIdField.value = session.id;
-            
+
             document.getElementById('session-date').value = session.date;
-            document.getElementById('session-time').value = session.time.substring(0,5);
+            document.getElementById('session-time').value = session.time.substring(0, 5);
             document.getElementById('session-location').value = session.location;
-            document.getElementById('session-notes').value = session.notes || ""; 
-            
-            let studentVal = session.studentNpm || session.studentnpm;
-            if(studentSelect && studentVal) {
-                studentSelect.value = studentVal;
-                studentSelect.disabled = true; 
+            document.getElementById('session-notes').value = session.notes || "";
+
+            // Task 4: Populate Additional Lecturer
+            const addLecturerSelect = document.getElementById('session-additional-lecturer');
+            if (addLecturerSelect) {
+                addLecturerSelect.value = session.additionalLecturer || "";
             }
-            if(deleteSessionBtn) deleteSessionBtn.classList.remove('hidden'); 
+
+            let studentVal = session.studentNpm || session.studentnpm;
+            if (studentSelect && studentVal) {
+                studentSelect.value = studentVal;
+                studentSelect.disabled = true;
+            }
+            if (deleteSessionBtn) deleteSessionBtn.classList.remove('hidden');
         }
     }
 
     if (sessionForm) {
         sessionForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            
+
             const timeVal = document.getElementById('session-time').value;
             if (timeVal < "07:00" || timeVal > "19:00") {
                 alert("Session time must be between 07:00 and 19:00.");
@@ -411,7 +417,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 date: document.getElementById('session-date').value,
                 time: timeVal,
                 location: document.getElementById('session-location').value,
-                notes: document.getElementById('session-notes').value 
+                notes: document.getElementById('session-notes').value,
+                additionalLecturer: document.getElementById('session-additional-lecturer').value // Task 4
             };
 
             fetch('/api/student/session', {
@@ -419,16 +426,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             })
-            .then(res => {
-                if(res.ok) {
-                    alert("Session saved successfully!");
-                    sessionModal.classList.add('hidden');
-                    fetchSchedules();
-                } else {
-                    res.text().then(t => alert("Error: " + t));
-                }
-            })
-            .catch(err => alert("Network Error: " + err));
+                .then(res => {
+                    if (res.ok) {
+                        alert("Session saved successfully!");
+                        sessionModal.classList.add('hidden');
+                        fetchSchedules();
+                    } else {
+                        res.text().then(t => alert("Error: " + t));
+                    }
+                })
+                .catch(err => alert("Network Error: " + err));
         });
     }
 
@@ -441,35 +448,35 @@ document.addEventListener('DOMContentLoaded', function () {
                 fetch(`/api/session/${id}`, {
                     method: 'DELETE'
                 })
-                .then(res => {
-                    if (res.ok) {
-                        alert("Session deleted.");
-                        sessionModal.classList.add('hidden');
-                        fetchSchedules();
-                    } else {
-                        alert("Failed to delete session.");
-                    }
-                })
-                .catch(err => alert("Network Error: " + err));
+                    .then(res => {
+                        if (res.ok) {
+                            alert("Session deleted.");
+                            sessionModal.classList.add('hidden');
+                            fetchSchedules();
+                        } else {
+                            alert("Failed to delete session.");
+                        }
+                    })
+                    .catch(err => alert("Network Error: " + err));
             }
         });
     }
 
     if (closeBtn) closeBtn.addEventListener('click', () => sessionModal.classList.add('hidden'));
-    
+
     if (prevMonthBtn) {
-        prevMonthBtn.addEventListener('click', () => { 
-            selectedDate.setMonth(selectedDate.getMonth() - 1); 
+        prevMonthBtn.addEventListener('click', () => {
+            selectedDate.setMonth(selectedDate.getMonth() - 1);
             selectDate(selectedDate);
         });
     }
     if (nextMonthBtn) {
-        nextMonthBtn.addEventListener('click', () => { 
-            selectedDate.setMonth(selectedDate.getMonth() + 1); 
+        nextMonthBtn.addEventListener('click', () => {
+            selectedDate.setMonth(selectedDate.getMonth() + 1);
             selectDate(selectedDate);
         });
     }
-    
+
     if (addSessionBtn) {
         addSessionBtn.addEventListener('click', () => openSessionModal(null, 'create'));
     }
