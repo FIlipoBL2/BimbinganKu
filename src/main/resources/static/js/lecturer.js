@@ -397,8 +397,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 studentSelect.value = studentVal;
                 studentSelect.disabled = true;
             }
-            if (deleteSessionBtn) deleteSessionBtn.classList.remove('hidden');
         }
+    }
+
+    // Custom Location Visibility Logic (Moved to Global Scope)
+    const locationSelect = document.getElementById('session-location');
+    const customLocationInput = document.getElementById('session-location-custom');
+
+    if (locationSelect && customLocationInput) {
+        locationSelect.addEventListener('change', () => {
+            console.log('Location selected:', locationSelect.value); // Debug
+            if (locationSelect.value === 'Other') {
+                customLocationInput.style.display = 'block';
+                customLocationInput.required = true;
+            } else {
+                customLocationInput.style.display = 'none';
+                customLocationInput.required = false;
+            }
+        });
     }
 
     if (sessionForm) {
@@ -409,22 +425,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (timeVal < "07:00" || timeVal > "19:00") {
                 alert("Session time must be between 07:00 and 19:00.");
                 return;
-            }
-
-            // Custom Location Visibility Logic
-            const locationSelect = document.getElementById('session-location');
-            const customLocationInput = document.getElementById('session-location-custom');
-
-            if (locationSelect && customLocationInput) {
-                locationSelect.addEventListener('change', () => {
-                    if (locationSelect.value === 'Other') {
-                        customLocationInput.style.display = 'block';
-                        customLocationInput.required = true;
-                    } else {
-                        customLocationInput.style.display = 'none';
-                        customLocationInput.required = false;
-                    }
-                });
             }
 
             const formData = {
