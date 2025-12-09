@@ -109,19 +109,19 @@ INSERT INTO Akademik (year, semester) VALUES
 
 -- LECTURERS as Users
 INSERT INTO Users (id, name, email, password) VALUES 
-('CEN', 'C.E. Nugraheni', 'cen@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
-('KAP', 'Kapi Kapibara', 'kapi@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
-('LNV', 'Lionov', 'lnv@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
-('MTA', 'Mariskha', 'mta@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
-('GDK', 'Gede Karya', 'gdk@unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6');
+('CEN', 'C.E. Nugraheni', 'cen@unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
+('KAP', 'Kapi Kapibara', 'kapi@unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
+('LNV', 'Lionov', 'lnv@unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
+('MTA', 'Mariskha', 'mta@unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
+('GDK', 'Gede Karya', 'gdk@unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy');
 
 -- STUDENTS as Users
 INSERT INTO Users (id, name, email, password) VALUES 
-('6182101001', 'Wom Wombat', '6182101001@student.unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
-('6182101002', 'Budi Santoso', '6182101002@student.unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
-('6182101003', 'Siti Aminah', '6182101003@student.unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
-('6182101004', 'Andi Pratama', '6182101004@student.unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6'),
-('6182101005', 'Dewi Lestari', '6182101005@student.unpar.ac.id', '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6');
+('6182101001', 'Wom Wombat', '6182101001@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
+('6182101002', 'Budi Santoso', '6182101002@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
+('6182101003', 'Siti Aminah', '6182101003@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
+('6182101004', 'Andi Pratama', '6182101004@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy'),
+('6182101005', 'Dewi Lestari', '6182101005@student.unpar.ac.id', '$2a$10$nq9UqQM4cXcWhnyM6mCukeYsW975/K.zPzuGjrL.0fV.v3gYpFDWy');
 
 -- =============================================
 -- LECTURERS TABLE
