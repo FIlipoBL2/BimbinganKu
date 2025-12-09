@@ -22,7 +22,9 @@ CREATE TABLE Users (
 CREATE TABLE Akademik (
     akademik_ID SERIAL PRIMARY KEY,
     year VARCHAR(20) NOT NULL,
-    semester VARCHAR(20) NOT NULL
+    semester VARCHAR(20) NOT NULL,
+    uts_deadline DATE,
+    uas_deadline DATE
 );
 
 -- STUDENTS: Extends Users
@@ -101,9 +103,8 @@ CREATE TABLE GuidanceSchedule (
 -- =============================================
 
 -- AKADEMIK: Academic Year/Semester
-INSERT INTO Akademik (year, semester) VALUES 
-('2024/2025', 'Ganjil'),
-('2024/2025', 'Genap');
+INSERT INTO Akademik (year, semester, uts_deadline, uas_deadline) VALUES 
+('2025/2026', 'Ganjil', '2025-10-20', '2026-01-15');
 
 -- =============================================
 -- USERS TABLE (Base for all users)

@@ -1,32 +1,107 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BimbinganKu - Student Home</title>
     <link rel="stylesheet" th:href="@{/css/global.css}">
     <style>
         /* Tab Styles */
-        .tabs { display: flex; border-bottom: 2px solid #ddd; margin-bottom: 15px; }
-        .tab-btn { 
-            padding: 10px 20px; cursor: pointer; border: none; background: none; font-size: 16px; font-weight: bold; color: #666;
-            border-bottom: 3px solid transparent; 
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 15px;
         }
-        .tab-btn.active { color: #007bff; border-bottom-color: #007bff; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+
+        /* Deadline Cards */
+        .deadline-container {
+            display: flex;
+            gap: 15px;
+            margin-right: 20px;
+        }
+
+        .deadline-card {
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .uts-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            color: #1f2937;
+        }
+
+        .uas-card {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .deadline-icon {
+            font-size: 1.2rem;
+        }
+
+        .deadline-info {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .deadline-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        .deadline-timer {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: #666;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
 
         /* Session List Styling (Card Look) */
-        .upcoming-list { 
-            list-style: none; 
-            padding: 0; 
+        .upcoming-list {
+            list-style: none;
+            padding: 0;
         }
+
         .session-item {
             background: #fff;
             margin-bottom: 12px;
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -34,27 +109,30 @@
             transition: all 0.2s ease;
             border: 1px solid #e0e0e0;
         }
+
         .session-item:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-color: #007bff;
         }
-        
+
         /* Inner text styling */
         .session-info {
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
+
         .session-title {
             font-size: 1.05rem;
             color: #333;
         }
+
         .session-date {
             font-size: 0.9rem;
             color: #666;
         }
-        
+
         /* Location badge styling */
         .session-location {
             font-size: 0.85rem;
@@ -68,11 +146,31 @@
         }
     </style>
 </head>
+
 <body>
     <input type="hidden" id="user-id" th:value="${npm}">
 
     <header>
         <div class="logo">BimbinganKU</div>
+
+        <!-- DEADLINE CARDS -->
+        <div class="deadline-container">
+            <div class="deadline-card uts-card" th:if="${utsDeadline}">
+                <span class="deadline-icon">📅</span>
+                <div class="deadline-info">
+                    <span class="deadline-label">UTS</span>
+                    <span class="deadline-timer" id="uts-timer" th:data-date="${utsDeadline}">Loading...</span>
+                </div>
+            </div>
+            <div class="deadline-card uas-card" th:if="${uasDeadline}">
+                <span class="deadline-icon">📅</span>
+                <div class="deadline-info">
+                    <span class="deadline-label">UAS</span>
+                    <span class="deadline-timer" id="uas-timer" th:data-date="${uasDeadline}">Loading...</span>
+                </div>
+            </div>
+        </div>
+
         <nav>
             <div class="inbox-area">
                 <a th:href="@{/inbox(role='student')}" id="inbox-link" title="Inbox">✉️ Inbox</a>
@@ -90,23 +188,27 @@
 
     <main class="container">
         <section class="status-card">
-            <h2 id="welcome-heading">Welcome Back, <span id="student-name" th:text="${studentName}">[Student Name]</span></h2>
+            <h2 id="welcome-heading">Welcome Back, <span id="student-name" th:text="${studentName}">[Student
+                    Name]</span></h2>
             <p>Your current Guidance Session Count:</p>
             <div class="eligibility-bar-container">
-                <div id="eligibility-bar" class="eligibility-bar blue" 
-                     th:style="'width: ' + ((${sessionCountUTS} + ${sessionCountUAS}) * 20) + '%;'" 
-                     th:data-count="${sessionCountUTS} + ${sessionCountUAS}"></div>
+                <div id="eligibility-bar" class="eligibility-bar blue"
+                    th:style="'width: ' + ((${sessionCountUTS} + ${sessionCountUAS}) * 20) + '%;'"
+                    th:data-count="${sessionCountUTS} + ${sessionCountUAS}"></div>
             </div>
-            <p><small>You have completed <strong th:text="${sessionCountUTS} + ${sessionCountUAS}">0</strong> out of 5 mandatory guidance sessions.</small></p>
+            <p><small>You have completed <strong th:text="${sessionCountUTS} + ${sessionCountUAS}">0</strong> out of 5
+                    mandatory guidance sessions.</small></p>
         </section>
 
         <section class="scheduling-section schedule-page-layout">
             <div class="mini-calendar-container">
                 <div id="mini-calendar" class="calendar-card">
                     <div class="calendar-header">
-                        <button class="arrow left-arrow" id="prev-month" style="background:none; border:none; cursor:pointer;">&lt;</button>
+                        <button class="arrow left-arrow" id="prev-month"
+                            style="background:none; border:none; cursor:pointer;">&lt;</button>
                         <span class="month-year" id="month-year-display">October 2025</span>
-                        <button class="arrow right-arrow" id="next-month" style="background:none; border:none; cursor:pointer;">&gt;</button>
+                        <button class="arrow right-arrow" id="next-month"
+                            style="background:none; border:none; cursor:pointer;">&gt;</button>
                     </div>
                     <div class="calendar-weekdays">
                         <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
@@ -117,8 +219,9 @@
 
             <div class="schedule-view">
                 <h3>🗓️ Weekly Schedule (Your Sessions)</h3>
-                
-                <div class="schedule-controls-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+
+                <div class="schedule-controls-row"
+                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
                     <div id="lecturer-schedule-filter-container">
                         <label>Show Teaching Schedule For:</label>
                         <select id="lecturer-schedule-filter">
@@ -133,24 +236,147 @@
                 <table id="weekly-schedule-table">
                     <thead>
                         <tr id="schedule-header-days">
-                            <th>Time</th><th data-day="0">Sun</th><th data-day="1">Mon</th><th data-day="2">Tue</th>
-                            <th data-day="3">Wed</th><th data-day="4">Thu</th><th data-day="5">Fri</th><th data-day="6">Sat</th>
+                            <th>Time</th>
+                            <th data-day="0">Sun</th>
+                            <th data-day="1">Mon</th>
+                            <th data-day="2">Tue</th>
+                            <th data-day="3">Wed</th>
+                            <th data-day="4">Thu</th>
+                            <th data-day="5">Fri</th>
+                            <th data-day="6">Sat</th>
                         </tr>
                     </thead>
                     <tbody id="schedule-body">
-                        <tr data-time="07:00"><td>07:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr data-time="08:00"><td>08:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr data-time="09:00"><td>09:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr data-time="10:00"><td>10:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr data-time="11:00"><td>11:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr data-time="12:00"><td>12:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr data-time="13:00"><td>13:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr data-time="14:00"><td>14:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr data-time="15:00"><td>15:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr data-time="16:00"><td>16:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr data-time="17:00"><td>17:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr data-time="18:00"><td>18:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr data-time="19:00"><td>19:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr data-time="07:00">
+                            <td>07:00</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-time="08:00">
+                            <td>08:00</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-time="09:00">
+                            <td>09:00</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-time="10:00">
+                            <td>10:00</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-time="11:00">
+                            <td>11:00</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-time="12:00">
+                            <td>12:00</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-time="13:00">
+                            <td>13:00</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-time="14:00">
+                            <td>14:00</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-time="15:00">
+                            <td>15:00</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-time="16:00">
+                            <td>16:00</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-time="17:00">
+                            <td>17:00</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-time="18:00">
+                            <td>18:00</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr data-time="19:00">
+                            <td>19:00</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -186,7 +412,7 @@
                 <label for="session-date">Date:</label>
                 <input type="date" id="session-date" required>
                 <label for="session-time">Time:</label>
-                <input type="time" id="session-time" required>
+                <input type="time" id="session-time" step="60" required>
                 <label for="session-location">Location:</label>
                 <select id="session-location" required>
                     <option value="Lecturer Room">Lecturer Room</option>
@@ -210,5 +436,37 @@
     </div>
 
     <script th:src="@{/js/student.js}"></script>
+    <script>
+        function updateCountdowns() {
+            const update = (id) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const deadlineStr = el.getAttribute('data-date');
+                if (!deadlineStr) return;
+
+                const deadline = new Date(deadlineStr + 'T23:59:59');
+                const now = new Date();
+                const diff = deadline - now;
+
+                if (diff <= 0) {
+                    el.innerText = "ENDED";
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                el.innerText = `${days}d ${hours}h`;
+            };
+
+            update('uts-timer');
+            update('uas-timer');
+        }
+
+        // Run immediately and every minute
+        document.addEventListener('DOMContentLoaded', updateCountdowns);
+        setInterval(updateCountdowns, 60000);
+    </script>
 </body>
+
+
 </html>

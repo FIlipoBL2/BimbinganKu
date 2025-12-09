@@ -23,6 +23,9 @@ public class HomeController {
     @Autowired
     private LecturerRepository lecturerRepo;
 
+    @Autowired
+    private com.RPL.BimbinganKu.repository.AkademikRepository akademikRepo;
+
     @GetMapping("/student/home")
     public String showStudentDashboard(HttpSession session, Model model) {
         User user = (User) session.getAttribute("loggedUser");
@@ -41,6 +44,14 @@ public class HomeController {
             model.addAttribute("sessionCountUAS", student.getTotalGuidanceUAS());
         }
 
+        // Add Academic Info
+        akademikRepo.findCurrentAkademik().ifPresent(ak -> {
+            model.addAttribute("currentYear", ak.getYear());
+            model.addAttribute("currentSemester", ak.getSemester());
+            model.addAttribute("utsDeadline", ak.getUtsDeadline());
+            model.addAttribute("uasDeadline", ak.getUasDeadline());
+        });
+
         return "student";
     }
 
@@ -57,8 +68,17 @@ public class HomeController {
         if (lecturer != null) {
             model.addAttribute("lecturer", lecturer);
             model.addAttribute("lecturerName", lecturer.getName());
+            model.addAttribute("lecturerName", lecturer.getName());
             model.addAttribute("lecturerCode", lecturer.getId());
         }
+
+        // Add Academic Info
+        akademikRepo.findCurrentAkademik().ifPresent(ak -> {
+            model.addAttribute("currentYear", ak.getYear());
+            model.addAttribute("currentSemester", ak.getSemester());
+            model.addAttribute("utsDeadline", ak.getUtsDeadline());
+            model.addAttribute("uasDeadline", ak.getUasDeadline());
+        });
 
         return "lecturer";
     }
@@ -72,6 +92,15 @@ public class HomeController {
         }
 
         model.addAttribute("adminName", user.getName());
+
+        // Add Academic Info
+        akademikRepo.findCurrentAkademik().ifPresent(ak -> {
+            model.addAttribute("currentYear", ak.getYear());
+            model.addAttribute("currentSemester", ak.getSemester());
+            model.addAttribute("utsDeadline", ak.getUtsDeadline());
+            model.addAttribute("uasDeadline", ak.getUasDeadline());
+        });
+
         return "admin";
     }
 
