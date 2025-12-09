@@ -411,12 +411,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
+            // Custom Location Visibility Logic
+            const locationSelect = document.getElementById('session-location');
+            const customLocationInput = document.getElementById('session-location-custom');
+
+            if (locationSelect && customLocationInput) {
+                locationSelect.addEventListener('change', () => {
+                    if (locationSelect.value === 'Other') {
+                        customLocationInput.style.display = 'block';
+                        customLocationInput.required = true;
+                    } else {
+                        customLocationInput.style.display = 'none';
+                        customLocationInput.required = false;
+                    }
+                });
+            }
+
             const formData = {
                 id: sessionIdField.value,
                 studentNpm: studentSelect ? studentSelect.value : null,
                 date: document.getElementById('session-date').value,
                 time: timeVal,
-                location: document.getElementById('session-location').value,
+                location: (document.getElementById('session-location').value === 'Other') ?
+                    document.getElementById('session-location-custom').value :
+                    document.getElementById('session-location').value,
                 notes: document.getElementById('session-notes').value,
                 additionalLecturer: document.getElementById('session-additional-lecturer').value // Task 4
             };

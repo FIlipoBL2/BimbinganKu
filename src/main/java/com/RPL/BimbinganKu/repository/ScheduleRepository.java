@@ -51,12 +51,12 @@ public class ScheduleRepository {
         try {
             schedules.addAll(jdbcTemplate.queryForList(classSql, npm));
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return schedules;
     }
 
-    // --- LECTURER VIEW ---
     // --- LECTURER VIEW ---
     public List<Map<String, Object>> findScheduleByLecturer(String code) {
         // Updated: Select additionalLecturer
