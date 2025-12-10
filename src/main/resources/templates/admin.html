@@ -177,10 +177,44 @@
                     </div>
 
                     <div class="data-table-container">
-                        <h3 id="table-title">Student Table</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3 id="table-title">Student Table</h3>
+                            <button id="export-student-pdf-btn" class="primary-btn" style="margin-bottom: 8px;">Export PDF</button>
+                        </div>
                         <table id="admin-data-table" class="data-table">
                             <!-- Populated by JS -->
                         </table>
+
+                        <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const exportBtn = document.getElementById('export-student-pdf-btn');
+                            if (exportBtn) {
+                                exportBtn.addEventListener('click', function() {
+                                    fetch('/api/admin/export-student-pdf', {
+                                        method: 'GET',
+                                        headers: {
+                                            'Accept': 'application/pdf'
+                                        }
+                                    })
+                                    .then(response => {
+                                        if (!response.ok) throw new Error('Failed to export PDF');
+                                        return response.blob();
+                                    })
+                                    .then(blob => {
+                                        const url = window.URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = 'student-table.pdf';
+                                        document.body.appendChild(a);
+                                        a.click();
+                                        a.remove();
+                                        window.URL.revokeObjectURL(url);
+                                    })
+                                    .catch(err => alert('Export failed: ' + err.message));
+                                });
+                            }
+                        });
+                        </script>
                     </div>
                 </div>
 
