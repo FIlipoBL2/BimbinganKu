@@ -47,13 +47,85 @@ document.addEventListener('DOMContentLoaded', function () {
         if (topicLabel) topicLabel.style.display = 'none';
     }
 
+    // Main Lecturer Code (student's assigned thesis lecturer)
+    const mainLecturerCode = document.getElementById('main-lecturer-code')?.value || '';
+    const lecturerScheduleFilter = document.getElementById('lecturer-schedule-filter');
+
+    // Overlay schedule state
+    let lecturerOverlaySchedules = []; // Stores selected lecturer's teaching schedule
+    let selectedLecturerCode = 'all';
+
     // --- INIT ---
     if (npm) {
         console.log("Loaded Student JS for NPM:", npm);
         fetchSchedules();
+        fetchAllLecturers(); // Fetch all lecturers for filter dropdown
     }
 
     renderCalendar(selectedDate);
+
+    // Fetch all lecturers and populate dropdown with Main Lecturer marking
+    function fetchAllLecturers() {
+        fetch('/api/admin/lecturers')
+            .then(res => res.json())
+            .then(lecturers => {
+                if (!lecturerScheduleFilter) return;
+
+                lecturerScheduleFilter.innerHTML = '<option value="all">All Lecturers</option>';
+
+                lecturers.forEach(l => {
+                    const opt = document.createElement('option');
+                    opt.value = l.lecturerCode;
+                    // Mark the student's main lecturer distinctly
+                    if (l.lecturerCode === mainLecturerCode) {
+                        opt.textContent = `${l.name} (Main Lecturer)`;
+                        opt.style.fontWeight = 'bold';
+                    } else {
+                        opt.textContent = l.name;
+                    }
+                    lecturerScheduleFilter.appendChild(opt);
+                });
+            })
+            .catch(err => console.error("Error loading lecturers:", err));
+    }
+
+    // Lecturer filter dropdown event listener
+    if (lecturerScheduleFilter) {
+        lecturerScheduleFilter.addEventListener('change', (e) => {
+            selectedLecturerCode = e.target.value;
+            if (selectedLecturerCode === 'all') {
+                lecturerOverlaySchedules = [];
+                const startOfWeek = new Date(selectedDate);
+                startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
+                renderWeeklySchedule(startOfWeek);
+            } else {
+                fetchLecturerScheduleOverlay(selectedLecturerCode);
+            }
+        });
+    }
+
+    // Fetch a specific lecturer's schedule and overlay it
+    function fetchLecturerScheduleOverlay(lecturerCode) {
+        fetch(`/api/lecturer/schedule/${lecturerCode}`)
+            .then(res => res.json())
+            .then(data => {
+                lecturerOverlaySchedules = [];
+                data.forEach(session => {
+                    if (session.date) {
+                        // Store date-based sessions
+                        lecturerOverlaySchedules.push(session);
+                    } else if (session.day_name && dayMap[session.day_name] !== undefined) {
+                        // Store recurring weekly sessions
+                        session.dayIndex = dayMap[session.day_name];
+                        lecturerOverlaySchedules.push(session);
+                    }
+                });
+                const startOfWeek = new Date(selectedDate);
+                startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
+                renderWeeklySchedule(startOfWeek);
+            })
+            .catch(err => console.error("Error loading lecturer schedule:", err));
+    }
 
     // --- HELPER: Local Date String ---
     function toLocalDateString(date) {
@@ -191,6 +263,20 @@ document.addEventListener('DOMContentLoaded', function () {
             currentDay.setDate(startOfWeek.getDate() + i);
             const dateStr = toLocalDateString(currentDay);
 
+            // First, render lecturer overlay schedules (underneath student sessions)
+            if (lecturerOverlaySchedules.length > 0) {
+                lecturerOverlaySchedules.forEach(os => {
+                    if (os.date && os.date === dateStr) {
+                        // Date-based session (guidance sessions)
+                        placeSessionInTable(os, i, 'teaching-schedule');
+                    } else if (os.dayIndex !== undefined && os.dayIndex === i) {
+                        // Recurring class schedule
+                        placeSessionInTable(os, i, 'blocked-schedule');
+                    }
+                });
+            }
+
+            // Then render student's own sessions (on top)
             if (schedules[dateStr]) {
                 schedules[dateStr].forEach(session => {
                     placeSessionInTable(session, i, 'session');

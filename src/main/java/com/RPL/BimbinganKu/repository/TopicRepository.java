@@ -13,4 +13,16 @@ public class TopicRepository {
         String sql = "INSERT INTO Topic (topicCode, NPM, lecturerCode, topicName) VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sql, topicCode, npm, lecturerCode, topicName);
     }
+
+    /**
+     * Get the main lecturer code for a student based on their Topic assignment.
+     */
+    public String findLecturerCodeByNpm(String npm) {
+        try {
+            String sql = "SELECT lecturerCode FROM Topic WHERE npm = ? LIMIT 1";
+            return jdbcTemplate.queryForObject(sql, String.class, npm);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

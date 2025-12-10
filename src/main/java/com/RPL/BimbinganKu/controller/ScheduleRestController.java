@@ -70,7 +70,7 @@ public class ScheduleRestController {
             if (notes == null)
                 notes = "";
             if (additionalLecturer != null && additionalLecturer.trim().isEmpty()) {
-                additionalLecturer = null;
+                additionalLecturer = null; // Convert empty string to null for DB
             }
 
             String endTime = time;

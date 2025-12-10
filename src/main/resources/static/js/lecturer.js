@@ -17,8 +17,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const prevMonthBtn = document.getElementById('prev-month');
     const nextMonthBtn = document.getElementById('next-month');
     const weeklyTableBody = document.getElementById('schedule-body');
-    const filterSelect = document.getElementById('student-schedule-filter');
     const listFilterSelect = document.getElementById('list-student-filter');
+
+    // Overlay Filter Elements (declared early for fetchLecturers)
+    const studentOverlayBtn = document.getElementById('student-overlay-btn');
+    const studentOverlayDropdown = document.getElementById('student-overlay-dropdown');
+    const lecturerOverlayBtn = document.getElementById('lecturer-overlay-btn');
+    const lecturerOverlayDropdown = document.getElementById('lecturer-overlay-dropdown');
+    let selectedStudentOverlays = [];
+    let selectedLecturerOverlays = [];
 
     // List & Tab Elements
     const upcomingList = document.getElementById('upcoming-list');
@@ -37,15 +44,30 @@ document.addEventListener('DOMContentLoaded', function () {
     const addSessionBtn = document.getElementById('add-session-btn');
     const deleteSessionBtn = document.getElementById('delete-session-btn');
 
-    // Time Restriction
+    // Time Restriction (6 AM - 11 PM, minute accuracy)
     const timeInput = document.getElementById('session-time');
     if (timeInput) {
-        timeInput.min = "07:00";
-        timeInput.max = "19:00";
-        timeInput.step = "3600";
+        timeInput.min = "06:00";
+        timeInput.max = "23:00";
+        timeInput.step = "60"; // Allow minute selection
     }
 
-    // FIX: Hide Topic Input
+    // Week Navigation Helper (must be before its use)
+    function getStartOfWeek(date) {
+        const d = new Date(date);
+        const day = d.getDay();
+        d.setDate(d.getDate() - day);
+        d.setHours(0, 0, 0, 0);
+        return d;
+    }
+
+    // Week Navigation Elements
+    const weekDisplay = document.getElementById('week-display');
+    const prevWeekBtn = document.getElementById('prev-week-btn');
+    const nextWeekBtn = document.getElementById('next-week-btn');
+    let currentWeekStart = getStartOfWeek(new Date());
+
+    // Hide Topic Input (field auto-populated from student selection)
     const topicInput = document.getElementById('session-topic');
     if (topicInput) {
         topicInput.style.display = 'none';
@@ -60,9 +82,44 @@ document.addEventListener('DOMContentLoaded', function () {
         fetchStudents().then(() => {
             fetchSchedules();
         });
+        fetchLecturers(); // Fetch all lecturers for overlay filter
     }
 
     renderCalendar(selectedDate);
+
+    // Fetch all lecturers for overlay filter
+    function fetchLecturers() {
+        fetch('/api/admin/lecturers')
+            .then(res => res.json())
+            .then(lecturers => {
+                initLecturerOverlayFilter(lecturers);
+            })
+            .catch(err => console.error("Error loading lecturers:", err));
+    }
+
+    function initLecturerOverlayFilter(lecturers) {
+        if (!lecturerOverlayDropdown) return;
+        lecturerOverlayDropdown.innerHTML = '';
+
+        lecturers.forEach(l => {
+            const item = document.createElement('div');
+            item.className = 'overlay-checkbox-item';
+            item.innerHTML = `
+                <input type="checkbox" id="overlay-lecturer-${l.lecturerCode}" value="${l.lecturerCode}">
+                <label for="overlay-lecturer-${l.lecturerCode}">${l.name}</label>
+            `;
+            lecturerOverlayDropdown.appendChild(item);
+
+            item.querySelector('input').addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    selectedLecturerOverlays.push(l.lecturerCode);
+                } else {
+                    selectedLecturerOverlays = selectedLecturerOverlays.filter(id => id !== l.lecturerCode);
+                }
+                renderWeeklySchedule(currentWeekStart);
+            });
+        });
+    }
 
     // --- HELPERS ---
     function toLocalDateString(date) {
@@ -98,45 +155,129 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // --- 1. FETCH STUDENTS ---
+    let allStudents = []; // Store for search filtering
+    const studentListContainer = document.getElementById('student-list-container');
+    const studentSearch = document.getElementById('student-search');
+    const currentPeriod = document.getElementById('current-period')?.value || 'UAS';
+    const requiredSessions = 3;
+
     function fetchStudents() {
         return fetch(`/api/lecturer/students/${lecturerCode}`)
             .then(res => res.json())
             .then(students => {
-                if (filterSelect) filterSelect.innerHTML = '<option value="all">All Students</option>';
-                if (listFilterSelect) listFilterSelect.innerHTML = '<option value="all">All Students</option>';
-                if (studentSelect) studentSelect.innerHTML = '<option value="" disabled selected>Select Student</option>';
+                allStudents = students;
 
-                students.forEach(s => {
-                    const opt = document.createElement('option');
-                    opt.value = s.npm;
-                    opt.textContent = `${s.name} (${s.npm})`;
-                    if (filterSelect) filterSelect.appendChild(opt);
-
-                    const opt2 = opt.cloneNode(true);
-                    if (listFilterSelect) listFilterSelect.appendChild(opt2);
-
-                    if (studentSelect) {
+                // Populate session modal student dropdown
+                if (studentSelect) {
+                    studentSelect.innerHTML = '<option value="" disabled selected>Select Student</option>';
+                    students.forEach(s => {
                         const modalOpt = document.createElement('option');
                         modalOpt.value = s.npm;
                         modalOpt.textContent = `${s.name} (${s.npm})`;
                         studentSelect.appendChild(modalOpt);
-                    }
-                });
+                    });
+                }
+
+                // Populate overlay filter dropdown
+                initStudentOverlayFilter(students);
+
+                // Render student list with eligibility dots
+                renderStudentList(students);
             })
             .catch(err => console.error("Error loading students:", err));
     }
 
-    // --- 2. FILTERS ---
-    if (filterSelect) {
-        filterSelect.addEventListener('change', (e) => {
-            currentFilter = e.target.value;
-            const startOfWeek = new Date(selectedDate);
-            startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
-            renderWeeklySchedule(startOfWeek);
-            renderCalendar(selectedDate);
+    function renderStudentList(students) {
+        if (!studentListContainer) return;
+        studentListContainer.innerHTML = '';
+
+        students.forEach(s => {
+            // Get current period session count
+            const count = currentPeriod === 'UTS' ? (s.totalGuidanceUTS || 0) : (s.totalGuidanceUAS || 0);
+
+            // Determine eligibility color: red < 2, blue = 2, green >= 3
+            let colorClass = 'eligibility-red';
+            if (count >= requiredSessions) {
+                colorClass = 'eligibility-green';
+            } else if (count >= 2) {
+                colorClass = 'eligibility-blue';
+            }
+
+            const card = document.createElement('div');
+            card.className = 'student-card';
+            card.innerHTML = `
+                <div class="student-info">
+                    <span class="student-name">${s.name}</span>
+                    <span class="student-npm">${s.npm}</span>
+                </div>
+                <div class="student-badge">
+                    <span class="session-count-badge ${colorClass}">${count}</span>
+                </div>
+            `;
+            studentListContainer.appendChild(card);
         });
     }
 
+    // Student search filter
+    if (studentSearch) {
+        studentSearch.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = allStudents.filter(s =>
+                s.name.toLowerCase().includes(query) || s.npm.includes(query)
+            );
+            renderStudentList(filtered);
+        });
+    }
+
+    // Note: Overlay filter elements declared at top of file
+
+    function initStudentOverlayFilter(students) {
+        if (!studentOverlayDropdown) return;
+        studentOverlayDropdown.innerHTML = '';
+
+        students.forEach(s => {
+            const item = document.createElement('div');
+            item.className = 'overlay-checkbox-item';
+            item.innerHTML = `
+                <input type="checkbox" id="overlay-student-${s.npm}" value="${s.npm}">
+                <label for="overlay-student-${s.npm}">${s.name}</label>
+            `;
+            studentOverlayDropdown.appendChild(item);
+
+            item.querySelector('input').addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    selectedStudentOverlays.push(s.npm);
+                } else {
+                    selectedStudentOverlays = selectedStudentOverlays.filter(id => id !== s.npm);
+                }
+                renderWeeklySchedule(currentWeekStart);
+            });
+        });
+    }
+
+    // Toggle dropdown visibility
+    if (studentOverlayBtn) {
+        studentOverlayBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            studentOverlayDropdown.classList.toggle('show');
+            if (lecturerOverlayDropdown) lecturerOverlayDropdown.classList.remove('show');
+        });
+    }
+    if (lecturerOverlayBtn) {
+        lecturerOverlayBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            lecturerOverlayDropdown.classList.toggle('show');
+            if (studentOverlayDropdown) studentOverlayDropdown.classList.remove('show');
+        });
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', () => {
+        if (studentOverlayDropdown) studentOverlayDropdown.classList.remove('show');
+        if (lecturerOverlayDropdown) lecturerOverlayDropdown.classList.remove('show');
+    });
+
+    // --- 2. FILTERS ---
     if (listFilterSelect) {
         listFilterSelect.addEventListener('change', (e) => {
             currentListFilter = e.target.value;
@@ -498,6 +639,35 @@ document.addEventListener('DOMContentLoaded', function () {
     if (addSessionBtn) {
         addSessionBtn.addEventListener('click', () => openSessionModal(null, 'create'));
     }
+
+    // --- WEEK NAVIGATION ---
+
+    function updateWeekDisplay() {
+        const endOfWeek = new Date(currentWeekStart);
+        endOfWeek.setDate(currentWeekStart.getDate() + 6);
+        const options = { month: 'short', day: 'numeric' };
+        const startStr = currentWeekStart.toLocaleDateString('en-US', options);
+        const endStr = endOfWeek.toLocaleDateString('en-US', options);
+        if (weekDisplay) {
+            weekDisplay.textContent = `🗓️ ${startStr} - ${endStr}`;
+        }
+    }
+
+    function navigateWeek(direction) {
+        currentWeekStart.setDate(currentWeekStart.getDate() + (direction * 7));
+        updateWeekDisplay();
+        renderWeeklySchedule(currentWeekStart);
+    }
+
+    if (prevWeekBtn) {
+        prevWeekBtn.addEventListener('click', () => navigateWeek(-1));
+    }
+    if (nextWeekBtn) {
+        nextWeekBtn.addEventListener('click', () => navigateWeek(1));
+    }
+
+    // Initialize week display
+    updateWeekDisplay();
 
     const logoutBtn = document.getElementById('logout-btn');
     const logoutModal = document.getElementById('logout-modal');

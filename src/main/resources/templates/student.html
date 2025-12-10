@@ -187,17 +187,24 @@
     </header>
 
     <main class="container">
+        <!-- Hidden inputs for JS -->
+        <input type="hidden" id="current-period" th:value="${currentPeriod}">
+        <input type="hidden" id="current-session-count" th:value="${currentSessionCount}">
+        <input type="hidden" id="required-sessions" th:value="${requiredSessions}">
+        <input type="hidden" id="main-lecturer-code" th:value="${mainLecturerCode}">
+
         <section class="status-card">
             <h2 id="welcome-heading">Welcome Back, <span id="student-name" th:text="${studentName}">[Student
                     Name]</span></h2>
-            <p>Your current Guidance Session Count:</p>
+            <p>Your <strong th:text="${currentPeriod}">UTS</strong> Guidance Session Progress:</p>
             <div class="eligibility-bar-container">
-                <div id="eligibility-bar" class="eligibility-bar blue"
-                    th:style="'width: ' + ((${sessionCountUTS} + ${sessionCountUAS}) * 20) + '%;'"
-                    th:data-count="${sessionCountUTS} + ${sessionCountUAS}"></div>
+                <div id="eligibility-bar" class="eligibility-bar"
+                    th:classappend="${currentSessionCount >= 3 ? 'green' : (currentSessionCount >= 2 ? 'blue' : 'red')}"
+                    th:style="'width: ' + (${currentSessionCount} * 33.33) + '%;'"
+                    th:data-count="${currentSessionCount}"></div>
             </div>
-            <p><small>You have completed <strong th:text="${sessionCountUTS} + ${sessionCountUAS}">0</strong> out of 5
-                    mandatory guidance sessions.</small></p>
+            <p><small>You have completed <strong th:text="${currentSessionCount}">0</strong> out of 3
+                    mandatory sessions for <span th:text="${currentPeriod}">UTS</span>.</small></p>
         </section>
 
         <section class="scheduling-section schedule-page-layout">

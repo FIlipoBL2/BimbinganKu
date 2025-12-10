@@ -165,6 +165,7 @@
 
 <body>
     <input type="hidden" id="user-id" th:value="${lecturerCode}">
+    <input type="hidden" id="current-period" th:value="${currentPeriod}">
 
     <header>
         <div class="logo">BimbinganKU (Lecturer)</div>
@@ -230,170 +231,246 @@
                     </div>
                     <div class="calendar-days" id="calendar-grid"></div>
                 </div>
+
+                <!-- Mahasiswa List Section -->
+                <div class="student-list-section">
+                    <h3>👥 Mahasiswa</h3>
+                    <input type="text" class="student-search" id="student-search" placeholder="Cari mahasiswa...">
+                    <div class="student-list" id="student-list-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
             </div>
 
             <div class="schedule-table-wrapper">
-                <h3>🗓️ Weekly Schedule (This Week)</h3>
-
-                <div class="schedule-controls-row"
-                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                    <div id="student-schedule-filter-container">
-                        <label for="student-schedule-filter">Show Student Study Schedule For:</label>
-                        <select id="student-schedule-filter">
-                            <option value="all">All Students</option>
-                        </select>
+                <div class="schedule-nav-header"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <button id="prev-week-btn" class="nav-btn">◀ Prev Week</button>
+                    <h3 id="week-display">🗓️ Weekly Schedule</h3>
+                    <button id="next-week-btn" class="nav-btn">Next Week ▶</button>
+                </div>
+                <!-- Overlay Filters -->
+                <div class="overlay-filters">
+                    <div class="overlay-filter-dropdown">
+                        <button class="overlay-filter-btn" id="student-overlay-btn">
+                            Overlay Student Schedules ▼
+                        </button>
+                        <div class="overlay-dropdown-content" id="student-overlay-dropdown">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                    <div class="overlay-filter-dropdown">
+                        <button class="overlay-filter-btn" id="lecturer-overlay-btn">
+                            Overlay Lecturer Schedules ▼
+                        </button>
+                        <div class="overlay-dropdown-content" id="lecturer-overlay-dropdown">
+                            <!-- Populated by JS -->
+                        </div>
                     </div>
                     <div id="new-session-action" class="session-actions">
                         <button id="add-session-btn" class="primary-btn">➕ New Session</button>
                     </div>
                 </div>
 
-                <table id="weekly-schedule-table">
-                    <thead>
-                        <tr id="schedule-header-days">
-                            <th>Time</th>
-                            <th data-day="0">Sunday</th>
-                            <th data-day="1">Monday</th>
-                            <th data-day="2">Tuesday</th>
-                            <th data-day="3">Wednesday</th>
-                            <th data-day="4">Thursday</th>
-                            <th data-day="5">Friday</th>
-                            <th data-day="6">Saturday</th>
-                        </tr>
-                    </thead>
-                    <tbody id="schedule-body">
-                        <tr data-time="07:00">
-                            <td>07:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr data-time="08:00">
-                            <td>08:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr data-time="09:00">
-                            <td>09:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr data-time="10:00">
-                            <td>10:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr data-time="11:00">
-                            <td>11:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr data-time="12:00">
-                            <td>12:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr data-time="13:00">
-                            <td>13:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr data-time="14:00">
-                            <td>14:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr data-time="15:00">
-                            <td>15:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr data-time="16:00">
-                            <td>16:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr data-time="17:00">
-                            <td>17:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr data-time="18:00">
-                            <td>18:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr data-time="19:00">
-                            <td>19:00</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="schedule-table-scroll" style="overflow-x: auto; max-height: 600px; overflow-y: auto;">
+                    <table id="weekly-schedule-table" style="min-width: 800px;">
+                        <thead>
+                            <tr id="schedule-header-days">
+                                <th style="width: 60px;">Time</th>
+                                <th data-day="0">Sunday</th>
+                                <th data-day="1">Monday</th>
+                                <th data-day="2">Tuesday</th>
+                                <th data-day="3">Wednesday</th>
+                                <th data-day="4">Thursday</th>
+                                <th data-day="5">Friday</th>
+                                <th data-day="6">Saturday</th>
+                            </tr>
+                        </thead>
+                        <tbody id="schedule-body">
+                            <!-- 06:00 - 00:00 (19 rows) -->
+                            <tr data-time="06:00">
+                                <td>06:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="07:00">
+                                <td>07:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="08:00">
+                                <td>08:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="09:00">
+                                <td>09:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="10:00">
+                                <td>10:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="11:00">
+                                <td>11:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="12:00">
+                                <td>12:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="13:00">
+                                <td>13:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="14:00">
+                                <td>14:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="15:00">
+                                <td>15:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="16:00">
+                                <td>16:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="17:00">
+                                <td>17:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="18:00">
+                                <td>18:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="19:00">
+                                <td>19:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="20:00">
+                                <td>20:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="21:00">
+                                <td>21:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="22:00">
+                                <td>22:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-time="23:00">
+                                <td>23:00</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
 

@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.RPL.BimbinganKu.data.Akademik;
 import com.RPL.BimbinganKu.data.Lecturer;
 import com.RPL.BimbinganKu.data.Student;
 import com.RPL.BimbinganKu.data.User;
@@ -13,6 +14,7 @@ import com.RPL.BimbinganKu.repository.LecturerRepository;
 import com.RPL.BimbinganKu.repository.StudentRepository;
 
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +29,34 @@ public class HomeController {
 
     @Autowired
     private com.RPL.BimbinganKu.repository.AkademikRepository akademikRepo;
+
+    @Autowired
+    private com.RPL.BimbinganKu.repository.TopicRepository topicRepo;
+
+    private static final int REQUIRED_SESSIONS = 3;
+
+    /**
+     * Helper method to determine current academic period (UTS, UAS, or NONE).
+     */
+    private String determineCurrentPeriod(Akademik ak) {
+        if (ak == null)
+            return "NONE";
+
+        LocalDate today = LocalDate.now();
+        LocalDate semStart = ak.getSemesterStart();
+        LocalDate utsEnd = ak.getUtsDeadline();
+        LocalDate uasEnd = ak.getUasDeadline();
+
+        if (semStart == null || utsEnd == null || uasEnd == null)
+            return "NONE";
+
+        if (!today.isBefore(semStart) && !today.isAfter(utsEnd)) {
+            return "UTS";
+        } else if (today.isAfter(utsEnd) && !today.isAfter(uasEnd)) {
+            return "UAS";
+        }
+        return "NONE";
+    }
 
     @GetMapping("/student/home")
     public String showStudentDashboard(HttpSession session, Model model) {
@@ -44,14 +74,31 @@ public class HomeController {
             model.addAttribute("npm", student.getId());
             model.addAttribute("sessionCountUTS", student.getTotalGuidanceUTS());
             model.addAttribute("sessionCountUAS", student.getTotalGuidanceUAS());
+
+            // Get the student's main lecturer from their Topic assignment
+            String mainLecturerCode = topicRepo.findLecturerCodeByNpm(student.getId());
+            model.addAttribute("mainLecturerCode", mainLecturerCode != null ? mainLecturerCode : "");
         }
 
-        // Add Academic Info
+        model.addAttribute("requiredSessions", REQUIRED_SESSIONS);
+
         akademikRepo.findCurrentAkademik().ifPresent(ak -> {
             model.addAttribute("currentYear", ak.getYear());
             model.addAttribute("currentSemester", ak.getSemester());
             model.addAttribute("utsDeadline", ak.getUtsDeadline());
             model.addAttribute("uasDeadline", ak.getUasDeadline());
+            model.addAttribute("semesterStart", ak.getSemesterStart());
+
+            String currentPeriod = determineCurrentPeriod(ak);
+            int currentSessionCount = 0;
+            if ("UTS".equals(currentPeriod) && student != null) {
+                currentSessionCount = student.getTotalGuidanceUTS();
+            } else if ("UAS".equals(currentPeriod) && student != null) {
+                currentSessionCount = student.getTotalGuidanceUAS();
+            }
+
+            model.addAttribute("currentPeriod", currentPeriod);
+            model.addAttribute("currentSessionCount", currentSessionCount);
         });
 
         return "student";
@@ -73,21 +120,21 @@ public class HomeController {
             model.addAttribute("userName", lecturerOpt.get().getName());
             model.addAttribute("lecturerCode", lecturerCode);
 
-            // Task 4: Fetch all other lecturers for "Additional Lecturer" dropdown
             List<Lecturer> allLecturers = lecturerRepo.findAll();
-            // Optional: Filter out current lecturer?
-            // allLecturers.removeIf(l -> l.getLecturerCode().equals(lecturerCode));
             model.addAttribute("allLecturers", allLecturers);
         } else {
             return "redirect:/login";
         }
 
-        // Academic Info & Deadlines
+        model.addAttribute("requiredSessions", REQUIRED_SESSIONS);
+
         akademikRepo.findCurrentAkademik().ifPresent(ak -> {
             model.addAttribute("currentYear", ak.getYear());
             model.addAttribute("currentSemester", ak.getSemester());
             model.addAttribute("utsDeadline", ak.getUtsDeadline());
             model.addAttribute("uasDeadline", ak.getUasDeadline());
+            model.addAttribute("semesterStart", ak.getSemesterStart());
+            model.addAttribute("currentPeriod", determineCurrentPeriod(ak));
         });
 
         return "lecturer";
@@ -103,7 +150,6 @@ public class HomeController {
 
         model.addAttribute("adminName", user.getName());
 
-        // Add Academic Info
         akademikRepo.findCurrentAkademik().ifPresent(ak -> {
             model.addAttribute("currentYear", ak.getYear());
             model.addAttribute("currentSemester", ak.getSemester());
@@ -114,7 +160,6 @@ public class HomeController {
         return "admin";
     }
 
-    // --- Inbox Endpoint ---
     @GetMapping("/inbox")
     public String showInbox(@RequestParam(required = false) String role, HttpSession session, Model model) {
         User user = (User) session.getAttribute("loggedUser");
@@ -123,7 +168,6 @@ public class HomeController {
             return "redirect:/login";
         }
 
-        // Pass role to the view so 'Back to Dashboard' link works correctly
         model.addAttribute("role", role != null ? role : "student");
         model.addAttribute("userName", user.getName());
 

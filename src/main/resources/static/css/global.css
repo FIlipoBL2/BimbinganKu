@@ -5,7 +5,8 @@ body {
     padding: 0;
     background-color: #f4f4f9;
     color: #333;
-    padding-top: 80px; /* Add padding to body so content doesn't hide under header */
+    padding-top: 80px;
+    /* Add padding to body so content doesn't hide under header */
 
 }
 
@@ -18,12 +19,15 @@ header {
     align-items: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-    position: fixed; /*Fixes position of header on the screen*/
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;   /* Prevent shrinking */
-    z-index: 1000; /* Stay above content */
-    box-sizing: border-box;  /* ensures padding doesn’t make it overflow */
+    width: 100%;
+    /* Prevent shrinking */
+    z-index: 1000;
+    /* Stay above content */
+    box-sizing: border-box;
+    /* ensures padding doesn’t make it overflow */
 
 }
 
@@ -32,12 +36,12 @@ header .logo {
     font-weight: bold;
 }
 
-header nav{
+header nav {
     display: flex;
 }
 
-header nav div a{
-    font-size:x-large;
+header nav div a {
+    font-size: x-large;
 }
 
 
@@ -47,8 +51,8 @@ header nav a {
     margin-left: 20px;
     padding: 5px 10px;
     border-radius: 4px;
-    transition: background-color 0.3s;
-    font-size:x-large;
+
+    font-size: x-large;
 }
 
 header nav a:hover {
@@ -81,12 +85,19 @@ header nav a:hover {
 
 .eligibility-bar {
     height: 100%;
-    transition: width 0.5s ease;
 }
 
-.eligibility-bar.red { background-color: #dc3545; }
-.eligibility-bar.blue { background-color: #007bff; }
-.eligibility-bar.green { background-color: #28a745; }
+.eligibility-bar.red {
+    background-color: #dc3545;
+}
+
+.eligibility-bar.blue {
+    background-color: #007bff;
+}
+
+.eligibility-bar.green {
+    background-color: #28a745;
+}
 
 /* --- Notification Area (Lecturer/Student) --- */
 .notification-area {
@@ -118,7 +129,7 @@ header nav a:hover {
     right: 0;
     background-color: white;
     min-width: 250px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 10;
     border-radius: 4px;
     padding: 10px;
@@ -144,30 +155,38 @@ header nav a:hover {
 /* The .scheduling-section itself has white background, let's keep it clean */
 .scheduling-section {
     margin-top: 30px;
-    background-color: white; /* Retained background color */
-    padding: 20px; /* Retained padding */
-    border-radius: 8px; /* Retained border radius */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Retained shadow */
+    background-color: white;
+    /* Retained background color */
+    padding: 20px;
+    /* Retained padding */
+    border-radius: 8px;
+    /* Retained border radius */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Retained shadow */
 }
 
 .schedule-page-layout {
-    display: flex; /* FIX: Enable flex layout for side-by-side elements */
+    display: flex;
     gap: 25px;
     /* Removed margin-top: 20px here, as it's already on .scheduling-section */
-    align-items: flex-start; /* FIX: Ensures both columns start at the top */
+    align-items: flex-start;
 }
 
 /* Apply specific dimensions only within the new layout */
 .schedule-page-layout .mini-calendar-container {
-    flex: 0 0 300px; /* Do not grow, do not shrink, fixed width */
+    flex: 0 0 300px;
+    /* Do not grow, do not shrink, fixed width */
     /* Add position: sticky to keep it visible while scrolling the schedule (Optional but highly recommended) */
     position: sticky;
-    top: 100px; /* Adjust based on your header height (80px + margin) */
+    top: 100px;
+    /* Adjust based on your header height (80px + margin) */
 }
 
 .schedule-page-layout .schedule-table-wrapper {
-    flex-grow: 1; /* Allow the schedule to take up the remaining width */
-    width: auto; /* Remove fixed width calculation */
+    flex-grow: 1;
+    /* Allow the schedule to take up the remaining width */
+    width: auto;
+    /* Remove fixed width calculation */
 }
 
 .schedule-controls {
@@ -189,7 +208,7 @@ header nav a:hover {
     background-color: #f9f9f9;
     cursor: pointer;
     border-radius: 4px;
-    transition: background-color 0.2s;
+
 }
 
 #calendar-days button.selected {
@@ -200,7 +219,7 @@ header nav a:hover {
 
 .primary-btn {
     padding: 10px 15px;
-    background-color: #28a745; 
+    background-color: #28a745;
     color: white;
     border: none;
     border-radius: 4px;
@@ -213,23 +232,24 @@ header nav a:hover {
 }
 
 /* --- Schedule/Data Table --- */
-.schedule-view h3, .data-table-container h3 {
+.schedule-view h3,
+.data-table-container h3 {
     border-bottom: 2px solid #eee;
     padding-bottom: 10px;
     margin-top: 0;
-    /* FIX: Ensure there's no massive margin after the schedule-view h3 */
-    margin-bottom: 10px; 
+    margin-bottom: 10px;
 }
 
-#weekly-schedule-table, .data-table {
+#weekly-schedule-table,
+.data-table {
     width: 100%;
     border-collapse: collapse;
-    /* FIX: Set a small margin-top to eliminate the large gap */
-    margin-top: 5px; 
-    table-layout: fixed; /* For uniform column width */
+    margin-top: 5px;
+    table-layout: fixed;
+    /* For uniform column width */
 }
 
-#weekly-schedule-table th, 
+#weekly-schedule-table th,
 #weekly-schedule-table td,
 .data-table th,
 .data-table td {
@@ -238,20 +258,23 @@ header nav a:hover {
     text-align: center;
 }
 
-#weekly-schedule-table th, .data-table th {
+#weekly-schedule-table th,
+.data-table th {
     background-color: #f2f2f2;
     color: #555;
 }
 
 /* Highlighting the selected day column */
-#weekly-schedule-table th.highlighted, 
+#weekly-schedule-table th.highlighted,
 #weekly-schedule-table td.highlighted {
-    background-color: #fffacd; /* Light yellow highlight */
+    background-color: #fffacd;
+    /* Light yellow highlight */
     font-weight: bold;
 }
 
 .session {
-    background-color: #d1ecf1; /* Light blue for sessions */
+    background-color: #d1ecf1;
+    /* Light blue for sessions */
     color: #0c5460;
     cursor: pointer;
 }
@@ -268,7 +291,7 @@ header nav a:hover {
     cursor: pointer;
     border-radius: 4px 4px 0 0;
     margin-right: 5px;
-    transition: background-color 0.2s;
+
 }
 
 .tab-menu button:hover {
@@ -285,13 +308,14 @@ header nav a:hover {
 /* --- Modal Styles --- */
 .modal {
     position: fixed;
-    z-index: 100; /* High z-index to overlay everything */
+    z-index: 100;
+    /* High z-index to overlay everything */
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
@@ -320,14 +344,15 @@ header nav a:hover {
 }
 
 /* Form elements within modal */
-#session-form label, #import-form label {
+#session-form label,
+#import-form label {
     display: block;
     margin-top: 10px;
     font-weight: bold;
 }
 
-#session-form input, 
-#session-form select, 
+#session-form input,
+#session-form select,
 #session-form textarea,
 #import-form input,
 #import-form select {
@@ -340,7 +365,8 @@ header nav a:hover {
     box-sizing: border-box;
 }
 
-#save-session-btn, #execute-import-btn {
+#save-session-btn,
+#execute-import-btn {
     width: 100%;
     margin-top: 10px;
 }
@@ -359,14 +385,17 @@ header nav a:hover {
 /* --- Custom Logout Modal Styles --- */
 .modal-actions {
     display: flex;
-    justify-content: flex-end; /* Pushes buttons to the right */
-    gap: 10px; /* Space between buttons */
+    justify-content: flex-end;
+    /* Pushes buttons to the right */
+    gap: 10px;
+    /* Space between buttons */
     margin-top: 20px;
 }
 
 /* Optional: Style the primary and cancel buttons */
 #confirm-logout-btn {
-    background-color: #dc3545; /* Red for Logout */
+    background-color: #dc3545;
+    /* Red for Logout */
     color: white;
     border: none;
     padding: 10px 15px;
@@ -375,7 +404,8 @@ header nav a:hover {
 }
 
 #cancel-logout-btn {
-    background-color: #6c757d; /* Grey for Cancel */
+    background-color: #6c757d;
+    /* Grey for Cancel */
     color: white;
     border: none;
     padding: 10px 15px;
@@ -388,17 +418,17 @@ header nav a:hover {
     display: flex;
     gap: 25px;
     margin-top: 20px;
-    align-items: flex-start; 
+    align-items: flex-start;
 }
 
 /* Apply specific dimensions only within the new layout */
 .schedule-page-layout .mini-calendar-container {
-    flex: 0 0 300px; 
+    flex: 0 0 300px;
 }
 
 .schedule-page-layout .schedule-table-wrapper {
-    flex-grow: 1; 
-    width: calc(100% - 325px); 
+    flex-grow: 1;
+    width: calc(100% - 325px);
 }
 
 /* --- Mini Calendar Styling (The Widget) --- */
@@ -422,7 +452,8 @@ header nav a:hover {
     cursor: pointer;
     font-size: 1.2em;
     padding: 0 5px;
-    color: #007bff; /* Blue color for arrows */
+    color: #007bff;
+    /* Blue color for arrows */
 }
 
 .calendar-weekdays,
@@ -433,7 +464,8 @@ header nav a:hover {
 }
 
 .calendar-weekdays span {
-    color: #6c757d; /* Grey color for days of the week */
+    color: #6c757d;
+    /* Grey color for days of the week */
     font-size: 0.8em;
     padding: 5px 0;
 }
@@ -442,7 +474,7 @@ header nav a:hover {
     padding: 8px 0;
     cursor: pointer;
     border-radius: 50%;
-    transition: background-color 0.2s;
+
 }
 
 .calendar-days div:hover:not(.empty) {
@@ -450,71 +482,79 @@ header nav a:hover {
 }
 
 .calendar-days .current-day {
-    background-color: #007bff; /* Highlight today's date */
+    background-color: #007bff;
+    /* Highlight today's date */
     color: white;
     font-weight: bold;
 }
 
 .calendar-days .empty {
-    visibility: hidden; /* Hide days from previous/next month */
+    visibility: hidden;
+    /* Hide days from previous/next month */
 }
 
 /* --- New Style for Selected Day on Mini Calendar --- */
 .calendar-days .selected-day {
-    background-color: #ffc107; /* Bright highlight color (Yellow/Orange) */
+    background-color: #ffc107;
+    /* Bright highlight color (Yellow/Orange) */
     color: #333;
     font-weight: bold;
-    border: 2px solid #333; /* Make it pop */
-    padding: 6px 0; 
+    border: 2px solid #333;
+    /* Make it pop */
+    padding: 6px 0;
 }
 
 /* Ensure the selected day highlight works on 'today's' date too */
 .calendar-days .current-day.selected-day {
-    background-color: #ffc107 !important; 
+    background-color: #ffc107 !important;
     color: #333 !important;
 }
 
 /* --- Style for the Selected Column in the Schedule Table --- */
 /* Highlights the header of the selected day */
 #schedule-table th.selected-column {
-    background-color: #ffc107; /* Matches the mini-calendar highlight */
+    background-color: #ffc107;
+    /* Matches the mini-calendar highlight */
     color: #333;
     font-weight: bold;
 }
 
 /* Highlights the cells (TDs) of the selected day's column */
 #schedule-table td.selected-column {
-    background-color: #fff9e6; /* Lighter background for the column body */
+    background-color: #fff9e6;
+    /* Lighter background for the column body */
 }
 
 /* --- Style for the Selected Day on Mini Calendar --- */
 .calendar-days .selected-day {
-    background-color: #ffc107; /* Bright highlight color (Yellow/Orange) */
+    background-color: #ffc107;
+    /* Bright highlight color (Yellow/Orange) */
     color: #333;
     font-weight: bold;
-    border: 2px solid #333; /* Make it pop */
-    padding: 6px 0; 
+    border: 2px solid #333;
+    /* Make it pop */
+    padding: 6px 0;
 }
 
 /* Ensure the selected day highlight works on 'today's' date too */
 .calendar-days .current-day.selected-day {
-    background-color: #ffc107 !important; 
+    background-color: #ffc107 !important;
     color: #333 !important;
 }
 
 /* --- Style for the Selected Column in the Schedule Table --- */
 /* Highlights the header of the selected day */
-/* CORRECTED SELECTOR: Targets #weekly-schedule-table */
-#weekly-schedule-table th.selected-column { 
-    background-color: #ffc107; /* Matches the mini-calendar highlight */
+#weekly-schedule-table th.selected-column {
+    background-color: #ffc107;
+    /* Matches the mini-calendar highlight */
     color: #333;
     font-weight: bold;
 }
 
 /* Highlights the cells (TDs) of the selected day's column */
-/* CORRECTED SELECTOR: Targets #weekly-schedule-table */
-#weekly-schedule-table td.selected-column { 
-    background-color: #fff9e6; /* Lighter background for the column body */
+#weekly-schedule-table td.selected-column {
+    background-color: #fff9e6;
+    /* Lighter background for the column body */
 }
 
 /* --- New/Updated Schedule Cell Styles (Add to global.css) --- */
@@ -526,32 +566,36 @@ header nav a:hover {
     font-size: 0.8em;
     padding: 2px;
     border-radius: 4px;
-    transition: all 0.2s ease-in-out; 
-    /* FIX: Use flexbox to center content vertically/horizontally */
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100%; /* Important: makes the content fill the cell height */
-    box-sizing: border-box; /* Include padding in the height */
+    height: 100%;
+    /* Important: makes the content fill the cell height */
+    box-sizing: border-box;
+    /* Include padding in the height */
 }
 
 /* Style for Guidance Sessions (Existing) */
 #weekly-schedule-table td.session {
-    background-color: #ffc107; /* Orange/Yellow */
+    background-color: #ffc107;
+    /* Orange/Yellow */
     color: #333;
     font-weight: bold;
 }
 
 /* New Style for Lecturer Teaching Schedule (Busy time) */
 #weekly-schedule-table td.teaching-schedule {
-    background-color: #28a745; /* Green */
+    background-color: #28a745;
+    /* Green */
     color: white;
 }
 
 /* New Style for Student Study Schedule (Busy time) */
 #weekly-schedule-table td.study-schedule {
-    background-color: #17a2b8; /* Cyan/Light Blue */
+    background-color: #17a2b8;
+    /* Cyan/Light Blue */
     color: white;
 }
 
@@ -561,7 +605,8 @@ header nav a:hover {
     visibility: hidden;
     opacity: 0;
     padding: 0;
-    pointer-events: none; /* Disable interaction when hidden */
+    pointer-events: none;
+    /* Disable interaction when hidden */
 }
 
 /* Ensure empty cells look normal */
@@ -591,12 +636,13 @@ header nav a:hover {
     font-weight: 500;
     text-decoration: none;
     position: relative;
-    transition: color 0.2s;
+
 }
 
 .tab-btn-admin.active {
     font-weight: bold;
-    color: #007bff; /* Use primary blue color */
+    color: #007bff;
+    /* Use primary blue color */
 }
 
 .tab-btn-admin.active::after {
@@ -604,7 +650,8 @@ header nav a:hover {
     position: absolute;
     width: 100%;
     height: 3px;
-    background: #007bff; /* Matches header and primary blue */
+    background: #007bff;
+    /* Matches header and primary blue */
     left: 0;
     bottom: -10px;
     border-radius: 2px;
@@ -636,8 +683,9 @@ header nav a:hover {
     border: 1px solid #e5e5e5;
     border-radius: 10px;
     text-align: center;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.05);
-    background-color: #fff; /* Explicitly set for new cards */
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+    background-color: #fff;
+    /* Explicitly set for new cards */
 }
 
 .scheduling-section .card h3 {
@@ -645,7 +693,8 @@ header nav a:hover {
     font-weight: 600;
     color: #333;
     margin-bottom: 20px;
-    margin-top: 0; /* Override potential margin from global h3 */
+    margin-top: 0;
+    /* Override potential margin from global h3 */
 }
 
 /* Button Row (from AdminStyle.css) */
@@ -663,21 +712,25 @@ header nav a:hover {
     font-weight: 600;
     cursor: pointer;
     border-radius: 5px;
-    transition: background-color 0.2s;
+
 }
 
 .btn.blue {
-    background: #007bff; /* Use global blue for consistency */
+    background: #007bff;
+    /* Use global blue for consistency */
     color: white;
 }
+
 .btn.blue:hover {
     background: #0056b3;
 }
 
 .btn.green {
-    background: #28a745; /* Use global green for consistency */
+    background: #28a745;
+    /* Use global green for consistency */
     color: white;
 }
+
 .btn.green:hover {
     background: #218838;
 }
@@ -691,22 +744,27 @@ header nav a:hover {
     font-size: 14px;
     margin-top: 15px;
     outline: none;
-    box-sizing: border-box; /* Ensures padding is inside the width */
+    box-sizing: border-box;
+    /* Ensures padding is inside the width */
 }
 
 /* --- CRITICAL MODAL STYLES (REQUIRED for both import and logout modals) --- */
 
 /* Base Modal Container: Fixes position, covers screen, and centers content */
 .modal {
-    position: fixed; /* Makes it overlay the entire viewport */
-    z-index: 2000; /* CRITICAL: Must be higher than the header (z-index: 1000) */
+    position: fixed;
+    /* Makes it overlay the entire viewport */
+    z-index: 2000;
+    /* CRITICAL: Must be higher than the header (z-index: 1000) */
     left: 0;
     top: 0;
-    width: 100%; 
+    width: 100%;
     height: 100%;
-    overflow: auto; 
-    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
-    display: flex; /* Use flexbox to center the content box */
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    /* Semi-transparent black background */
+    display: flex;
+    /* Use flexbox to center the content box */
     justify-content: center;
     align-items: center;
 }
@@ -721,9 +779,9 @@ header nav a:hover {
     background-color: #fefefe;
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    width: 90%; 
-    max-width: 450px; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 450px;
     text-align: center;
 }
 
@@ -754,7 +812,7 @@ header nav a:hover {
     display: flex;
     align-items: center;
     gap: 15px;
-    transition: background-color 0.2s;
+
     cursor: pointer;
 }
 
@@ -764,8 +822,10 @@ header nav a:hover {
 
 /* Style for unread messages */
 .inbox-item.unread {
-    background-color: #e6f7ff; /* Light blue background for unread */
-    border-left: 5px solid #007bff; /* Blue marker */
+    background-color: #e6f7ff;
+    /* Light blue background for unread */
+    border-left: 5px solid #007bff;
+    /* Blue marker */
     font-weight: bold;
 }
 
@@ -805,7 +865,7 @@ header nav a:hover {
     padding: 5px 10px;
     border-radius: 4px;
     cursor: pointer;
-    transition: all 0.2s;
+
     margin-left: 5px;
     font-size: 0.85em;
 }
@@ -834,7 +894,7 @@ header nav a:hover {
     padding: 8px 15px;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s;
+
 }
 
 .inbox-filter-bar button:hover {
@@ -846,8 +906,230 @@ header nav a:hover {
     gap: 10px;
 }
 
-.inbox-filter-bar select, .inbox-filter-bar input[type="text"] {
+.inbox-filter-bar select,
+.inbox-filter-bar input[type="text"] {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+/* ================================================
+   STUDENT LIST (Mahasiswa) - Lecturer Dashboard
+   ================================================ */
+.student-list-section {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.student-list-section h3 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.student-search {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.student-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.student-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #eee;
+
+}
+
+.student-card:hover {
+    background: #f0f0f0;
+}
+
+.student-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.student-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.student-npm {
+    font-size: 12px;
+    color: #888;
+}
+
+.student-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.session-count-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Eligibility Dot Colors */
+.eligibility-red {
+    background-color: #dc3545;
+}
+
+.eligibility-blue {
+    background-color: #007bff;
+}
+
+.eligibility-green {
+    background-color: #28a745;
+}
+
+/* ================================================
+   BLOCKED SCHEDULE - Striped Pattern
+   ================================================ */
+.blocked-schedule {
+    background: repeating-linear-gradient(45deg,
+            #e0e0e0,
+            #e0e0e0 5px,
+            #f5f5f5 5px,
+            #f5f5f5 10px) !important;
+    cursor: not-allowed !important;
+    color: #333 !important;
+}
+
+.blocked-schedule small {
+    color: #333;
+    font-style: italic;
+}
+
+/* Teaching schedule - different striped pattern */
+.teaching-schedule {
+    background: repeating-linear-gradient(45deg,
+            #d0e8ff,
+            #d0e8ff 5px,
+            #e8f4ff 5px,
+            #e8f4ff 10px) !important;
+    color: #333 !important;
+}
+
+.teaching-schedule small {
+    color: #333;
+}
+
+/* Session colors */
+.session {
+    background-color: #4CAF50 !important;
+    color: #333 !important;
+}
+
+/* ================================================
+   WEEK NAVIGATION BUTTONS
+   ================================================ */
+.nav-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+
+}
+
+.nav-btn:hover {
+    background: #0056b3;
+}
+
+/* ================================================
+   OVERLAY FILTER CONTROLS
+   ================================================ */
+.overlay-filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.overlay-filter-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.overlay-filter-btn {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.overlay-filter-btn:hover {
+    background: #f5f5f5;
+}
+
+.overlay-dropdown-content {
+    display: none;
+    position: absolute;
+    background: white;
+    min-width: 200px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    z-index: 100;
+    padding: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.overlay-dropdown-content.show {
+    display: block;
+}
+
+.overlay-checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.overlay-checkbox-item:hover {
+    background: #f5f5f5;
+}
+
+.overlay-checkbox-item input[type="checkbox"] {
+    margin-right: 10px;
+    width: 16px;
+    height: 16px;
+}
+
+.overlay-checkbox-item label {
+    cursor: pointer;
+    flex: 1;
 }
