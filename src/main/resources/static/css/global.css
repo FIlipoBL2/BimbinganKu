@@ -24,7 +24,7 @@ header {
     left: 0;
     width: 100%;
     /* Prevent shrinking */
-    z-index: 1000;
+    z-index: 10;
     /* Stay above content */
     box-sizing: border-box;
     /* ensures padding doesn’t make it overflow */
@@ -130,7 +130,7 @@ header nav a:hover {
     background-color: white;
     min-width: 250px;
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 10;
+    z-index: 1;
     border-radius: 4px;
     padding: 10px;
 }
@@ -304,22 +304,13 @@ header nav a:hover {
     border-color: #007bff;
 }
 
-/* Ensure tab buttons sit above any modal overlay or table rows */
-.tab-menu button,
-.tab-btn-admin,
-.button-row .btn,
-.primary-btn,
-.import-trigger {
-    position: relative;
-    z-index: 2100;
-}
 
 
 /* --- Modal Styles --- */
 .modal {
     position: fixed;
-    z-index: 100;
-    /* High z-index to overlay everything */
+    z-index: 20;
+    /* Must be higher than header (z-index: 10) */
     left: 0;
     top: 0;
     width: 100%;
@@ -764,8 +755,8 @@ header nav a:hover {
 .modal {
     position: fixed;
     /* Makes it overlay the entire viewport */
-    z-index: 2000;
-    /* CRITICAL: Must be higher than the header (z-index: 1000) */
+    z-index: 20;
+    /* Higher than the header (z-index: 10) */
     left: 0;
     top: 0;
     width: 100%;
@@ -793,6 +784,8 @@ header nav a:hover {
     width: 90%;
     max-width: 450px;
     text-align: center;
+    position: relative;
+    z-index: 21;
 }
 
 .modal-content h3 {
@@ -1111,7 +1104,7 @@ header nav a:hover {
     min-width: 200px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     border-radius: 8px;
-    z-index: 100;
+    z-index: 2;
     padding: 10px;
     max-height: 300px;
     overflow-y: auto;
