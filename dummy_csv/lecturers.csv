@@ -1,4 +1,4 @@
 LecturerCode,Name,Email,Password
-L005,Dr. Alice Brown,alice.brown@university.edu,password123
-L006,Prof. Robert Taylor,robert.taylor@university.edu,password123
-L007,Dr. Sarah Miller,sarah.miller@university.edu,password123
+L001,Loid Forger,loid@spy.com,$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlQExBE5O1Q.3k
+L002,Sylvia Sherwood,sylvia@wise.com,$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlQExBE5O1Q.3k
+L003,Henry Henderson,elegant@eden.edu,$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlQExBE5O1Q.3k

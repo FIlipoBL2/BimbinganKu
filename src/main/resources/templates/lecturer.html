@@ -192,13 +192,7 @@
             <div class="inbox-area">
                 <a th:href="@{/inbox(role='lecturer')}" id="inbox-link" title="Inbox">✉️ Inbox</a>
             </div>
-            <div class="notification-area" id="notification-area">
-                <span id="notification-bell" role="button">🔔</span>
-                <span id="unread-count" class="badge hidden">0</span>
-                <div id="notification-dropdown" class="dropdown-content hidden">
-                    <p class="empty-message">No unread messages.</p>
-                </div>
-            </div>
+
             <a href="#" id="logout-btn">Logout</a>
         </nav>
     </header>
@@ -216,7 +210,7 @@
             <p>You have <strong>Active Sessions</strong> this week.</p>
         </section>
 
-        <section class="scheduling-section schedule-page-layout">
+        <section id="main-schedule-container" class="scheduling-section schedule-page-layout">
             <div class="mini-calendar-container">
                 <div id="mini-calendar" class="calendar-card">
                     <div class="calendar-header">
@@ -245,12 +239,16 @@
             <div class="schedule-table-wrapper">
                 <div class="schedule-nav-header"
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <button id="prev-week-btn" class="nav-btn">◀ Prev Week</button>
+
                     <h3 id="week-display">🗓️ Weekly Schedule</h3>
-                    <button id="next-week-btn" class="nav-btn">Next Week ▶</button>
                 </div>
                 <!-- Overlay Filters -->
                 <div class="overlay-filters">
+                    <div class="flex items-center space-x-4">
+                <span id="current-week-display" class="text-lg font-medium text-gray-700 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+                    <!-- Week Range -->
+                </span>
+            </div>
                     <div class="overlay-filter-dropdown">
                         <button class="overlay-filter-btn" id="student-overlay-btn">
                             Overlay Student Schedules ▼
@@ -480,6 +478,14 @@
                 <button class="tab-btn" data-tab="history">Session History</button>
             </div>
 
+
+
+            <!-- Week Header -->
+            <div class="schedule-header">
+                <h2 id="list-schedule-header">Weekly Schedule</h2>
+                <span class="week-display" id="week-display-history"></span>
+            </div>
+
             <!-- List Filter -->
             <div class="list-filter-bar">
                 <label>Filter by Student:
@@ -518,7 +524,7 @@
                 <label for="session-date">Date:</label>
                 <input type="date" id="session-date" required>
                 <label for="session-time">Time:</label>
-                <input type="time" id="session-time" step="60" required>
+                <input type="time" id="session-time" step="any" required>
                 <label for="session-location">Location:</label>
                 <select id="session-location" required>
                     <option value="Lecturer Room">Lecturer Room</option>
@@ -540,8 +546,11 @@
                     </option>
                 </select>
 
-                <button type="submit" id="save-session-btn" class="primary-btn">Save Session</button>
-                <button type="button" id="delete-session-btn" class="delete-btn hidden">Delete</button>
+                <div class="modal-actions">
+                    <button type="button" id="delete-session-btn" class="delete-btn hidden">Delete</button>
+                    <button type="button" id="confirm-delete-btn" class="delete-btn hidden" style="background-color: #c82333;">Confirm Delete</button>
+                    <button type="submit" id="save-session-btn" class="primary-btn">Save Session</button>
+                </div>
             </form>
         </div>
     </div>

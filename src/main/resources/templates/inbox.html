@@ -27,6 +27,16 @@
         
         .inbox-filter-bar { display: flex; justify-content: space-between; margin-bottom: 20px; }
         .filter-group { display: flex; gap: 10px; }
+        .action-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .action-btn:hover { background-color: #0056b3; }
     </style>
 </head>
 <body>
@@ -53,7 +63,8 @@
                     <option value="unread">Unread Only</option>
                     <option value="read">Read Only</option>
                 </select>
-                <input type="text" id="search-inbox" placeholder="Search messages..." />
+                <!-- Hidden recipient ID -->
+                <input type="hidden" id="user-id" th:value="${recipientId}" />
             </div>
         </div>
 

@@ -175,13 +175,7 @@
             <div class="inbox-area">
                 <a th:href="@{/inbox(role='student')}" id="inbox-link" title="Inbox">✉️ Inbox</a>
             </div>
-            <div class="notification-area" id="notification-area">
-                <span id="notification-bell" role="button">🔔</span>
-                <span id="unread-count" class="badge hidden">0</span>
-                <div id="notification-dropdown" class="dropdown-content hidden">
-                    <p class="empty-message">No unread messages.</p>
-                </div>
-            </div>
+
             <a href="#" id="logout-btn">Logout</a>
         </nav>
     </header>
@@ -419,7 +413,7 @@
                 <label for="session-date">Date:</label>
                 <input type="date" id="session-date" required>
                 <label for="session-time">Time:</label>
-                <input type="time" id="session-time" step="60" required>
+                <input type="time" id="session-time" step="any" required>
                 <label for="session-location">Location:</label>
                 <select id="session-location" required>
                     <option value="Lecturer Room">Lecturer Room</option>
@@ -429,7 +423,32 @@
                 </select>
                 <input type="text" id="session-location-custom" placeholder="Enter custom location..."
                     style="display: none; margin-top: 5px;">
-                <button type="submit" id="save-session-btn" class="primary-btn">Save Session</button>
+                <label for="session-notes">Notes (From Lecturer):</label>
+                <textarea id="session-notes" rows="3" readonly placeholder="No notes yet..."></textarea>
+
+                <input type="hidden" id="main-lecturer-name-val" th:value="${mainLecturerName}">
+
+                <label for="session-main-lecturer">Main Lecturer:</label>
+                <input type="text" id="session-main-lecturer" readonly style="background-color: #f9f9f9; color: #555;">
+
+                <label for="session-additional-lecturer">Additional Lecturer (Optional):</label>
+                <select id="session-additional-lecturer">
+                    <option value="">-- None --</option>
+                    <th:block th:each="lecturer : ${allLecturers}">
+                        <option th:value="${lecturer.lecturerCode}" th:text="${lecturer.name}"></option>
+                    </th:block>
+                </select>
+
+                <div id="attendees-container">
+                    <label for="session-attendees">Attendees:</label>
+                    <input type="text" id="session-attendees" readonly placeholder="Loading..." style="background-color: #f9f9f9;">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="delete-session-btn" class="delete-btn hidden">Delete</button>
+                    <button type="button" id="confirm-delete-btn" class="delete-btn hidden" style="background-color: #c82333;">Confirm Delete</button>
+                    <button type="submit" id="save-session-btn" class="primary-btn">Save Session</button>
+                </div>
             </form>
         </div>
     </div>

@@ -78,9 +78,21 @@ public class HomeController {
             // Get the student's main lecturer from their Topic assignment
             String mainLecturerCode = topicRepo.findLecturerCodeByNpm(student.getId());
             model.addAttribute("mainLecturerCode", mainLecturerCode != null ? mainLecturerCode : "");
+            
+            String mainLecturerName = "";
+            if (mainLecturerCode != null && !mainLecturerCode.isEmpty()) {
+                 mainLecturerName = lecturerRepo.findByLecturerCode(mainLecturerCode)
+                                                .map(Lecturer::getName)
+                                                .orElse("Unknown");
+            }
+            model.addAttribute("mainLecturerName", mainLecturerName);
         }
 
         model.addAttribute("requiredSessions", REQUIRED_SESSIONS);
+
+        // Fetch all lecturers for the dropdown (Same as in Lecturer Home)
+        List<Lecturer> allLecturers = lecturerRepo.findAll();
+        model.addAttribute("allLecturers", allLecturers);
 
         akademikRepo.findCurrentAkademik().ifPresent(ak -> {
             model.addAttribute("currentYear", ak.getYear());
@@ -170,6 +182,7 @@ public class HomeController {
 
         model.addAttribute("role", role != null ? role : "student");
         model.addAttribute("userName", user.getName());
+        model.addAttribute("recipientId", user.getId()); // Pass User ID as recipientId
 
         return "inbox";
     }

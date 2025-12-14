@@ -1,9 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    // --- CONFIG ---
+
     const dayMap = { "Sunday": 0, "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5, "Saturday": 6 };
     let schedules = {};
     let weeklySchedules = [];
+    let studentOverlaySchedules = [];
+    let lecturerOverlaySchedules = [];
     let selectedDate = new Date();
     let currentFilter = 'all';
     let currentListFilter = 'all';
@@ -11,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const codeField = document.getElementById('user-id');
     const lecturerCode = codeField ? codeField.value : null;
 
-    // Elements
+
     const calendarGrid = document.getElementById('calendar-grid');
     const monthYearDisplay = document.getElementById('month-year-display');
     const prevMonthBtn = document.getElementById('prev-month');
@@ -19,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const weeklyTableBody = document.getElementById('schedule-body');
     const listFilterSelect = document.getElementById('list-student-filter');
 
-    // Overlay Filter Elements (declared early for fetchLecturers)
+
     const studentOverlayBtn = document.getElementById('student-overlay-btn');
     const studentOverlayDropdown = document.getElementById('student-overlay-dropdown');
     const lecturerOverlayBtn = document.getElementById('lecturer-overlay-btn');
@@ -27,13 +29,13 @@ document.addEventListener('DOMContentLoaded', function () {
     let selectedStudentOverlays = [];
     let selectedLecturerOverlays = [];
 
-    // List & Tab Elements
+
     const upcomingList = document.getElementById('upcoming-list');
     const historyList = document.getElementById('history-list');
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // Modal Elements
+
     const sessionModal = document.getElementById('session-modal');
     const sessionModalTitle = document.getElementById('modal-title') || document.querySelector('#session-modal h3');
     const closeBtn = sessionModal ? sessionModal.querySelector('.close-btn') : null;
@@ -44,15 +46,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const addSessionBtn = document.getElementById('add-session-btn');
     const deleteSessionBtn = document.getElementById('delete-session-btn');
 
-    // Time Restriction (6 AM - 11 PM, minute accuracy)
+
     const timeInput = document.getElementById('session-time');
     if (timeInput) {
         timeInput.min = "06:00";
         timeInput.max = "23:00";
-        timeInput.step = "60"; // Allow minute selection
+        timeInput.step = "60";
     }
 
-    // Week Navigation Helper (must be before its use)
+
     function getStartOfWeek(date) {
         const d = new Date(date);
         const day = d.getDay();
@@ -61,13 +63,13 @@ document.addEventListener('DOMContentLoaded', function () {
         return d;
     }
 
-    // Week Navigation Elements
+
     const weekDisplay = document.getElementById('week-display');
     const prevWeekBtn = document.getElementById('prev-week-btn');
     const nextWeekBtn = document.getElementById('next-week-btn');
     let currentWeekStart = getStartOfWeek(new Date());
 
-    // Hide Topic Input (field auto-populated from student selection)
+
     const topicInput = document.getElementById('session-topic');
     if (topicInput) {
         topicInput.style.display = 'none';
@@ -76,18 +78,18 @@ document.addEventListener('DOMContentLoaded', function () {
         if (topicLabel) topicLabel.style.display = 'none';
     }
 
-    // --- INIT ---
+
     if (lecturerCode) {
         console.log("Loaded Lecturer JS for Code:", lecturerCode);
         fetchStudents().then(() => {
             fetchSchedules();
         });
-        fetchLecturers(); // Fetch all lecturers for overlay filter
+        fetchLecturers();
     }
 
     renderCalendar(selectedDate);
 
-    // Fetch all lecturers for overlay filter
+
     function fetchLecturers() {
         fetch('/api/admin/lecturers')
             .then(res => res.json())
@@ -95,6 +97,49 @@ document.addEventListener('DOMContentLoaded', function () {
                 initLecturerOverlayFilter(lecturers);
             })
             .catch(err => console.error("Error loading lecturers:", err));
+    }
+
+
+    function updateOverlayData() {
+        // Clear current
+        studentOverlaySchedules = [];
+        lecturerOverlaySchedules = [];
+
+        const promises = [];
+
+        // Fetch selected Students
+        selectedStudentOverlays.forEach(npm => {
+            promises.push(fetch(`/api/student/schedule/${npm}`)
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(s => {
+                        // Adapt structure if needed
+                         let label = s.type === 'class' ? 'Class' : 'Student';
+                         let name = s.studentName || s.studentNpm || npm;
+                         let detail = (s.type !== 'class' && (s.topicCode || s.topic)) ? ` (${s.topicCode || s.topic})` : '';
+                         s.topic = `${label}: ${name}${detail}`;
+                         studentOverlaySchedules.push(s);
+                    });
+                }));
+        });
+
+        // Fetch selected Lecturers
+        selectedLecturerOverlays.forEach(code => {
+            promises.push(fetch(`/api/lecturer/schedule/${code}`)
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(s => {
+                         let label = s.type === 'class' ? 'Class' : 'Session';
+                         let detail = s.type === 'class' ? '' : ` (${s.topic})`;
+                         s.topic = `${label}: ${s.lecturerName || code}${detail}`;
+                         lecturerOverlaySchedules.push(s);
+                    });
+                }));
+        });
+
+        Promise.all(promises).then(() => {
+            renderWeeklySchedule(currentWeekStart);
+        });
     }
 
     function initLecturerOverlayFilter(lecturers) {
@@ -116,12 +161,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     selectedLecturerOverlays = selectedLecturerOverlays.filter(id => id !== l.lecturerCode);
                 }
-                renderWeeklySchedule(currentWeekStart);
+                updateOverlayData();
             });
         });
     }
 
-    // --- HELPERS ---
+
     function toLocalDateString(date) {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -138,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return target < today;
     }
 
-    // --- TABS LOGIC ---
+
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             tabBtns.forEach(b => b.classList.remove('active'));
@@ -154,8 +199,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // --- 1. FETCH STUDENTS ---
-    let allStudents = []; // Store for search filtering
+
+    let allStudents = [];
     const studentListContainer = document.getElementById('student-list-container');
     const studentSearch = document.getElementById('student-search');
     const currentPeriod = document.getElementById('current-period')?.value || 'UAS';
@@ -167,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(students => {
                 allStudents = students;
 
-                // Populate session modal student dropdown
+
                 if (studentSelect) {
                     studentSelect.innerHTML = '<option value="" disabled selected>Select Student</option>';
                     students.forEach(s => {
@@ -178,10 +223,22 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                 }
 
-                // Populate overlay filter dropdown
-                initStudentOverlayFilter(students);
+                if (listFilterSelect) {
+                    listFilterSelect.innerHTML = '<option value="all">All Students</option>';
+                    students.forEach(s => {
+                         const opt = document.createElement('option');
+                         opt.value = s.npm;
+                         opt.textContent = s.name;
+                         listFilterSelect.appendChild(opt);
+                    });
 
-                // Render student list with eligibility dots
+                    listFilterSelect.addEventListener('change', (e) => {
+                        currentListFilter = e.target.value;
+                        renderLists();
+                    });
+                }
+                
+                initStudentOverlayFilter(students);
                 renderStudentList(students);
             })
             .catch(err => console.error("Error loading students:", err));
@@ -195,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Get current period session count
             const count = currentPeriod === 'UTS' ? (s.totalGuidanceUTS || 0) : (s.totalGuidanceUAS || 0);
 
-            // Determine eligibility color: red < 2, blue = 2, green >= 3
+
             let colorClass = 'eligibility-red';
             if (count >= requiredSessions) {
                 colorClass = 'eligibility-green';
@@ -215,10 +272,47 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
             studentListContainer.appendChild(card);
+            
+            // Interaction: Click to Overlay AND Filter
+            card.addEventListener('click', () => {
+                // 1. Toggle Overlay Checkbox (Visual Schedule)
+                const overlayCheckbox = document.getElementById(`overlay-student-${s.npm}`);
+                if (overlayCheckbox) {
+                    if (!overlayCheckbox.checked) {
+                        overlayCheckbox.checked = true;
+                        // Trigger change event to update the overlay map
+                        overlayCheckbox.dispatchEvent(new Event('change'));
+                    }
+                    
+                    // Scroll to the Weekly Schedule List Header (<h2>)
+                    const scheduleHeader = document.getElementById('list-schedule-header');
+                    if (scheduleHeader) {
+                        const headerOffset = 100; // 80px fixed nav + buffer
+                        const elementPosition = scheduleHeader.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.scrollY - headerOffset;
+                    
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: "smooth"
+                        });
+                    }
+                }
+
+                // 2. Set List Filter (Upcoming/History)
+                if (listFilterSelect) {
+                    listFilterSelect.value = s.npm;
+                    // Trigger change manually since setting value programmatically doesn't fire it
+                    listFilterSelect.dispatchEvent(new Event('change'));
+                    
+                    // Ensure the correct tab is visible (optional, but good UX)
+                    // If focusing on a student, maybe Upcoming is best default?
+                    // Already default.
+                }
+            });
         });
     }
 
-    // Student search filter
+
     if (studentSearch) {
         studentSearch.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
@@ -229,7 +323,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Note: Overlay filter elements declared at top of file
+
 
     function initStudentOverlayFilter(students) {
         if (!studentOverlayDropdown) return;
@@ -250,12 +344,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     selectedStudentOverlays = selectedStudentOverlays.filter(id => id !== s.npm);
                 }
-                renderWeeklySchedule(currentWeekStart);
+                updateOverlayData();
             });
         });
     }
 
-    // Toggle dropdown visibility
+
     if (studentOverlayBtn) {
         studentOverlayBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -271,13 +365,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Close dropdowns when clicking outside
+
     document.addEventListener('click', () => {
         if (studentOverlayDropdown) studentOverlayDropdown.classList.remove('show');
         if (lecturerOverlayDropdown) lecturerOverlayDropdown.classList.remove('show');
     });
 
-    // --- 2. FILTERS ---
+
     if (listFilterSelect) {
         listFilterSelect.addEventListener('change', (e) => {
             currentListFilter = e.target.value;
@@ -297,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return sNpm === currentListFilter;
     }
 
-    // --- 3. FETCH SCHEDULES ---
+
     function fetchSchedules() {
         const url = `/api/lecturer/schedule/${lecturerCode}`;
         fetch(url)
@@ -324,7 +418,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error fetching schedules:', error));
     }
 
-    // --- 4. RENDER LISTS ---
+
     function renderLists() {
         if (!upcomingList || !historyList) return;
         upcomingList.innerHTML = '';
@@ -358,12 +452,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!hasHistory) historyList.innerHTML = '<li>No session history found.</li>';
     }
 
-    // FIX: Updated to match Student Dashboard styling
+
     function createSessionListItem(session, isPast) {
         const li = document.createElement('li');
         li.className = 'session-item';
 
-        // Status color for left border logic (green future, grey past)
+
         const statusColor = isPast ? '#6c757d' : '#28a745';
 
         let sName = session.studentName || session.studentname;
@@ -382,7 +476,21 @@ document.addEventListener('DOMContentLoaded', function () {
         return li;
     }
 
-    // --- 5. CALENDAR & TABLE ---
+    if (prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', () => {
+            selectedDate.setMonth(selectedDate.getMonth() - 1);
+            renderCalendar(selectedDate);
+        });
+    }
+
+    if (nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', () => {
+            selectedDate.setMonth(selectedDate.getMonth() + 1);
+            renderCalendar(selectedDate);
+        });
+    }
+
+
     function selectDate(date) {
         selectedDate = new Date(date);
         renderCalendar(selectedDate);
@@ -470,6 +578,28 @@ document.addEventListener('DOMContentLoaded', function () {
                     placeSessionInTable(ws, i, 'teaching-schedule');
                 }
             });
+
+
+            studentOverlaySchedules.forEach(s => {
+                if (s.date === dateStr) {
+                    let css = s.type === 'class' ? 'overlay-student-class' : 'overlay-student';
+                    placeSessionInTable(s, i, css);
+                }
+                // Handle student weekly class (StudentSchedule has day_name)
+                if (s.type === 'class' && s.day_name && dayMap[s.day_name] === i) {
+                     placeSessionInTable(s, i, 'overlay-student-class');
+                }
+            });
+            lecturerOverlaySchedules.forEach(l => {
+                if (l.date === dateStr) {
+                    let css = l.type === 'class' ? 'overlay-lecturer-class' : 'overlay-lecturer';
+                    placeSessionInTable(l, i, css);
+                }
+                if (l.day_name && dayMap[l.day_name] === i) {
+                    let css = l.type === 'class' ? 'overlay-lecturer-class' : 'overlay-lecturer';
+                    placeSessionInTable(l, i, css);
+                }
+            });
         }
 
         const dayHeaders = document.querySelectorAll('#schedule-header-days th');
@@ -503,10 +633,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // --- 6. MODAL & SAVE ---
+
+    const deleteReasonContainer = document.getElementById('delete-reason-container');
+    const deleteReasonInput = document.getElementById('delete-reason');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
     function openSessionModal(session, mode) {
         sessionModal.classList.remove('hidden');
         sessionForm.reset();
+
+
+        if (deleteReasonContainer) deleteReasonContainer.classList.add('hidden');
+        if (saveSessionBtn) saveSessionBtn.classList.remove('hidden');
 
         if (mode === 'create') {
             if (sessionModalTitle) sessionModalTitle.textContent = "Book New Session";
@@ -527,10 +665,10 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('session-location').value = session.location;
             document.getElementById('session-notes').value = session.notes || "";
 
-            // Task 4: Populate Additional Lecturer
+
             const addLecturerSelect = document.getElementById('session-additional-lecturer');
             if (addLecturerSelect) {
-                addLecturerSelect.value = session.additionalLecturer || "";
+                addLecturerSelect.value = session.additionalLecturer || session.additionallecturer || "";
             }
 
             let studentVal = session.studentNpm || session.studentnpm;
@@ -538,101 +676,131 @@ document.addEventListener('DOMContentLoaded', function () {
                 studentSelect.value = studentVal;
                 studentSelect.disabled = true;
             }
+
+
+            if (deleteSessionBtn) deleteSessionBtn.classList.remove('hidden');
         }
     }
 
-    // Custom Location Visibility Logic (Moved to Global Scope)
+
     const locationSelect = document.getElementById('session-location');
     const customLocationInput = document.getElementById('session-location-custom');
-
     if (locationSelect && customLocationInput) {
         locationSelect.addEventListener('change', () => {
-            console.log('Location selected:', locationSelect.value); // Debug
             if (locationSelect.value === 'Other') {
                 customLocationInput.style.display = 'block';
                 customLocationInput.required = true;
             } else {
                 customLocationInput.style.display = 'none';
                 customLocationInput.required = false;
+                customLocationInput.value = '';
             }
         });
     }
+    
 
-    if (sessionForm) {
-        sessionForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+    sessionForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const start = document.getElementById('session-time').value;
+        const student = studentSelect ? studentSelect.value : null;
 
-            const timeVal = document.getElementById('session-time').value;
-            if (timeVal < "07:00" || timeVal > "19:00") {
-                alert("Session time must be between 07:00 and 19:00.");
-                return;
+        if (!student) {
+            alert("Please select a student.");
+            return;
+        }
+
+
+        const hour = parseInt(start.split(':')[0]);
+        if (hour < 6 || hour > 23) {
+             alert("Session time must be between 06:00 and 23:00.");
+             return;
+        }
+        const finalTime = `${start.split(':')[0]}:00`;
+        
+        const payload = {
+            id: sessionIdField.value || null,
+            studentNpm: student,
+            date: document.getElementById('session-date').value,
+            time: finalTime,
+            location: document.getElementById('session-location').value === 'Other' 
+                      ? document.getElementById('session-location-custom').value 
+                      : document.getElementById('session-location').value,
+            notes: document.getElementById('session-notes').value,
+            additionalLecturer: document.getElementById('session-additional-lecturer') ? document.getElementById('session-additional-lecturer').value : null,
+            initiator: 'lecturer'
+        };
+
+        fetch('/api/student/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Session saved successfully!');
+                sessionModal.classList.add('hidden');
+                fetchSchedules();
+            } else {
+                response.text().then(text => alert('Failed to save session: ' + text));
             }
-
-            const formData = {
-                id: sessionIdField.value,
-                studentNpm: studentSelect ? studentSelect.value : null,
-                date: document.getElementById('session-date').value,
-                time: timeVal,
-                location: (document.getElementById('session-location').value === 'Other') ?
-                    document.getElementById('session-location-custom').value :
-                    document.getElementById('session-location').value,
-                notes: document.getElementById('session-notes').value,
-                additionalLecturer: document.getElementById('session-additional-lecturer').value // Task 4
-            };
-
-            fetch('/api/student/session', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            })
-                .then(res => {
-                    if (res.ok) {
-                        alert("Session saved successfully!");
-                        sessionModal.classList.add('hidden');
-                        fetchSchedules();
-                    } else {
-                        res.text().then(t => alert("Error: " + t));
-                    }
-                })
-                .catch(err => alert("Network Error: " + err));
-        });
-    }
+        })
+        .catch(err => console.error(err));
+    });
 
     if (deleteSessionBtn) {
         deleteSessionBtn.addEventListener('click', () => {
-            const id = sessionIdField.value;
-            if (!id) return;
 
-            if (confirm("Are you sure you want to delete this session?")) {
-                fetch(`/api/session/${id}`, {
-                    method: 'DELETE'
-                })
-                    .then(res => {
-                        if (res.ok) {
-                            alert("Session deleted.");
-                            sessionModal.classList.add('hidden');
-                            fetchSchedules();
-                        } else {
-                            alert("Failed to delete session.");
-                        }
-                    })
-                    .catch(err => alert("Network Error: " + err));
-            }
+             saveSessionBtn.classList.add('hidden');
+             deleteSessionBtn.classList.add('hidden');
+             if (confirmDeleteBtn) confirmDeleteBtn.classList.remove('hidden');
+        });
+    }
+
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', () => {
+             const id = sessionIdField.value;
+
+             
+
+
+             if (!id) {
+                 alert("Error: Session ID is missing.");
+                 return;
+             }
+
+             console.log("Sending DELETE request for ID:", id);
+             fetch(`/api/session/${id}?initiator=lecturer`, {
+                 method: 'DELETE'
+             })
+             .then(res => {
+                 if (res.ok) {
+                     alert("Session deleted.");
+                     sessionModal.classList.add('hidden');
+                     fetchSchedules();
+                 } else {
+                     res.text().then(text => alert("Failed to delete session: " + text));
+                 }
+             })
+             .catch(err => alert("Network Error: " + err));
         });
     }
 
     if (closeBtn) closeBtn.addEventListener('click', () => sessionModal.classList.add('hidden'));
-
-    if (prevMonthBtn) {
-        prevMonthBtn.addEventListener('click', () => {
-            selectedDate.setMonth(selectedDate.getMonth() - 1);
-            selectDate(selectedDate);
+    // Navigation Listeners
+    if (prevWeekBtn) {
+        prevWeekBtn.addEventListener('click', () => {
+             currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+             updateWeekDisplay();
+             renderWeeklySchedule(currentWeekStart);
         });
     }
-    if (nextMonthBtn) {
-        nextMonthBtn.addEventListener('click', () => {
-            selectedDate.setMonth(selectedDate.getMonth() + 1);
-            selectDate(selectedDate);
+
+    if (nextWeekBtn) {
+        nextWeekBtn.addEventListener('click', () => {
+             currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+             updateWeekDisplay();
+             renderWeeklySchedule(currentWeekStart);
         });
     }
 
@@ -640,7 +808,26 @@ document.addEventListener('DOMContentLoaded', function () {
         addSessionBtn.addEventListener('click', () => openSessionModal(null, 'create'));
     }
 
-    // --- WEEK NAVIGATION ---
+
+
+    function selectDate(date) {
+        selectedDate = new Date(date);
+        renderCalendar(selectedDate);
+        document.getElementById('session-date').value = toLocalDateString(selectedDate);
+        
+
+        currentWeekStart = new Date(selectedDate);
+        currentWeekStart.setDate(selectedDate.getDate() - selectedDate.getDay());
+        updateWeekDisplay();
+        renderWeeklySchedule(currentWeekStart);
+    }
+    
+
+    renderCalendar(selectedDate);
+    fetchSchedules(); 
+    fetchStudents();
+
+
 
     function updateWeekDisplay() {
         const endOfWeek = new Date(currentWeekStart);
@@ -651,19 +838,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (weekDisplay) {
             weekDisplay.textContent = `🗓️ ${startStr} - ${endStr}`;
         }
-    }
-
-    function navigateWeek(direction) {
-        currentWeekStart.setDate(currentWeekStart.getDate() + (direction * 7));
-        updateWeekDisplay();
-        renderWeeklySchedule(currentWeekStart);
-    }
-
-    if (prevWeekBtn) {
-        prevWeekBtn.addEventListener('click', () => navigateWeek(-1));
-    }
-    if (nextWeekBtn) {
-        nextWeekBtn.addEventListener('click', () => navigateWeek(1));
     }
 
     // Initialize week display

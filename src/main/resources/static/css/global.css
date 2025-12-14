@@ -99,53 +99,7 @@ header nav a:hover {
     background-color: #28a745;
 }
 
-/* --- Notification Area (Lecturer/Student) --- */
-.notification-area {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-    margin-left: 20px;
-}
 
-#notification-bell {
-    font-size: 1.5em;
-    padding: 5px;
-}
-
-.badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    padding: 2px 6px;
-    border-radius: 50%;
-    background-color: red;
-    color: white;
-    font-size: 0.7em;
-}
-
-.dropdown-content {
-    position: absolute;
-    top: 40px;
-    right: 0;
-    background-color: white;
-    min-width: 250px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-    border-radius: 4px;
-    padding: 10px;
-}
-
-.dropdown-content p {
-    margin: 5px 0;
-    padding: 5px;
-    border-bottom: 1px solid #eee;
-}
-
-.dropdown-content .unread {
-    font-weight: bold;
-    color: black;
-    background-color: #e9ecef;
-}
 
 .hidden {
     display: none;
@@ -366,10 +320,36 @@ header nav a:hover {
     box-sizing: border-box;
 }
 
+header nav {
+    display: flex;
+    align-items: center; /* Fix alignment vertically */
+    gap: 20px; /* Space between Inbox and Logout */
+}
+
+/* Ensure the div wrapping the inbox link doesn't break alignment */
+.inbox-area {
+    display: flex;
+    align-items: center;
+}
+
+header nav div a {
+    font-size: 1.2rem; /* Normalize font size */
+}
+
+
+header nav a {
+    color: white;
+    text-decoration: none;
+    /* margin-left: 20px; Removed in favor of gap */
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 1.2rem;
+}
+
 #save-session-btn,
 #execute-import-btn {
-    width: 100%;
-    margin-top: 10px;
+    /* width: 100%; REMOVED to allow side-by-side with delete button */
+    /* margin-top: 10px; Removed to correct alignment in modals */
 }
 
 .delete-btn {
@@ -379,18 +359,22 @@ header nav a:hover {
     padding: 10px 15px;
     border-radius: 4px;
     cursor: pointer;
-    width: 100%;
     margin-top: 5px;
 }
 
 /* --- Custom Logout Modal Styles --- */
 .modal-actions {
     display: flex;
-    justify-content: flex-end;
-    /* Pushes buttons to the right */
-    gap: 10px;
-    /* Space between buttons */
+    justify-content: space-between;
+    gap: 15px;
     margin-top: 20px;
+}
+
+.modal-actions button,
+.modal-actions .delete-btn,
+.modal-actions .primary-btn {
+    flex: 1; /* Force equal width */
+    margin-top: 0; /* Align perfectly */
 }
 
 /* Optional: Style the primary and cancel buttons */
@@ -1135,4 +1119,53 @@ header nav a:hover {
 .overlay-checkbox-item label {
     cursor: pointer;
     flex: 1;
+}
+/* --- Overlay Syles --- */
+#weekly-schedule-table td.overlay-student {
+    background-color: #d6d8db; /* Gray */
+    color: #1b1e21;
+    font-size: 0.8em;
+    padding: 2px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+#weekly-schedule-table td.overlay-student-class {
+    background-color: #17a2b8; /* Cyan (Same as Study Schedule) */
+    color: white;
+    font-size: 0.8em;
+    padding: 2px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+#weekly-schedule-table td.overlay-lecturer {
+    background-color: #c6c8ca; /* Darker Gray */
+    color: #1b1e21;
+    font-size: 0.8em;
+    padding: 2px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+#weekly-schedule-table td.overlay-lecturer-class {
+    background-color: #28a745; /* Green (Same as Teaching Schedule) */
+    color: white;
+    font-size: 0.8em;
+    padding: 2px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }

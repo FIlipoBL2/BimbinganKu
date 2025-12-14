@@ -56,16 +56,24 @@ public class ScheduleRepository {
     public List<Map<String, Object>> findScheduleByStudent(String npm) {
         String guidanceSql = """
                     SELECT
-                        gs.guidance_id as id,
+                        gs.guidance_id as "id",
                         gs.date,
-                        TO_CHAR(gs.hourStart, 'HH24:MI') as time,
-                        t.topicName as topic,
-                        t.topicCode as topicCode,
-                        gs.place as location,
-                        gs.notes,
-                        'guidance' as type
+                        TO_CHAR(gs.hourStart, 'HH24:MI') as "time",
+                        t.topicName as "topic",
+                        t.topicCode as "topicCode",
+                        gs.place as "location",
+                        gs.notes as "notes",
+                        gs.additionalLecturer as "additionalLecturer",
+                        u_main.name as "mainLecturerName",
+                        u_add.name as "additionalLecturerName",
+                        u_student.name as "studentName",
+                        t.NPM as "studentNpm",
+                        'guidance' as "type"
                     FROM GuidanceSchedule gs
                     JOIN Topic t ON gs.topicCode = t.topicCode
+                    JOIN Users u_main ON t.lecturerCode = u_main.id
+                    JOIN Users u_student ON t.NPM = u_student.id
+                    LEFT JOIN Users u_add ON gs.additionalLecturer = u_add.id
                     WHERE t.NPM = ?
                 """;
         List<Map<String, Object>> schedules = jdbcTemplate.queryForList(guidanceSql, npm);
@@ -104,17 +112,17 @@ public class ScheduleRepository {
                         u.name as studentName,
                         gs.place as location,
                         gs.notes,
-                        gs.additionalLecturer, -- Added this!
+                        gs.additionalLecturer as "additionalLecturer",
                         'guidance' as type
                     FROM GuidanceSchedule gs
                     INNER JOIN Topic t ON gs.topicCode = t.topicCode
                     INNER JOIN Students s ON t.NPM = s.NPM
                     INNER JOIN Users u ON s.NPM = u.id
-                    WHERE t.lecturerCode = ?
+                    WHERE t.lecturerCode = ? OR gs.additionalLecturer = ?
                 """;
 
         try {
-            List<Map<String, Object>> schedules = jdbcTemplate.queryForList(guidanceSql, code);
+            List<Map<String, Object>> schedules = jdbcTemplate.queryForList(guidanceSql, code, code);
 
             String classSql = """
                         SELECT

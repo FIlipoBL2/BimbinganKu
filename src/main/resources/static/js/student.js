@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    // --- 1. CONFIG & STATE ---
+
     const dayMap = { "Sunday": 0, "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5, "Saturday": 6 };
     let schedules = {};
     let weeklySchedules = [];
@@ -9,16 +9,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const npmField = document.getElementById('user-id');
     const npm = npmField ? npmField.value : null;
 
-    // Elements
+
     const calendarGrid = document.getElementById('calendar-grid');
     const monthYearDisplay = document.getElementById('month-year-display');
     const prevMonthBtn = document.getElementById('prev-month');
     const nextMonthBtn = document.getElementById('next-month');
     const weeklyTableBody = document.getElementById('schedule-body');
 
-    // List Elements
+
     const upcomingList = document.getElementById('upcoming-list');
-    const historyList = document.getElementById('history-list'); // New
+    const historyList = document.getElementById('history-list');
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
 
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const saveSessionBtn = document.getElementById('save-session-btn');
     const sessionIdField = document.getElementById('session-id');
 
-    // Time Restriction
+
     const timeInput = document.getElementById('session-time');
     if (timeInput) {
         timeInput.min = "07:00";
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
         timeInput.step = "3600";
     }
 
-    // Hide Topic Input
+
     const topicInput = document.getElementById('session-topic');
     if (topicInput) {
         topicInput.style.display = 'none';
@@ -47,24 +47,24 @@ document.addEventListener('DOMContentLoaded', function () {
         if (topicLabel) topicLabel.style.display = 'none';
     }
 
-    // Main Lecturer Code (student's assigned thesis lecturer)
+
     const mainLecturerCode = document.getElementById('main-lecturer-code')?.value || '';
     const lecturerScheduleFilter = document.getElementById('lecturer-schedule-filter');
 
-    // Overlay schedule state
-    let lecturerOverlaySchedules = []; // Stores selected lecturer's teaching schedule
+
+    let lecturerOverlaySchedules = [];
     let selectedLecturerCode = 'all';
 
-    // --- INIT ---
+
     if (npm) {
         console.log("Loaded Student JS for NPM:", npm);
         fetchSchedules();
-        fetchAllLecturers(); // Fetch all lecturers for filter dropdown
+        fetchAllLecturers();
     }
 
     renderCalendar(selectedDate);
 
-    // Fetch all lecturers and populate dropdown with Main Lecturer marking
+
     function fetchAllLecturers() {
         fetch('/api/admin/lecturers')
             .then(res => res.json())
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 lecturers.forEach(l => {
                     const opt = document.createElement('option');
                     opt.value = l.lecturerCode;
-                    // Mark the student's main lecturer distinctly
+
                     if (l.lecturerCode === mainLecturerCode) {
                         opt.textContent = `${l.name} (Main Lecturer)`;
                         opt.style.fontWeight = 'bold';
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(err => console.error("Error loading lecturers:", err));
     }
 
-    // Lecturer filter dropdown event listener
+
     if (lecturerScheduleFilter) {
         lecturerScheduleFilter.addEventListener('change', (e) => {
             selectedLecturerCode = e.target.value;
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Fetch a specific lecturer's schedule and overlay it
+
     function fetchLecturerScheduleOverlay(lecturerCode) {
         fetch(`/api/lecturer/schedule/${lecturerCode}`)
             .then(res => res.json())
@@ -112,10 +112,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 lecturerOverlaySchedules = [];
                 data.forEach(session => {
                     if (session.date) {
-                        // Store date-based sessions
+
                         lecturerOverlaySchedules.push(session);
                     } else if (session.day_name && dayMap[session.day_name] !== undefined) {
-                        // Store recurring weekly sessions
+
                         session.dayIndex = dayMap[session.day_name];
                         lecturerOverlaySchedules.push(session);
                     }
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(err => console.error("Error loading lecturer schedule:", err));
     }
 
-    // --- HELPER: Local Date String ---
+
     function toLocalDateString(date) {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return target < today;
     }
 
-    // --- TABS LOGIC ---
+
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             tabBtns.forEach(b => b.classList.remove('active'));
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // --- 2. FETCH DATA ---
+
     function fetchSchedules() {
         fetch(`/api/student/schedule/${npm}`)
             .then(response => {
@@ -183,13 +183,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
                 renderCalendar(selectedDate);
-                renderLists(); // Render both lists
+                renderLists();
                 selectDate(selectedDate);
             })
             .catch(error => console.error('Error:', error));
     }
 
-    // --- 3. CALENDAR ---
+
     function selectDate(date) {
         selectedDate = new Date(date);
         renderCalendar(selectedDate);
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // --- 4. TABLE ---
+
     function renderWeeklySchedule(startOfWeek) {
         if (!weeklyTableBody) return;
         const rows = weeklyTableBody.querySelectorAll('tr');
@@ -263,20 +263,20 @@ document.addEventListener('DOMContentLoaded', function () {
             currentDay.setDate(startOfWeek.getDate() + i);
             const dateStr = toLocalDateString(currentDay);
 
-            // First, render lecturer overlay schedules (underneath student sessions)
+
             if (lecturerOverlaySchedules.length > 0) {
                 lecturerOverlaySchedules.forEach(os => {
                     if (os.date && os.date === dateStr) {
-                        // Date-based session (guidance sessions)
+
                         placeSessionInTable(os, i, 'teaching-schedule');
                     } else if (os.dayIndex !== undefined && os.dayIndex === i) {
-                        // Recurring class schedule
+
                         placeSessionInTable(os, i, 'blocked-schedule');
                     }
                 });
             }
 
-            // Then render student's own sessions (on top)
+
             if (schedules[dateStr]) {
                 schedules[dateStr].forEach(session => {
                     placeSessionInTable(session, i, 'session');
@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // --- 5. RENDER LISTS ---
+
     function renderLists() {
         if (!upcomingList || !historyList) return;
         upcomingList.innerHTML = '';
@@ -365,20 +365,80 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!hasHistory) historyList.innerHTML = '<li>No session history found.</li>';
     }
 
-    // --- 6. MODAL & SAVE ---
+
+
+    const deleteSessionBtn = document.getElementById('delete-session-btn');
+    const deleteReasonContainer = document.getElementById('delete-reason-container');
+    const deleteReasonInput = document.getElementById('delete-reason');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
+
+    const mainLecturerNameVal = document.getElementById('main-lecturer-name-val')?.value || "Main Lecturer";
+    const mainLecturerInput = document.getElementById('session-main-lecturer');
+    
+
+    const notesLabel = document.querySelector('label[for="session-notes"]');
+    const notesInput = document.getElementById('session-notes');
+
     function openSessionModal(session = null, mode = 'create') {
         sessionModal.classList.remove('hidden');
         sessionForm.reset();
+        
+
+        if (deleteReasonContainer) deleteReasonContainer.classList.add('hidden');
+        if (saveSessionBtn) saveSessionBtn.classList.remove('hidden');
 
         if (mode === 'create') {
             if (sessionModalTitle) sessionModalTitle.textContent = "Book New Session";
             sessionIdField.value = "";
             document.getElementById('session-date').value = toLocalDateString(selectedDate);
             saveSessionBtn.classList.remove('hidden');
+            if (deleteSessionBtn) deleteSessionBtn.classList.add('hidden');
+            
+
+            if (notesLabel) notesLabel.style.display = 'none';
+            if (notesInput) notesInput.style.display = 'none';
+
+
+            if (mainLecturerInput) {
+                mainLecturerInput.value = mainLecturerNameVal;
+                mainLecturerInput.style.display = 'block';
+                document.querySelector('label[for="session-main-lecturer"]').style.display = 'block';
+            }
+            
+
+            if (additionalLecturerSelect) {
+                additionalLecturerSelect.value = ""; 
+                additionalLecturerSelect.disabled = false;
+                additionalLecturerSelect.parentElement.classList.remove('hidden'); 
+                additionalLecturerSelect.style.display = 'block';
+                document.querySelector('label[for="session-additional-lecturer"]').style.display = 'block';
+            }
+            if (attendeesContainer) attendeesContainer.classList.add('hidden');
+
         }
         else if (mode === 'edit') {
             sessionIdField.value = session.id;
             const past = isPast(session.date);
+
+
+            if (notesLabel) notesLabel.style.display = 'block';
+            if (notesInput) {
+                notesInput.style.display = 'block';
+                notesInput.value = session.notes || "";
+            }
+
+
+            if (mainLecturerInput) {
+                mainLecturerInput.value = session.mainLecturerName || mainLecturerNameVal;
+                mainLecturerInput.style.display = 'block';
+                document.querySelector('label[for="session-main-lecturer"]').style.display = 'block';
+            }
+
+
+             if (additionalLecturerSelect) {
+                additionalLecturerSelect.value = session.additionalLecturer || "";
+            }
 
             if (past) {
                 if (sessionModalTitle) sessionModalTitle.textContent = "Session Details (Completed)";
@@ -386,73 +446,149 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('session-time').value = session.time.substring(0, 5);
                 document.getElementById('session-location').value = session.location;
                 saveSessionBtn.classList.add('hidden');
+                if (deleteSessionBtn) deleteSessionBtn.classList.add('hidden');
+                
+
+                 if (additionalLecturerSelect) {
+                    additionalLecturerSelect.style.display = 'none';
+                    document.querySelector('label[for="session-additional-lecturer"]').style.display = 'none';
+                }
+
+                if (mainLecturerInput) {
+                     mainLecturerInput.style.display = 'none';
+                     document.querySelector('label[for="session-main-lecturer"]').style.display = 'none';
+                }
+
+                if (attendeesContainer) {
+                    attendeesContainer.classList.remove('hidden');
+                    let attendeesText = session.mainLecturerName || 'Main Lecturer';
+                    if (session.additionalLecturerName) {
+                        attendeesText += ` & ${session.additionalLecturerName}`;
+                    }
+                    document.getElementById('session-attendees').value = attendeesText;
+                }
+
             } else {
                 if (sessionModalTitle) sessionModalTitle.textContent = "Update Session";
                 saveSessionBtn.classList.remove('hidden');
                 document.getElementById('session-date').value = session.date;
                 document.getElementById('session-time').value = session.time.substring(0, 5);
                 document.getElementById('session-location').value = session.location;
+                
+
+                if (additionalLecturerSelect) {
+                    additionalLecturerSelect.style.display = 'block';
+                    document.querySelector('label[for="session-additional-lecturer"]').style.display = 'block';
+                }
+                if (attendeesContainer) attendeesContainer.classList.add('hidden'); 
+
+                
+
+                if (deleteSessionBtn) deleteSessionBtn.classList.remove('hidden');
             }
         }
     }
 
-    // Custom Location Visibility Logic (Moved to Global Scope)
+
     const locationSelect = document.getElementById('session-location');
     const customLocationInput = document.getElementById('session-location-custom');
-
     if (locationSelect && customLocationInput) {
         locationSelect.addEventListener('change', () => {
-            console.log('Location selected:', locationSelect.value); // Debug
             if (locationSelect.value === 'Other') {
                 customLocationInput.style.display = 'block';
                 customLocationInput.required = true;
             } else {
                 customLocationInput.style.display = 'none';
                 customLocationInput.required = false;
+                customLocationInput.value = '';
             }
         });
     }
+    const additionalLecturerSelect = document.getElementById('session-additional-lecturer');
+    const attendeesContainer = document.getElementById('attendees-container');
 
-    if (sessionForm) {
-        sessionForm.addEventListener('submit', (e) => {
-            e.preventDefault();
 
-            const timeVal = document.getElementById('session-time').value;
-            // UPDATE: Check 19:00
-            if (timeVal < "07:00" || timeVal > "19:00") {
-                alert("Session time must be between 07:00 and 19:00.");
-                return;
+    sessionForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const start = document.getElementById('session-time').value;
+
+
+        const hour = parseInt(start.split(':')[0]);
+        if (hour < 7 || hour > 19) {
+             alert("Session time must be between 07:00 and 19:00.");
+             return;
+        }
+
+
+        const finalTime = `${start.split(':')[0]}:00`;
+
+        const payload = {
+            id: sessionIdField.value || null,
+            studentNpm: npm,
+            date: document.getElementById('session-date').value,
+            time: finalTime,
+            topic: "Guidance Session",
+            location: document.getElementById('session-location').value === 'Other' 
+                      ? document.getElementById('session-location-custom').value 
+                      : document.getElementById('session-location').value,
+            additionalLecturer: additionalLecturerSelect ? additionalLecturerSelect.value : null,
+            initiator: 'student'
+        };
+
+        fetch('/api/student/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Session saved successfully!');
+                sessionModal.classList.add('hidden');
+                fetchSchedules();
+            } else {
+                response.text().then(text => alert('Failed to save session: ' + text));
             }
+        })
+        .catch(err => console.error(err));
+    });
 
-            const formData = {
-                id: sessionIdField.value,
-                studentNpm: npm,
-                date: document.getElementById('session-date').value,
-                time: timeVal,
-                location: (document.getElementById('session-location').value === 'Other') ?
-                    document.getElementById('session-location-custom').value :
-                    document.getElementById('session-location').value,
-            };
 
-            fetch('/api/student/session', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            })
-                .then(res => {
-                    if (res.ok) {
-                        alert("Session booked successfully!");
-                        sessionModal.classList.add('hidden');
-                        fetchSchedules();
-                    } else {
-                        res.text().then(t => alert("Error: " + t));
-                    }
-                })
-                .catch(err => alert("Network Error: " + err));
+    if (deleteSessionBtn) {
+        deleteSessionBtn.addEventListener('click', () => {
+
+             saveSessionBtn.classList.add('hidden');
+             deleteSessionBtn.classList.add('hidden');
+             if (confirmDeleteBtn) confirmDeleteBtn.classList.remove('hidden');
         });
     }
 
-    // --- LISTENERS ---
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', () => {
+             const id = sessionIdField.value;
+
+             
+             if (!id) {
+                 alert("Error: Session ID is missing. Please close and reopen the modal.");
+                 return;
+             }
+
+             fetch(`/api/session/${id}?initiator=student`, {
+                 method: 'DELETE'
+             })
+             .then(res => {
+                 if (res.ok) {
+                     alert("Session deleted.");
+                     sessionModal.classList.add('hidden');
+                     fetchSchedules();
+                 } else {
+                     alert("Failed to delete session.");
+                 }
+             })
+             .catch(err => alert("Network Error: " + err));
+        });
+    }
+
+
     if (requestSessionBtn) requestSessionBtn.addEventListener('click', () => openSessionModal(null, 'create'));
     if (closeBtn) closeBtn.addEventListener('click', () => sessionModal.classList.add('hidden'));
 

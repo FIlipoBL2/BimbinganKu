@@ -45,10 +45,12 @@ CREATE TABLE Lecturers (
 -- INBOX: Notifications
 CREATE TABLE Inbox (
     inbox_ID SERIAL PRIMARY KEY,
+    user_id VARCHAR(50) NOT NULL, -- Renamed from implicit recipient_id idea to user_id
     date DATE NOT NULL,
     time TIME NOT NULL,
-    msgType VARCHAR(50),
-    message TEXT
+    msgType VARCHAR(50), -- 'read' or 'unread'
+    message TEXT,
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
 
 -- TOPIC: Links Student <-> Lecturer
@@ -160,12 +162,12 @@ INSERT INTO Students (npm, totalGuidanceUTS, totalGuidanceUAS) VALUES
 -- =============================================
 -- INBOX TABLE (Notifications)
 -- =============================================
-INSERT INTO Inbox (date, time, msgType, message) VALUES 
-('2025-12-09', '08:00:00', 'reminder', 'Jangan lupa bimbingan hari ini!'),
-('2025-12-09', '09:30:00', 'info', 'Jadwal bimbingan minggu depan sudah tersedia'),
-('2025-12-08', '14:00:00', 'alert', 'Deadline pengumpulan Bab 2: 15 Desember 2025'),
-('2025-12-07', '10:00:00', 'reminder', 'Revisi Bab 1 sudah selesai direview'),
-('2025-12-06', '16:00:00', 'info', 'Selamat datang di BimbinganKu!');
+INSERT INTO Inbox (user_id, date, time, msgType, message) VALUES 
+('6182101001', '2025-12-09', '08:00:00', 'unread', 'Jangan lupa bimbingan hari ini!'),
+('6182101001', '2025-12-09', '09:30:00', 'read', 'Jadwal bimbingan minggu depan sudah tersedia'),
+('6182101001', '2025-12-08', '14:00:00', 'unread', 'Deadline pengumpulan Bab 2: 15 Desember 2025'),
+('6182101001', '2025-12-07', '10:00:00', 'read', 'Revisi Bab 1 sudah selesai direview'),
+('6182101001', '2025-12-06', '16:00:00', 'unread', 'Selamat datang di BimbinganKu!');
 
 -- =============================================
 -- TOPIC TABLE (Links Student <-> Lecturer)
